@@ -1,11 +1,17 @@
-import { BarsukLegalView } from "@/components/legal/LegalViews";
+import Link from "next/link";
 
-export const metadata = {
-  title: "Project Barsuk quantum pen — legal notice | ANCAP",
-  description:
-    "AETERNA Project Barsuk rail: licensed secure-comms partner architecture literacy only. Not a Parker product, not a weapon, not unbreakable crypto, not a CE/FDA device.",
-};
-
-export default function LegalBarsukPage() {
-  return <BarsukLegalView />;
+export default function LegalBarsukRetiredPage() {
+  return (
+    <main style={{ maxWidth: 640, margin: "48px auto", padding: "0 24px", lineHeight: 1.7 }}>
+      <h1 style={{ fontWeight: 800 }}>Project Barsuk retired</h1>
+      <p style={{ color: "var(--text-muted)" }}>
+        This fiction / secure-comms literacy SKU is no longer offered on the public launch surface.
+      </p>
+      <p>
+        <Link href="/aeterna">AETERNA</Link>
+        {" · "}
+        <Link href="/legal">Legal hub</Link>
+      </p>
+    </main>
+  );
 }

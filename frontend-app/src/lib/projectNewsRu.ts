@@ -33,14 +33,6 @@ export const PROJECT_NEWS_RU: ProjectNewsItem[] = [
     href: "https://github.com/dragoncattrx-hub/ancap/blob/master/docs/ORACLE_CLOUD_ACP_NODE_PLAN.md",
   },
   {
-    id: "dark-matter-auction",
-    date: "2026-09-14",
-    title: "Аукцион тёмной материи",
-    summary:
-      "Новый /dark-matter — ACP-торги за символические титулы halo, filament, cluster, детекторов и космологии (featured Milky Way halo от 22 000 000 ACP). Не физическая тёмная материя и не сертификат детекции. Юр. текст: /legal/dark-matter.",
-    href: "/dark-matter",
-  },
-  {
     id: "counsel-worldwide-legal-services",
     date: "2026-09-14",
     title: "Юридические услуги в любой точке мира",
@@ -71,22 +63,6 @@ export const PROJECT_NEWS_RU: ProjectNewsItem[] = [
     summary:
       "На /aeterna — партнёрский бриф «Проект Установки» за 72 000 ACP: грамотность линии высокобелкового натурально-синтетического молока и неонатальной барокамеры. Это не смесь от ANCAP, не CE/FDA-устройство, не домашняя HBO и не гарантия клинического исхода. Страховка: neonatal_install. Юр. текст: /legal/installation-project.",
     href: "/aeterna#installation-project",
-  },
-  {
-    id: "aeterna-barsuk-quantum-pen",
-    date: "2026-09-13",
-    title: "AETERNA: Project Barsuk — бриф квантовой ручки",
-    summary:
-      "На /aeterna — партнёрский бриф для лицензированного secure-comms партнёра: ручка-формфактор, квантовая крипто-грамотность, сенсоры и умные чернила за 36 000 ACP. Инфографика — художественная / архитектурная грамотность. Это не продукт Parker, не оружие, не «невзламываемая» криптография, не изделие CE/FDA и не полевой комплект от ANCAP. Юр. текст: /legal/barsuk.",
-    href: "/aeterna#barsuk",
-  },
-  {
-    id: "aeterna-teleport-earphones",
-    date: "2026-09-13",
-    title: "AETERNA: наушники телепортации — грамотность медэвакуации",
-    summary:
-      "На /aeterna — партнёрский бриф AIRPODS T-2026 / teleport-earphones: художественная грамотность медицинской эвакуации и квантовых коммуникаций за 58 000 ACP. Это не продукт Apple, не реальный телепорт, не военная система оружия и не гарантия эвакуации. Акцент — спасение / медэвак, не наступательные сценарии. Юр. текст: /legal/teleport-earphones.",
-    href: "/aeterna#teleport-earphones",
   },
   {
     id: "aeterna-pulmopure-subscription",

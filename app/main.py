@@ -97,7 +97,6 @@ from app.api.routers import (
     space_auction,
     animal_auction,
     flora_auction,
-    dark_matter_auction,
     insurance,
     arena,
     exponential_growth,
@@ -319,7 +318,7 @@ ALL_ROUTERS = [
     space_auction.router,
     animal_auction.router,
     flora_auction.router,
-    dark_matter_auction.router,
+    # dark_matter_auction retired from public launch surface (routes unmounted).
     insurance.router,
     arena.router,
     exponential_growth.router,

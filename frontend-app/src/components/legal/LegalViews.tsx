@@ -135,12 +135,9 @@ export function LegalHubView() {
     { href: "/legal/tesla-coil-party", title: "teslaCoilPartyLink", body: "hubCardTeslaCoilParty" },
     { href: "/legal/antique-fire-restore", title: "antiqueFireRestoreLink", body: "hubCardAntiqueFireRestore" },
     { href: "/legal/pulmopure", title: "pulmopureLink", body: "hubCardPulmopure" },
-    { href: "/legal/barsuk", title: "barsukLink", body: "hubCardBarsuk" },
-    { href: "/legal/teleport-earphones", title: "teleportEarphonesLink", body: "hubCardTeleportEarphones" },
     { href: "/legal/installation-project", title: "installationProjectLink", body: "hubCardInstallationProject" },
     { href: "/legal/dna-pheromone-perfume", title: "dnaPheromonePerfumeLink", body: "hubCardDnaPheromonePerfume" },
     { href: "/legal/stardust", title: "stardustLink", body: "hubCardStardust" },
-    { href: "/legal/dark-matter", title: "darkMatterLink", body: "hubCardDarkMatter" },
     { href: "/legal/refunds", title: "refundsLink", body: "hubCardRefunds" },
     { href: "/legal/welcome-grant", title: "welcomeGrantLink", body: "hubCardWelcomeGrant" },
     { href: "/legal/humanitarian", title: "humanitarianLink", body: "hubCardHumanitarian" },
@@ -1833,8 +1830,6 @@ export function SiteLegalFooter() {
     { href: "/legal/tesla-coil-party", label: "footerTeslaCoilParty" },
     { href: "/legal/antique-fire-restore", label: "footerAntiqueFireRestore" },
     { href: "/legal/pulmopure", label: "footerPulmopure" },
-    { href: "/legal/barsuk", label: "footerBarsuk" },
-    { href: "/legal/teleport-earphones", label: "footerTeleportEarphones" },
     { href: "/legal/installation-project", label: "footerInstallationProject" },
     { href: "/legal/stardust", label: "footerStardust" },
     { href: "/legal/refunds", label: "footerRefunds" },
@@ -1878,10 +1873,6 @@ export function SiteLegalFooter() {
             support@ancap.cloud
           </a>
         </div>
-        <p style={{ marginTop: 10, fontSize: "0.72rem", opacity: 0.72, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
-          Easter egg (not a product claim): any “time machine” or “time lighter” lore is a joke for the
-          footer — not a launch feature and not investment advice.
-        </p>
       </div>
     </footer>
   );

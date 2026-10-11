@@ -157,20 +157,6 @@ _PRODUCTS: tuple[dict[str, Any], ...] = (
         "asset_ref_types": ["space_auction_lot", "ownership_certificate"],
     },
     {
-        "coverage_class": "dark_matter_title",
-        "label": "Dark matter title / cosmology desk",
-        "description": (
-            "Parametric cover for dark-matter auction title-desk RFQs "
-            "(halo/filament/cluster/detector literacy — not physical DM ownership)."
-        ),
-        "pool_id": "pool-dark-matter",
-        "min": "500",
-        "max": "25000000",
-        "premium_bps": 95,
-        "term_days": 365,
-        "asset_ref_types": ["dark_matter_auction_lot"],
-    },
-    {
         "coverage_class": "perimeter_cleanup",
         "label": "Perimeter cleanup / decontamination",
         "description": "Parametric cover for licensed perimeter cleanup jobs (all contamination classes) booked via /perimeter.",

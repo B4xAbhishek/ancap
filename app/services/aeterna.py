@@ -57,8 +57,6 @@ AETERNA_WORKFLOW_SLUGS = [
     "aeterna-down-syndrome-support",
     "aeterna-substance-coding",
     "aeterna-pulmopure-subscription",
-    "aeterna-barsuk-quantum-pen",
-    "aeterna-teleport-earphones",
     "aeterna-installation-project",
     "aeterna-dna-pheromone-perfume",
 ]
@@ -236,8 +234,6 @@ AETERNA_INTENT_DEFAULT_SLUGS: dict[str, str] = {
     AeternaIntentKind.down_syndrome_support_brief.value: DOWN_SYNDROME_SUPPORT_SLUG,
     AeternaIntentKind.substance_coding_brief.value: SUBSTANCE_CODING_SLUG,
     AeternaIntentKind.pulmopure_subscription.value: PULMOPURE_SLUG,
-    AeternaIntentKind.barsuk_quantum_pen_brief.value: BARSUK_SLUG,
-    AeternaIntentKind.teleport_earphones_brief.value: TELEPORT_SLUG,
     AeternaIntentKind.installation_project_brief.value: INSTALLATION_PROJECT_SLUG,
     AeternaIntentKind.dna_pheromone_perfume_bottle.value: DNA_PHEROMONE_PERFUME_SLUG,
 }
@@ -789,9 +785,8 @@ async def division_status(session: AsyncSession) -> AeternaStatusPublic:
             "Vascular Care+ gas-light rail, Vascular Care ultrasound/RF rail, needle-free transdermal pistol, "
             "M-receptor delivery subscription, artificial oxygen-carrier brief, "
             "synthetic-blood / Black Mamba peptide architecture brief, ADHD / СДВГ support brief, "
-            "PulmoPure lung-care subscription, Project Barsuk quantum-pen brief, teleport-earphones medevac "
-            "fiction brief, Installation Project neonatal nutrition / hyperbaric partner brief, licensed "
-            "longevity partners."
+            "PulmoPure lung-care subscription, Installation Project neonatal nutrition / hyperbaric "
+            "partner brief, licensed longevity partners."
         ),
         vault_entries=int(vaults or 0),
         intent_orders=int(orders or 0),
@@ -898,16 +893,8 @@ async def division_status(session: AsyncSession) -> AeternaStatusPublic:
             "CE/FDA device, not ozone therapy, not medical-gas compounding, and not a guaranteed "
             "tar-clearance or 'clean lungs' outcome."
         ),
-        barsuk_note=(
-            "Project Barsuk listings are licensed secure-comms partner intakes for pen-form cryptography "
-            "and sensor literacy. Infographics are fiction — not a Parker product, not a weapon, and not "
-            "unbreakable crypto sold by ANCAP."
-        ),
-        teleport_earphones_note=(
-            "Teleport-earphones listings are licensed partner intakes for fictional medical-evacuation "
-            "architecture. Infographics are sci-fi — not an Apple product, not a real teleporter, and not "
-            "a military weapon system."
-        ),
+        barsuk_note="Retired from public launch catalog.",
+        teleport_earphones_note="Retired from public launch catalog.",
         installation_project_note=(
             "Installation Project listings are licensed neonatology / infant-nutrition partner intakes for "
             "high-protein milk-line and neonatal hyperbaric-chamber literacy. Infographics are conceptual — "
@@ -966,6 +953,16 @@ async def create_intent_order(
 ) -> AeternaIntentOrderPublic:
     if not _feature_enabled():
         raise HTTPException(status_code=503, detail="AETERNA feature flag disabled")
+    if body.intent_kind == AeternaIntentKind.barsuk_quantum_pen_brief:
+        raise HTTPException(
+            status_code=410,
+            detail="barsuk_quantum_pen_brief retired from public launch catalog",
+        )
+    if body.intent_kind == AeternaIntentKind.teleport_earphones_brief:
+        raise HTTPException(
+            status_code=410,
+            detail="teleport_earphones_brief retired from public launch catalog",
+        )
     if org_id:
         await require_org_role(session, org_id, user_id, OrgRoleEnum.member)
     if body.vault_id:
@@ -1259,34 +1256,6 @@ async def create_intent_order(
         for key, value in PULMOPURE_META.items():
             meta.setdefault(key, value)
 
-    if body.intent_kind == AeternaIntentKind.barsuk_quantum_pen_brief:
-        if slug and slug != BARSUK_SLUG:
-            raise HTTPException(
-                status_code=400,
-                detail="barsuk_quantum_pen_brief requires workflow_slug aeterna-barsuk-quantum-pen",
-            )
-        slug = BARSUK_SLUG
-        if body.budget_acp < BARSUK_PRICE_ACP:
-            raise HTTPException(
-                status_code=400,
-                detail="barsuk_quantum_pen_brief budget_acp must be at least 36000 ACP",
-            )
-        for key, value in BARSUK_META.items():
-            meta.setdefault(key, value)
-    if body.intent_kind == AeternaIntentKind.teleport_earphones_brief:
-        if slug and slug != TELEPORT_SLUG:
-            raise HTTPException(
-                status_code=400,
-                detail="teleport_earphones_brief requires workflow_slug aeterna-teleport-earphones",
-            )
-        slug = TELEPORT_SLUG
-        if body.budget_acp < TELEPORT_PRICE_ACP:
-            raise HTTPException(
-                status_code=400,
-                detail="teleport_earphones_brief budget_acp must be at least 58000 ACP",
-            )
-        for key, value in TELEPORT_META.items():
-            meta.setdefault(key, value)
     if body.intent_kind == AeternaIntentKind.installation_project_brief:
         if slug and slug != INSTALLATION_PROJECT_SLUG:
             raise HTTPException(

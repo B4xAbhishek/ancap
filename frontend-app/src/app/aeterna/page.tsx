@@ -25,8 +25,6 @@ import { AureaVitaPanel } from "@/components/aeterna/AureaVitaPanel";
 import { DownSyndromeSupportPanel } from "@/components/aeterna/DownSyndromeSupportPanel";
 import { SubstanceCodingPanel } from "@/components/aeterna/SubstanceCodingPanel";
 import { PulmoPurePanel } from "@/components/aeterna/PulmoPurePanel";
-import { BarsukQuantumPenPanel } from "@/components/aeterna/BarsukQuantumPenPanel";
-import { TeleportEarphonesPanel } from "@/components/aeterna/TeleportEarphonesPanel";
 import { InstallationProjectPanel } from "@/components/aeterna/InstallationProjectPanel";
 import { DnaPheromonePerfumePanel } from "@/components/aeterna/DnaPheromonePerfumePanel";
 import { getApiUrl } from "@/lib/api";
@@ -253,18 +251,6 @@ export default function AeternaPage() {
               {t("aeternaPage.ppCta")}
             </a>
             <a
-              href="#barsuk"
-              className="rounded-md border border-[#7ad0c8]/40 px-5 py-3 text-sm font-medium text-[#9ae0d9] transition hover:border-[#7ad0c8]"
-            >
-              {t("aeternaPage.bkCta")}
-            </a>
-            <a
-              href="#teleport-earphones"
-              className="rounded-md border border-[#7ad0c8]/40 px-5 py-3 text-sm font-medium text-[#9ae0d9] transition hover:border-[#7ad0c8]"
-            >
-              {t("aeternaPage.teCta")}
-            </a>
-            <a
               href="#dna-pheromone-perfume"
               className="rounded-md border border-[#d4a574]/40 px-5 py-3 text-sm font-medium text-[#e8c9a0] transition hover:border-[#d4a574]"
             >
@@ -373,14 +359,6 @@ export default function AeternaPage() {
 
         <section className="mt-16">
           <PulmoPurePanel note={status?.pulmopure_note} />
-        </section>
-
-        <section className="mt-16">
-          <BarsukQuantumPenPanel note={status?.barsuk_note} />
-        </section>
-
-        <section className="mt-16">
-          <TeleportEarphonesPanel note={status?.teleport_earphones_note} />
         </section>
 
         <section className="mt-16">
