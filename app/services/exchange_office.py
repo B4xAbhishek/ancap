@@ -14,7 +14,7 @@ from __future__ import annotations
 import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import Decimal, InvalidOperation, ROUND_DOWN, ROUND_HALF_UP
 from typing import Any
 from uuid import uuid4
 
@@ -32,6 +32,7 @@ from app.schemas.exchange_office import (
 )
 from app.services import otc_intake as otc_svc
 from app.services import sacp as sacp_svc
+from app.services.bridge_decimal import WACP_PER_ACP
 
 _Q = Decimal("0.00000001")
 _HUB = "acp"
@@ -456,7 +457,8 @@ def _to_acp(asset: ExchangeAssetPublic, amount: Decimal, *, purity_ppt: int | No
         return amount * rate, f"{_api_str(rate)} ACP per USDT (desk)", "swap_desk"
 
     if asset.rail == "bridge" and asset.id == "wacp_bsc":
-        return amount, "1 wACP = 1 ACP (bridge floor)", "bridge"
+        acp = (amount / Decimal(WACP_PER_ACP)).quantize(_Q, rounding=ROUND_DOWN)
+        return acp, f"{WACP_PER_ACP} wACP = 1 ACP (bridge floor)", "bridge"
 
     if asset.rail == "stablecoin" and asset.id == "sacp_bsc":
         acp = sacp_svc.indicative_acp_for_sacp(amount)
@@ -524,7 +526,8 @@ def _from_acp(asset: ExchangeAssetPublic, acp_amount: Decimal) -> tuple[Decimal,
         return acp_amount, "1 ACP = 1 ACP", "ledger"
 
     if asset.id == "wacp_bsc":
-        return acp_amount, "1 ACP = 1 wACP (bridge floor)", "bridge"
+        out = (acp_amount * Decimal(WACP_PER_ACP)).quantize(_Q, rounding=ROUND_HALF_UP)
+        return out, f"1 ACP = {WACP_PER_ACP} wACP (bridge)", "bridge"
 
     if asset.id == "sacp_bsc":
         out = sacp_svc.indicative_sacp_for_acp(acp_amount)

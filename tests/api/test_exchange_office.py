@@ -73,6 +73,23 @@ def test_quote_usdt_into_acp(monkeypatch):
     get_settings.cache_clear()
 
 
+def test_quote_wacp_bridge_ratio_1_to_10():
+    """Bridge doctrine: 1 ACP ↔ 10 wACP (not 1:1)."""
+    into = quote(ExchangeQuoteRequest(from_asset="wacp_bsc", to_asset="acp", from_amount="10"))
+    assert Decimal(into.to_amount) == Decimal("1")
+    assert into.rail == "bridge"
+    assert "10 wACP = 1 ACP" in into.rate_note
+
+    out = quote(ExchangeQuoteRequest(from_asset="acp", to_asset="wacp_bsc", from_amount="1"))
+    assert Decimal(out.to_amount) == Decimal("10")
+    assert out.rail == "bridge"
+    assert "1 ACP = 10 wACP" in out.rate_note
+
+    # Floor on redeem dust
+    dust = quote(ExchangeQuoteRequest(from_asset="wacp_bsc", to_asset="acp", from_amount="9"))
+    assert Decimal(dust.to_amount) == Decimal("0.9")
+
+
 def test_quote_metal_into_acp_with_purity():
     q = quote(
         ExchangeQuoteRequest(

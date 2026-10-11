@@ -18,7 +18,8 @@ export default function WacpReserveDocsPage() {
             </div>
             <p style={{ color: "var(--text-muted)", lineHeight: 1.75 }}>
               Canonical invariant: <code>minted_wACP_on_BSC &lt;= locked_or_custodied_ACP_reserve - operational_buffer</code>.
-              ACP has 8 decimals. wACP on BSC has 18 decimals. Conversion target: <code>wacp_wei = acp_smallest_unit * 10^10</code>.
+              ACP has 8 decimals. wACP on BSC has 18 decimals. Conversion target (pad × wrap 1 ACP ↔ 10 wACP):{" "}
+              <code>wacp_wei = acp_smallest_unit * 10^11</code>.
             </p>
             <ul style={{ lineHeight: 1.9, color: "var(--text-muted)" }}>
               <li>Healthy: backing ratio &gt;= 1.0</li>

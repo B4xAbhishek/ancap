@@ -181,7 +181,23 @@ async def test_quote_catalog_acp_from_usd_sticker(monkeypatch):
     assert sticker == Decimal("349.00")
     assert spot == Decimal("0.000002")
     assert acp == Decimal("17450000.00")  # ceil(349 / (10 × 0.000002))
+    wacp_charge, _, _ = market_economy.quote_catalog_acp("349", payment_currency="WACP")
+    # wACP charge = ACP liability × 10 × 0.9
+    assert wacp_charge == Decimal("157050000.00")
     monkeypatch.setenv("WACP_ORACLE_PIN_DESK", "true")
+    get_settings.cache_clear()
+
+
+@pytest.mark.asyncio
+async def test_quote_catalog_wacp_pin_desk_scales_10x(monkeypatch):
+    monkeypatch.setenv("WACP_ORACLE_PIN_DESK", "true")
+    from app.config import get_settings
+
+    get_settings.cache_clear()
+    acp, sticker, spot = market_economy.quote_catalog_acp("100", payment_currency="ACP")
+    assert acp == Decimal("100.00")
+    wacp, _, _ = market_economy.quote_catalog_acp("100", payment_currency="WACP")
+    assert wacp == Decimal("900.00")  # 100 × 10 × 0.9
     get_settings.cache_clear()
 
 

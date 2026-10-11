@@ -64,7 +64,8 @@ export default function WorkflowBundlePage() {
   const quotedPreview = useMemo(() => {
     if (!bundle) return "";
     const base = Number(bundle.price.amount || 0);
-    if (paymentCurrency === "wACP") return `${(base * 0.9).toFixed(2)} ${paymentCurrency}`;
+    // Bridge 1 ACP ↔ 10 wACP; catalog wACP rail keeps a 10% discount → ×9.
+    if (paymentCurrency === "wACP") return `${(base * 9).toFixed(2)} ${paymentCurrency}`;
     return `${base.toFixed(2)} ${paymentCurrency}`;
   }, [bundle, paymentCurrency]);
   const includedWorkflows = useMemo(() => {

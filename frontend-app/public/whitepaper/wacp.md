@@ -43,7 +43,7 @@ the full contract address against https://ancap.cloud and
 https://ancap.cloud/docs/wacp/contracts.
 
 Decimal note: ACP uses 8 decimals on the ANCAP chain; wACP on BSC uses 18 decimals with
-the conversion target `wacp_wei = acp_smallest_unit * 10^10`.
+the conversion target `wacp_wei = acp_smallest_unit * 10^11` (decimal pad × wrap 1 ACP ↔ 10 wACP).
 
 Reserve invariant (target): minted wACP on BSC must not exceed locked/custodied ACP reserve
 minus operational buffer. Public proofs: https://ancap.cloud/docs/wacp/reserve

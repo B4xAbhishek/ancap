@@ -43,6 +43,10 @@ Ship ANCAP as a production ACP-first AI workflow platform:
 
 **Work-stop blockers: none.**
 
+Public launch hygiene (2026-10-11):
+- Bridge doctrine **1 ACP ↔ 10 wACP** enforced in exchange office, catalog wACP quotes, and Smart Pay bridge leg (not just docs).
+- Fiction SKUs retired from public surface: teleport earphones, Project Barsuk, dark-matter auction, time-machine footer lore. See [`docs/SAFE_LAUNCH_CHECKLIST.md`](docs/SAFE_LAUNCH_CHECKLIST.md).
+
 Active remaining work (not blockers):
 1. ACP mobile wallet — device-ready release (Play/TestFlight, physical sign-off, iOS native). Local Android test env is available (`docs/mobile/ANDROID_TEST_ENV.md`).
 2. Open-source follow-through — GitHub org naming/ownership; `ancap-docs` Discussions pin/category UI; project-board auth. Phase 1 community files (`README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`) are **in the repo root** and on the public GitHub repo.

@@ -63,7 +63,7 @@ export function MarketRateBar() {
         </span>
         <span className="market-rate-bar__pair">
           <strong>ACP</strong> {formatUsdMicro(acp)}
-          <span className="market-rate-bar__hint">{t("marketRateBar.oneToOne")}</span>
+          <span className="market-rate-bar__hint">{t("marketRateBar.wrapRatio")}</span>
         </span>
         <a
           className="market-rate-bar__link"

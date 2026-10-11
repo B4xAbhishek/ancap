@@ -20,6 +20,7 @@ from app.api.deps import DbSession, get_current_user_id, require_auth
 from app.api.routers import wallet_acp
 from app.db.models import MobileDevice, MobileSmartPayRecord
 from app.config import get_settings
+from app.services.bridge_decimal import WACP_PER_ACP
 from app.schemas.mobile_acp import (
     AcpBroadcastRequest,
     AcpBroadcastResponse,
@@ -649,10 +650,35 @@ def _build_quote_route(intent: PaymentIntentResponseItem, source_symbol: str) ->
             ]
             mode = "swap_then_send"
         else:
+            # Indicative: lock face ACP equal to USDT target → mint 10× wACP (bridge 1↔10).
+            target = Decimal(str(intent.amount.value if intent.amount else "0"))
+            wacp_bridged = format((target * Decimal(WACP_PER_ACP)).normalize(), "f")
+            usdt_out = intent.amount.value if intent.amount else "0"
             route = [
-                SmartPayRouteStep(kind="bridge", network="acp", dex_or_rail="ancap_bridge_v1", from_asset="ACP", to_asset="wACP", estimated_out=intent.amount.value if intent.amount else "0"),
-                SmartPayRouteStep(kind="swap", network="bsc", dex_or_rail="ancap_router_v1", from_asset="wACP", to_asset="USDT", estimated_out=intent.amount.value if intent.amount else "0"),
-                SmartPayRouteStep(kind="transfer", network="bsc", dex_or_rail=None, from_asset="USDT", to_asset="USDT", estimated_out=intent.amount.value if intent.amount else "0"),
+                SmartPayRouteStep(
+                    kind="bridge",
+                    network="acp",
+                    dex_or_rail="ancap_bridge_v1",
+                    from_asset="ACP",
+                    to_asset="wACP",
+                    estimated_out=wacp_bridged,
+                ),
+                SmartPayRouteStep(
+                    kind="swap",
+                    network="bsc",
+                    dex_or_rail="ancap_router_v1",
+                    from_asset="wACP",
+                    to_asset="USDT",
+                    estimated_out=usdt_out,
+                ),
+                SmartPayRouteStep(
+                    kind="transfer",
+                    network="bsc",
+                    dex_or_rail=None,
+                    from_asset="USDT",
+                    to_asset="USDT",
+                    estimated_out=usdt_out,
+                ),
             ]
             mode = "swap_then_send"
         return (

@@ -52,7 +52,10 @@ Evidence refreshed: 2026-09-28 (cloud agent pre-deploy pass on `cursor/ancap-saf
 
 ## Content
 
-- [x] No “time machine / time lighter” claims in hero; footer joke only
+- [x] No “time machine / time lighter” lore anywhere (hero, footer, or product claims)
+- [x] Teleport earphones + Project Barsuk retired from public AETERNA / workflow catalog / legal hub
+- [x] Dark-matter auction unmounted from API + removed from Explore nav (DB tables kept)
+- [x] Exchange / catalog / Smart Pay wACP math aligned to bridge **1 ACP ↔ 10 wACP**
 
 ## Migrations / deploy
 

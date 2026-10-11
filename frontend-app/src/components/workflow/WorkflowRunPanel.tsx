@@ -297,7 +297,7 @@ export function WorkflowRunPanel({ workflow }: { workflow: WorkflowTemplate }) {
 
   const pricePreview = useMemo(() => {
     const base = Number(workflow.price.amount || 0);
-    if (paymentCurrency === "wACP") return `${(base * 0.9).toFixed(2)} ${paymentCurrency}`;
+    if (paymentCurrency === "wACP") return `${(base * 9).toFixed(2)} ${paymentCurrency}`;
     return `${base.toFixed(2)} ${paymentCurrency}`;
   }, [workflow.price.amount, paymentCurrency]);
 

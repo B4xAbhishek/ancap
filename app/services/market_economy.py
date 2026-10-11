@@ -244,24 +244,33 @@ def quote_catalog_acp(
     payment_currency: str = "ACP",
     wacp_usd: Decimal | None = None,
 ) -> tuple[Decimal, Decimal, Decimal]:
-    """Return (acp_amount, usd_sticker, oracle_spot) for a catalog face amount.
+    """Return (charge_amount, usd_sticker, oracle_spot) for a catalog face amount.
+
+    Charge amount is in ``payment_currency`` units. For ACP it is the ACP liability.
+    For wACP it is bridge-scaled: ``acp_liability × WACP_PER_ACP × 0.9`` (10% wACP rail
+    discount), matching field-services desk doctrine (1 ACP ↔ 10 wACP).
 
     When WACP_ORACLE_PIN_DESK is true (tests / emergency), catalog faces are treated
     as ACP at a $1 accounting spot so existing credit balances stay meaningful.
     """
     settings = get_settings()
+    pay = (payment_currency or "ACP").upper()
     if bool(getattr(settings, "wacp_oracle_pin_desk", False)):
         amount = _to_dec(catalog_amount) or Decimal("0")
         acp = amount.quantize(_Q_ACP, rounding=ROUND_HALF_UP)
-        if (payment_currency or "ACP").upper() == "WACP":
-            acp = (acp * Decimal("0.9")).quantize(_Q_ACP, rounding=ROUND_CEILING)
-        return acp, amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP), Decimal("1")
+        sticker = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        spot = Decimal("1")
+    else:
+        sticker = catalog_amount_to_usd_sticker(catalog_amount)
+        spot = wacp_usd or get_cached_wacp_usd(allow_stale=True) or _FALLBACK_WACP_USD
+        acp = usd_to_acp(sticker, wacp_usd=spot)
 
-    sticker = catalog_amount_to_usd_sticker(catalog_amount)
-    spot = wacp_usd or get_cached_wacp_usd(allow_stale=True) or _FALLBACK_WACP_USD
-    acp = usd_to_acp(sticker, wacp_usd=spot)
-    if (payment_currency or "ACP").upper() == "WACP":
-        acp = (acp * Decimal("0.9")).quantize(_Q_ACP, rounding=ROUND_CEILING)
+    if pay == "WACP":
+        # Discount on ACP liability, then mint-scale to wACP charge units.
+        charge = (acp * Decimal(WACP_PER_ACP) * Decimal("0.9")).quantize(
+            _Q_ACP, rounding=ROUND_CEILING
+        )
+        return charge, sticker, spot
     return acp, sticker, spot
 
 

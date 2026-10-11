@@ -62,6 +62,7 @@ Reality note: this section is a capability snapshot, not a claim that the whole 
 | P7 | Organizations/teams | DONE for current stabilization slice: frontend wrappers + detail/member-role flows + tests/build green |
 | P7 | Webhooks | DONE for current stabilization slice: frontend wrappers + create/test/rotate/delete + delivery view + tests/build green |
 | Deploy | GitHub and production sync | DONE: `origin/master` matches local HEAD, working tree is clean, gitignore updated, push verified |
+| Launch | Bridge 1:10 math + fiction trim | DONE 2026-10-11: exchange/catalog/Smart Pay wACP ×10; teleport/Barsuk/dark-matter/time-machine off public surface |
 
 ## Immediate Finish Plan
 

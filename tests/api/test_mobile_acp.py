@@ -142,6 +142,14 @@ def test_smart_pay_quote_bsc_usdt_from_acp(client):
     assert quote["targetAsset"]["symbol"] == "USDT"
     assert len(quote["route"]) == 3
     assert quote["route"][0]["kind"] == "bridge"
+    # Bridge 1 ACP ↔ 10 wACP: indicative lock face = USDT target → 10× wACP out.
+    from decimal import Decimal
+
+    bridge_step = quote["route"][0]
+    swap_step = quote["route"][1]
+    bridged = Decimal(str(bridge_step.get("estimatedOut") or bridge_step.get("estimated_out")))
+    usdt_out = Decimal(str(swap_step.get("estimatedOut") or swap_step.get("estimated_out")))
+    assert bridged == usdt_out * 10
 
 
 def test_smart_pay_execute_receipt_and_recover(client):
