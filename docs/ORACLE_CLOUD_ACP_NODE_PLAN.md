@@ -3,13 +3,13 @@
 **Status:** `[x]` **Independent secondary ACP full node live** on Oracle Always Free (`eu-zurich-1`, 2026-10-02).  
 **Goal:** Public-facing Always Free ACP full node beside primary `ancap.cloud`, with documented bootstrap, peer sync, and GitHub transparency.
 
-**Network role:** secondary full node (peer of primary `https://acp1.ancap.cloud/rpc`). Not a cutover away from `ancap.cloud`.
+**Network role:** secondary full node (peer of primary). Not a cutover away from `ancap.cloud`.
 
 This document is the **public plan of action**. It does **not** contain OCI tenancy IDs, SSH keys, RPC tokens, or miner reward secrets.
 
 ---
 
-## Live peer (2026-10-02)
+## Live peer (2026-10-03)
 
 | Item | Value |
 |------|--------|
@@ -18,9 +18,18 @@ This document is the **public plan of action**. It does **not** contain OCI tena
 | Public IP | `152.67.79.206` |
 | JSON-RPC | `http://152.67.79.206:8545/rpc` |
 | P2P listen | `30333/tcp` |
-| Sync peer | `https://acp1.ancap.cloud/rpc` |
-| Tip check (go-live) | height **12**, issued **210,000,000** ACP, `supply_invariant_ok=true` (matches primary regenesis v3) |
+| Sync peer | `http://185.114.117.241:18545/rpc` (primary HTTP peer; UFW allowlist Oracle IP) |
+| Tip check | height **18**, tip hash matches `acp1` / primary (`ab6bdd19…d018`) — verified 2026-10-13 with Oracle + local PC peer |
 | Planned hostname | `acp2.ancap.cloud` (TLS + rate-limit) once DNS is pointed |
+| Local PC peer | `http://127.0.0.1:8545/rpc` via `scripts/start-acp-node.ps1 -Background` + `ACP_PEER_RPC_URLS=http://185.114.117.241:18545/rpc` (HTTPS peer needs rustls rebuild; stale EXE fails TLS) |
+
+### Sync incident (2026-10-03)
+
+Oracle lagged at height 12 while primary was at 17. Root cause: Oracle `acp-node` binary used `reqwest` **without TLS features**, so `https://acp1.ancap.cloud/rpc` peer sync failed every tick. Host `curl -4` to Cloudflare worked; the node binary could not.
+
+**Mitigation live now:** primary exposes read RPC on host `:18545` via `acp-rpc-peer-expose` (socat → `acp-node:8545`), UFW allows only Oracle `152.67.79.206`. Oracle `ACP_PEER_RPC_URLS` points at that HTTP peer.
+
+**Code fix (repo):** `ACP-crypto/acp-node/Cargo.toml` adds `reqwest` feature `rustls-tls` so future Oracle images can sync over HTTPS again after rebuild/redeploy.
 
 Read methods on the Oracle peer accept unauthenticated `getblockcount` / chain probes. State-changing methods still require the host-local `rpc.token` (never published).
 

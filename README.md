@@ -49,10 +49,12 @@ Project whitepaper: [docs/WHITEPAPER_PROJECT.md](docs/WHITEPAPER_PROJECT.md). AC
 
 ## Current Status
 
-- **Project state:** core platform is largely built, but the project is **not fully release-complete end-to-end**.
-- **Biggest remaining tails:** security / CI / prod-hardening, ACP mobile wallet release closure, monetization depth.
-- **Parallel trust/adoption track:** ANCAP is moving toward a GitHub-first open-source model for public-safe components, docs, SDK/integration surfaces, and protocol transparency — while private keys, bridge signer logic, deploy secrets, hot-wallet operations, and sensitive infrastructure remain private.
-- **Current truth source:** use [STATUS.md](STATUS.md), [MASTER_ROADMAP.md](MASTER_ROADMAP.md), and [docs/STATUS_MATRIX.md](docs/STATUS_MATRIX.md) before older roadmap/history docs.
+- **Project state:** core platform is largely built, but **not fully release-complete end-to-end**.
+- **GitHub:** [`ancapcloud/ancap`](https://github.com/ancapcloud/ancap) · docs [`ancapcloud/ancap-docs`](https://github.com/ancapcloud/ancap-docs) · product [ancap.cloud](https://ancap.cloud)
+- **Bridge:** **1 ACP ↔ 10 wACP**. Public launch dropped fiction SKUs (teleport / Barsuk / dark-matter).
+- **Biggest remaining tails:** ACP mobile wallet release closure, monetization depth, `acp2.ancap.cloud` DNS/TLS.
+- **Parallel trust track:** public-safe components stay open; keys, bridge signer, deploy secrets, and hot-wallet ops stay private.
+- **Current truth source:** [STATUS.md](STATUS.md), [MASTER_ROADMAP.md](MASTER_ROADMAP.md), [docs/STATUS_MATRIX.md](docs/STATUS_MATRIX.md) — trust these before older roadmap docs.
 
 ## Stripe / Fiat Credit Top-Up Adapter
 

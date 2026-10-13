@@ -1,6 +1,6 @@
 # ANCAP Status
 
-> Updated: 2026-10-02
+> Updated: 2026-10-13
 > Fast truth: this is the shortest current status entry point.
 
 ## Current truth
@@ -9,17 +9,22 @@ ANCAP is **largely built**, but it is **not fully release-complete end-to-end**.
 
 **Work-stop blockers: none.**
 
-**ACP supply (2026-10-02):** wallet figures such as `1,532,370,736.69` / `2,538,291,192.32` ACP were not protocol issuance. Replay of v2 heights 1–33,962 found genesis 210M + 56,537.05 synthetic validator + 622,130,939.999991 double-spend inflation = **832,187,477.05255227** unspent ACP. The UI also mixed stale UTXO-index rows across chain resets. **Regenesis v3 is live** on `ancap.cloud`: `gettxoutsetinfo` reports issued **210,000,000 ACP**, invariant ok, UTXO supply **209,999,999.999989** after 0.000011 ACP fees, height 12, genesis `78be2f72e8cf3bb41b0baa6fead9b40eb58be2f57e6a21a026d08ae8e8f6d8ce`. Recovery: `scripts/regenesis-v3-hard-cap.sh` + `docs/ACP_SUPPLY_INCIDENT_2026-10-02.md`.
+**Public GitHub:** source of truth is [`ancapcloud/ancap`](https://github.com/ancapcloud/ancap) (account rename from `dragoncattrx-hub`). Docs twin: [`ancapcloud/ancap-docs`](https://github.com/ancapcloud/ancap-docs). Live product: [ancap.cloud](https://ancap.cloud).
 
-**ACP “mining” clarification:** there is **no PoW mining pool**. The lean-chain miner is a fee-packed block assembler (see `docs/ACP_LEAN_CHAIN.md`). Staking bootstrap emission is ledger staking, not hash mining. Do not market “mine ACP” as energy-intensive PoW.
+**Bridge doctrine:** **1 ACP ↔ 10 wACP** (cutover 2026-10-04). Fiction SKUs (teleport / Barsuk / dark-matter auction) retired from the public launch surface.
 
-**Safe-launch controls (2026-09-28):** auth cookie policy is `SameSite=Lax` with prod `CORS_ORIGINS`; free ACP distribution has a 1M cap kill-switch; registration anti-sybil quarantines free grants; Theodore promo script is visible/portable with no spend keys; Terms §3 has a residency draft pending counsel; wACP mint preflight script + MetaMask education page shipped.
+**ACP supply (2026-10-02):** wallet figures such as `1,532,370,736.69` / `2,538,291,192.32` ACP were not protocol issuance. **Regenesis v3 is live** on `ancap.cloud`: issued **210,000,000 ACP** hard cap. Details: `docs/ACP_SUPPLY_INCIDENT_2026-10-02.md`.
+
+**ACP nodes (2026-10-13):** three peers on the same tip family (height **18**, tip `ab6bdd19…d018`): primary `https://acp1.ancap.cloud/rpc`, Oracle `http://152.67.79.206:8545/rpc`, local PC `:8545`. Plan: [`docs/ORACLE_CLOUD_ACP_NODE_PLAN.md`](docs/ORACLE_CLOUD_ACP_NODE_PLAN.md). DNS/TLS `acp2.ancap.cloud` still open.
+
+**ACP “mining” clarification:** there is **no PoW mining pool**. The lean-chain miner is a fee-packed block assembler (see `docs/ACP_LEAN_CHAIN.md`).
+
+**Safe-launch controls (2026-09-28):** auth cookie `SameSite=Lax` + prod CORS; free ACP 1M cap; anti-sybil; Terms §3 residency draft pending counsel.
 
 Active remaining work (not blockers):
-1. **ACP mobile wallet** — device-ready release (Play/TestFlight, physical sign-off, iOS native). Local Android test env is available.
-2. **Open-source follow-through** — GitHub org naming/ownership; `ancap-docs` Discussions pin/category UI. Phase 1 community files including root `README.md` are **present**. Do not report “absence of README.md”. Public-safe vs private boundaries stay in `docs/OPEN_SOURCE_GITHUB_TRANSPARENCY.md` (secrets stay private; do not hide material token/risk facts).
-3. **Monetization depth** — optional conversion/LTV after a **live** ACP-first loop. Stripe 4.1 is operator live verification only. Do **not** report “monetization after the first ACP cycle” as a blocker.
-4. **New ACP node — Oracle Cloud Always Free (eu-zurich-1)** — **live secondary full node** (2026-10-02). Public IP `152.67.79.206`, JSON-RPC `http://152.67.79.206:8545/rpc`, tip matched primary regenesis v3 (height 12 / 210M). Shape today: Always Free `VM.Standard.E2.1.Micro` (Ampere A1 retry when OCI capacity returns). Plan: [`docs/ORACLE_CLOUD_ACP_NODE_PLAN.md`](docs/ORACLE_CLOUD_ACP_NODE_PLAN.md). DNS/TLS `acp2.ancap.cloud` still open.
+1. **ACP mobile wallet** — device-ready release (Play/TestFlight, physical sign-off, iOS native).
+2. **Open-source follow-through** — `ancap-docs` Discussions pin/category UI. Root `README.md` is present — do not report it missing. Boundaries: `docs/OPEN_SOURCE_GITHUB_TRANSPARENCY.md`.
+3. **Monetization depth** — optional conversion/LTV; Stripe 4.1 is operator live verification only. Do **not** report “monetization after the first ACP cycle” as a blocker.
 
 Security / CI / prod-hardening baseline closed in the **2026-07-01** wave (`docs/SECURITY_CLOSURE_EVIDENCE_2026-07-01.md`); external upstream key revoke audit remains operator-open, not a freeze.
 

@@ -105,6 +105,11 @@ IMPROVEMENT_PLAN.md
 
 # Temporary scripts / migration artifacts
 tmp/
+tmp-*.py
+tmp-*.sh
+tmp-*.ps1
+_hypersearch_*
+reminder_message.txt
 _migration_out/
 .memory/
 memory/

@@ -131,6 +131,10 @@ if ($Background) {
         "`$env:ACP_CHAIN_ID = '$ci'"
         "`$env:ACP_MINER_ENABLED = '$me'"
     )
+    if (-not [string]::IsNullOrWhiteSpace($env:ACP_PEER_RPC_URLS)) {
+        $peer = $env:ACP_PEER_RPC_URLS.Replace("'", "''")
+        $lines += "`$env:ACP_PEER_RPC_URLS = '$peer'"
+    }
     if ($StrictCreatorVesting) {
         $lines += "`$env:ACP_ENFORCE_CREATOR_VESTING = '1'"
         $lines += "Remove-Item Env:ACP_DISABLE_CREATOR_VESTING -ErrorAction SilentlyContinue"
