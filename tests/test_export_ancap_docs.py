@@ -124,7 +124,7 @@ def test_export_script_contains_split_plan_and_manifest_guardrails():
     assert 'hot-wallet / bridge-signer internals' in script_text
     assert 'rewrite_markdown_links' in script_text
     assert 'find_unresolved_bundle_links' in script_text
-    assert 'https://github.com/dragoncattrx-hub/ancap' in script_text
+    assert 'https://github.com/ancapcloud/ancap' in script_text
     assert 'EXPORT_SOURCE_TO_OUTPUT' in script_text
 
 
@@ -189,14 +189,14 @@ def test_export_bundle_rewrites_out_of_bundle_links_to_source_monorepo(tmp_path:
 
     readme_text = (target_dir / "README.md").read_text(encoding="utf-8")
     assert "future `ancap-docs` repository" in readme_text
-    assert "https://github.com/dragoncattrx-hub/ancap/blob/master/examples/README.md" in readme_text
-    assert "https://github.com/dragoncattrx-hub/ancap/blob/master/examples/payment-integration/python_credit_topup.py" in readme_text
-    assert "https://github.com/dragoncattrx-hub/ancap/blob/master/contracts/bridge-bsc/README.md" in readme_text
+    assert "https://github.com/ancapcloud/ancap/blob/master/examples/README.md" in readme_text
+    assert "https://github.com/ancapcloud/ancap/blob/master/examples/payment-integration/python_credit_topup.py" in readme_text
+    assert "https://github.com/ancapcloud/ancap/blob/master/contracts/bridge-bsc/README.md" in readme_text
     assert "[Status matrix](docs/STATUS_MATRIX.md)" in readme_text
 
     architecture_text = (target_dir / "docs" / "ARCHITECTURE_LAYERS.md").read_text(encoding="utf-8")
-    assert "https://github.com/dragoncattrx-hub/ancap/blob/master/ROADMAP.md" in architecture_text
-    assert "https://github.com/dragoncattrx-hub/ancap/blob/master/docs/rfc/service-catalog.md" in architecture_text
+    assert "https://github.com/ancapcloud/ancap/blob/master/ROADMAP.md" in architecture_text
+    assert "https://github.com/ancapcloud/ancap/blob/master/docs/rfc/service-catalog.md" in architecture_text
 
 
 def test_export_bundle_has_no_broken_relative_markdown_links(tmp_path: Path):
@@ -240,8 +240,8 @@ def test_export_bundle_includes_public_safe_github_templates_and_codeowners(tmp_
     feature_template = (target_dir / ".github" / "ISSUE_TEMPLATE" / "feature_request.md").read_text(encoding="utf-8")
     config_template = (target_dir / ".github" / "ISSUE_TEMPLATE" / "config.yml").read_text(encoding="utf-8")
 
-    assert "@dragoncattrx" in codeowners
-    assert "/docs/ @dragoncattrx" in codeowners
+    assert "@ancapcloud" in codeowners
+    assert "/docs/ @ancapcloud" in codeowners
     assert "No secrets or sensitive infra details added" in pr_template
     assert "Do **not** include secrets" in bug_template
     assert "Which area is affected?" in feature_template

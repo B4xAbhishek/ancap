@@ -96,7 +96,7 @@ export default function ProjectsPage() {
             Quick Links
           </h2>
           <div className="responsive-grid responsive-grid-3">
-            <a href="https://github.com/dragoncattrx-hub/ancap" target="_blank" rel="noopener noreferrer"
+            <a href="https://github.com/ancapcloud/ancap" target="_blank" rel="noopener noreferrer"
               className="card" style={{ textDecoration: "none", cursor: "pointer" }}>
               <div style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "8px", color: "var(--text)" }}>GitHub Repository</div>
               <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>View source code</div>

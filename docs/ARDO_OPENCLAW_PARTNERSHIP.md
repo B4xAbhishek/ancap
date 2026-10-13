@@ -126,7 +126,7 @@
 ---
 
 ## Repository Info
-- **Main repo:** `https://github.com/dragoncattrx-hub/ancap`
+- **Main repo:** `https://github.com/ancapcloud/ancap`
 - **Local copy:** `~/Desktop/ANCAP/`
 - **Server path:** `/home/ancapadmin/`
 - **Docker compose:** `/home/ancapadmin/docker-compose.yml`

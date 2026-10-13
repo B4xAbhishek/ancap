@@ -47,7 +47,7 @@ export default async function DatingPage() {
           Open the <strong>Dating</strong> tab in the mobile wallet to scan devices, create a rendezvous point, or mesh-chat.
           Legal: <Link href="/legal/dating" className="underline">/legal/dating</Link>. Spec:{" "}
           <a
-            href="https://github.com/dragoncattrx-hub/ancap/blob/master/docs/mobile/ANCAP_DATING_MESH.md"
+            href="https://github.com/ancapcloud/ancap/blob/master/docs/mobile/ANCAP_DATING_MESH.md"
             className="underline"
             target="_blank"
             rel="noreferrer"

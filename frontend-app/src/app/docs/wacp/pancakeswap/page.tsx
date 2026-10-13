@@ -35,7 +35,7 @@ export default function WacpPancakeDocsPage() {
             <p style={{ color: "var(--text-muted)", lineHeight: 1.75 }}>
               Operator playbook (Stage A/B/C):{" "}
               <a
-                href="https://github.com/dragoncattrx-hub/ancap/blob/master/docs/WACP_LIQUIDITY_V3_PLAYBOOK.md"
+                href="https://github.com/ancapcloud/ancap/blob/master/docs/WACP_LIQUIDITY_V3_PLAYBOOK.md"
                 target="_blank"
                 rel="noreferrer"
               >

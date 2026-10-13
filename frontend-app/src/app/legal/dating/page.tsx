@@ -25,7 +25,7 @@ export default function DatingLegalPage() {
         </ul>
         <p>
           Product page: <Link href="/dating">/dating</Link>. Spec:{" "}
-          <a href="https://github.com/dragoncattrx-hub/ancap/blob/master/docs/mobile/ANCAP_DATING_MESH.md">
+          <a href="https://github.com/ancapcloud/ancap/blob/master/docs/mobile/ANCAP_DATING_MESH.md">
             docs/mobile/ANCAP_DATING_MESH.md
           </a>
           .

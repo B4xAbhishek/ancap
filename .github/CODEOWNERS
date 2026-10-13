@@ -1,12 +1,12 @@
 # Default CODEOWNERS seed for the current public-safe monorepo and the future `ancap-docs` export.
 # Keep a working single-maintainer fallback first; widen to org teams after GitHub org ownership is finalized.
 
-* @dragoncattrx
-/.github/ @dragoncattrx
-/docs/ @dragoncattrx
-/MASTER_ROADMAP.md @dragoncattrx
-/README.md @dragoncattrx
-/LICENSE @dragoncattrx
-/CONTRIBUTING.md @dragoncattrx
-/SECURITY.md @dragoncattrx
-/CODE_OF_CONDUCT.md @dragoncattrx
+* @ancapcloud
+/.github/ @ancapcloud
+/docs/ @ancapcloud
+/MASTER_ROADMAP.md @ancapcloud
+/README.md @ancapcloud
+/LICENSE @ancapcloud
+/CONTRIBUTING.md @ancapcloud
+/SECURITY.md @ancapcloud
+/CODE_OF_CONDUCT.md @ancapcloud

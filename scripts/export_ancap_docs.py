@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_NAME = "EXPORT_MANIFEST.md"
-SOURCE_REPO_WEB_BASE = "https://github.com/dragoncattrx-hub/ancap"
+SOURCE_REPO_WEB_BASE = "https://github.com/ancapcloud/ancap"
 SOURCE_REPO_REF = "master"
 MARKDOWN_LINK_RE = re.compile(r"(?P<prefix>!?\[[^\]]*\]\()(?P<target>[^)]+)(?P<suffix>\))")
 EXTERNAL_LINK_PREFIXES = ("http://", "https://", "mailto:", "tel:", "data:")

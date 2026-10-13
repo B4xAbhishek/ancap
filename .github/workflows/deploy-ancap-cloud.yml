@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.repository == 'dragoncattrx-hub/ancap'
+    if: github.repository == 'ancapcloud/ancap'
     runs-on: ubuntu-latest
     steps:
       - name: Validate deploy secrets

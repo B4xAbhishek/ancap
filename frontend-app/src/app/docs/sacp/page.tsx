@@ -46,7 +46,7 @@ export default function SacpDocsOverviewPage() {
                 <Link href="/docs/wacp">Compare with wACP</Link>
               </li>
               <li>
-                <a href="https://github.com/dragoncattrx-hub/ancap/blob/master/docs/STABLECOIN_SACP_SPEC.md">
+                <a href="https://github.com/ancapcloud/ancap/blob/master/docs/STABLECOIN_SACP_SPEC.md">
                   Spec (STABLECOIN_SACP_SPEC.md)
                 </a>
               </li>

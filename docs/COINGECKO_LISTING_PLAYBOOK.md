@@ -98,7 +98,7 @@ Copy into the CoinGecko Partners form.
 - Legal / market data: <https://ancap.cloud/legal/market-data>
 - X: <https://x.com/ancap24news>
 - Telegram: <https://t.me/ancap24news>
-- GitHub: <https://github.com/dragoncattrx-hub/ancap>
+- GitHub: <https://github.com/ancapcloud/ancap>
 
 ### Branding
 - Logo file: `frontend-app/public/wacp-logo.png`
@@ -106,7 +106,7 @@ Copy into the CoinGecko Partners form.
 - CoinGecko wants square PNG ≥ **200×200** (prefer 512×512). Upscale/export a clean 512 PNG before attach if the current asset is too small/pixelated.
 
 ### Short description (EN)
-> Wrapped ACP (wACP) is the official BEP-20 representation of ACP on BNB Smart Chain. It is minted and burned 1:1 via the ANCAP bridge gateway so ACP can settle against BSC DeFi rails (starting with PancakeSwap wACP/USDT). Native ACP remains the ANCAP chain accounting unit; wACP is the wrapped market form. Not investment advice.
+> Wrapped ACP (wACP) is the official BEP-20 representation of ACP on BNB Smart Chain. It is minted and burned at **1 ACP ↔ 10 wACP** via the ANCAP bridge gateway so ACP can settle against BSC DeFi rails (starting with PancakeSwap wACP/USDT). Native ACP remains the ANCAP chain accounting unit; wACP is the wrapped market form. Not investment advice.
 
 ### Additional notes for reviewers
 - Distinct from CoinGecko’s existing “ACP / Arena Of Faith” listing — different project, contract, and chain.

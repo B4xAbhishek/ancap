@@ -49,7 +49,7 @@ Recommended apply path once the public repo exists:
 - keep the chosen status-check context names documented here and in `.github/bootstrap/ancap-docs-repo-settings.json` if the expected CI surface changes.
 
 Current live status:
-- `dragoncattrx-hub/ancap-docs` now exists and already has the initial public-safe docs seed pushed to `main`;
+- `ancapcloud/ancap-docs` now exists and already has the initial public-safe docs seed pushed to `main`;
 - description/homepage/merge policy/secret scanning/push protection/labels/milestones are already applied live from this seed set;
 - branch protection is now applied live on `main` with the seeded `Docs CI / docs-bundle` required-check context;
 - `python scripts/bootstrap_ancap_docs_repo.py --repo <owner>/ancap-docs --verify-live` can compare the live repo metadata and protection state against this seed after launch-time changes.

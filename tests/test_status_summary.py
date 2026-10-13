@@ -31,7 +31,7 @@ def test_status_docs_clear_false_readme_and_monetization_blockers():
 def test_status_summary_keeps_ancap_docs_live_followup_truth_explicit():
     status_text = STATUS_PATH.read_text(encoding="utf-8")
 
-    assert "https://github.com/dragoncattrx-hub/ancap-docs" in status_text
+    assert "https://github.com/ancapcloud/ancap-docs" in status_text
     assert "scripts/generate_ancap_docs_live_followup.py" in status_text
     assert "tmp/ancap-docs-live-follow-up-latest.md" in status_text
     assert "tmp/ancap-docs-live-follow-up-latest.json" in status_text

@@ -203,7 +203,7 @@ def test_docs_split_plan_and_export_script_are_linked_and_reflected_in_roadmap()
     assert ".github/workflows/docs-ci.yml" in docs_split_text
     assert ".github/dependabot.yml" in docs_split_text
     assert "docs/ANCAP_DOCS_REPO_README.md" in docs_split_text
-    assert "https://github.com/dragoncattrx-hub/ancap-docs" in docs_split_text
+    assert "https://github.com/ancapcloud/ancap-docs" in docs_split_text
     assert "scripts/generate_ancap_docs_live_followup.py" in docs_split_text
     assert "tmp/ancap-docs-live-follow-up-YYYY-MM-DD.md" in docs_split_text
     assert "tmp/ancap-docs-live-follow-up-YYYY-MM-DD.json" in docs_split_text

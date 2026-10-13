@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.repository == 'dragoncattrx-hub/ancap'
+    if: github.repository == 'ancapcloud/ancap'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -90,7 +90,7 @@ jobs:
             if [ "$ARCH" = "aarch64" ]; then
               mkdir -p "$HOME/ancap-src"
               if [ ! -d "$HOME/ancap-src/.git" ]; then
-                git clone --depth 1 https://github.com/dragoncattrx-hub/ancap.git "$HOME/ancap-src"
+                git clone --depth 1 https://github.com/ancapcloud/ancap.git "$HOME/ancap-src"
               else
                 git -C "$HOME/ancap-src" fetch --depth 1 origin master
                 git -C "$HOME/ancap-src" reset --hard origin/master

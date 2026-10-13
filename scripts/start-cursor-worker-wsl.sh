@@ -2,7 +2,7 @@
 # Start Cursor self-hosted agent worker inside WSL (recommended Windows workaround).
 set -euo pipefail
 
-REPO_URL="${ANCAP_REPO_URL:-https://github.com/dragoncattrx-hub/ancap.git}"
+REPO_URL="${ANCAP_REPO_URL:-https://github.com/ancapcloud/ancap.git}"
 WORK_DIR="${ANCAP_WSL_WORK_DIR:-$HOME/ancap/ancap}"
 
 echo "==> Cursor WSL worker bootstrap"

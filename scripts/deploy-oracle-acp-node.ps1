@@ -21,8 +21,11 @@ param(
   [Parameter(Mandatory = $true)][string]$KeyPath,
   [string]$User = "opc",
   [ValidateSet("amd64", "arm64")][string]$Arch = "amd64",
-  [string]$PeerRpc = "https://acp1.ancap.cloud/rpc",
-  [string]$RepoUrl = "https://github.com/dragoncattrx-hub/ancap.git",
+  # Prefer direct HTTP peer on primary (:18545) — Oracle binary historically lacked
+  # reqwest TLS, and Cloudflare IPv6 from OCI is unreliable. Public HTTPS works after
+  # rebuilding acp-node with reqwest rustls-tls.
+  [string]$PeerRpc = "http://185.114.117.241:18545/rpc",
+  [string]$RepoUrl = "https://github.com/ancapcloud/ancap.git",
   [string]$BinaryPath = ""
 )
 

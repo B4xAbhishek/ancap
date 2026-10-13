@@ -27,7 +27,7 @@ Before creating or re-seeding the repo, confirm:
 6. Verify that the root `README.md` is the docs-focused landing page, not the monorepo operations README.
 
 Current live status from this run:
-- `https://github.com/dragoncattrx-hub/ancap-docs` now exists as the public seed repo;
+- `https://github.com/ancapcloud/ancap-docs` now exists as the public seed repo;
 - the exported bundle has already been pushed as the first commit on `main`;
 - the exported `Docs CI` workflow has already completed successfully on `main`;
 - repo settings / labels / milestones have already been applied from the checked-in helper + seeds;
@@ -40,7 +40,7 @@ Current live status from this run:
 - the wrapper now stays concise by default: it prints the saved artifact paths without echoing the full markdown checklist / JSON payload back into the terminal on success, and only emits the child helper output automatically when a generation step fails. Use `--verbose-child-output` when you explicitly want both saved files and the full underlying helper stdout/stderr in the same run.
 - when the paired JSON artifact still reports unresolved drift or unknowns, `python scripts/generate_ancap_docs_live_followup.py --repo <owner>/ancap-docs --fail-on-not-ok` now returns exit code `2` after writing both artifacts, which makes the same saved-artifact path usable for cron/CI drift alarms without a separate JSON parser wrapper.
 - that markdown handoff now also includes a dedicated `Project board seed targets` section with the checked-in board name, scope, `gh project create/edit/link` command skeletons, seeded field-create commands/manual steps, views, seed notes, the current GitHub auth login/token-source/scopes when detectable, and the missing-scope/auth-refresh guidance when project auth is blocked, so project-board follow-up no longer depends on cross-opening the seed doc while auth is still blocked;
-- that same community verification pass now also records when live GitHub Projects verification is blocked by auth scope (for the current `dragoncattrx-hub` owner, the active token lacks `read:project`, so live project-board seeding/verification still cannot be called complete from this helper);
+- that same community verification pass now also records when live GitHub Projects verification is blocked by auth scope (for the current `ancapcloud` owner, the active token lacks `read:project`, so live project-board seeding/verification still cannot be called complete from this helper);
 - open public Dependabot PRs may bump GitHub Actions versions in `.github/workflows/docs-ci.yml` before the exported bootstrap template is refreshed, so the live guard now requires structural workflow alignment rather than byte-for-byte sameness for that pair; logic/action-identity drift is still a hard failure.
 
 ## GitHub settings baseline

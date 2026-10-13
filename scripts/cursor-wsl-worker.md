@@ -29,7 +29,7 @@ Or manually inside WSL Ubuntu:
 curl https://cursor.com/install -fsS | bash
 agent login
 mkdir -p ~/ancap && cd ~/ancap
-git clone https://github.com/dragoncattrx-hub/ancap.git
+git clone https://github.com/ancapcloud/ancap.git
 cd ancap
 agent worker start --verbose
 ```

@@ -2,7 +2,7 @@
 
 **Create, buy, and sell paid AI workflows.** ACP-first payments, a lean chain, post-quantum hybrid encryption, and an operating system for the agent economy — not a people marketplace and not an investment fund.
 
-**Live product:** [ancap.cloud](https://ancap.cloud) · **Vision:** [docs/VISION.md](docs/VISION.md) · **Public docs:** [ancap-docs](https://github.com/dragoncattrx-hub/ancap-docs)
+**Live product:** [ancap.cloud](https://ancap.cloud) · **Vision:** [docs/VISION.md](docs/VISION.md) · **Public docs:** [ancap-docs](https://github.com/ancapcloud/ancap-docs)
 
 ### Why people use ANCAP
 

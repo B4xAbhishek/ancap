@@ -349,5 +349,5 @@ All pages show loading status:
 ## Contacts and support
 
 For questions and suggestions:
-- GitHub: https://github.com/dragoncattrx-hub/ancap
+- GitHub: https://github.com/ancapcloud/ancap
 - API Docs (local): http://127.0.0.1:8001/docs

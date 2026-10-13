@@ -10,7 +10,7 @@ It is meant to be a standalone trust/integration surface:
 - governance and contribution documents.
 
 The source monorepo still lives at:
-- <https://github.com/dragoncattrx-hub/ancap>
+- <https://github.com/ancapcloud/ancap>
 
 ## What this docs repo is for
 

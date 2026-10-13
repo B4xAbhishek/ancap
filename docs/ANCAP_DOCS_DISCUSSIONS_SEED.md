@@ -125,9 +125,9 @@ During the first `ancap-docs` repo setup:
 ## Current live follow-up state
 
 The public repo now already has the three seeded bootstrap topics live at:
-- `https://github.com/dragoncattrx-hub/ancap-docs/discussions/2` — `Welcome / how to use this repo`
-- `https://github.com/dragoncattrx-hub/ancap-docs/discussions/3` — `Where to ask what`
-- `https://github.com/dragoncattrx-hub/ancap-docs/discussions/4` — `Public scope boundaries`
+- `https://github.com/ancapcloud/ancap-docs/discussions/2` — `Welcome / how to use this repo`
+- `https://github.com/ancapcloud/ancap-docs/discussions/3` — `Where to ask what`
+- `https://github.com/ancapcloud/ancap-docs/discussions/4` — `Public scope boundaries`
 
 Current honest drift against this seed:
 - those three topics are still unpinned;

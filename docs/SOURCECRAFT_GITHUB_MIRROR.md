@@ -18,7 +18,7 @@ If you need to **push commits into SourceCraft yourself** (true dual-write), imp
    - `repo` (list + read private/public repos)
    - `read:org` (optional; collaborators / LFS)
 6. Paste PAT → **Authenticate**.
-7. Owner: `dragoncattrx-hub`
+7. Owner: `ancapcloud`
 8. Repository: pick one of:
    - `ancap` (main)
    - `assets`

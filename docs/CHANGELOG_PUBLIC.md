@@ -24,7 +24,7 @@ For exhaustive implementation detail, see [LOG.md](../LOG.md).
 
 ## 2026-06-01 — ancap-docs live follow-up truth surfaced
 
-- refreshed the checked-in status surfaces so they now explicitly reflect the live `dragoncattrx-hub/ancap-docs` repo state instead of stopping at launch-day notes
+- refreshed the checked-in status surfaces so they now explicitly reflect the live `ancapcloud/ancap-docs` repo state instead of stopping at launch-day notes
 - captured that the public docs repo is already live with the exported bundle pushed, Docs CI green on `main`, checked-in settings / labels / milestones applied, and default-branch protection enforced with the seeded `Docs CI / docs-bundle` check
 - recorded the first paired live follow-up artifact result from `scripts/generate_ancap_docs_live_followup.py`, including that the current run reported `8` concrete drifts and `0` unknowns rather than generic "still needs follow-up" wording
 - documented that the same wrapper now refreshes stable latest-alias handoff files (`tmp/ancap-docs-live-follow-up-latest.md` and `tmp/ancap-docs-live-follow-up-latest.json`) with embedded artifact metadata, now including generator repo HEAD provenance, so cron/reporting follow-through can read the latest verified public-repo state without reconstructing a date suffix

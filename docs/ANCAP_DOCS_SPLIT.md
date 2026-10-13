@@ -90,13 +90,13 @@ The script copies the approved public-safe files, exports a docs-focused root `R
 
 ## Current remaining follow-up
 
-GitHub org creation is still external, but the public docs repo now exists at `https://github.com/dragoncattrx-hub/ancap-docs`. Current checks from this cron run show:
+GitHub org creation is still external, but the public docs repo now exists at `https://github.com/ancapcloud/ancap-docs`. Current checks from this cron run show:
 
 - `https://github.com/ANCAP` resolves to an existing unrelated GitHub user profile (`ancap`)
 - `https://github.com/ancap-network` returns GitHub 404
 - `gh api orgs/ANCAP` and `gh api orgs/ancap-network` both fail with `admin:org` scope requirement in the current auth context
-- `gh repo view dragoncattrx-hub/ancap-docs` now succeeds, the repo is public, and the exported bundle has been pushed as the first seed commit
-- `gh run list --repo dragoncattrx-hub/ancap-docs --limit 5` shows the exported `Docs CI` workflow already ran successfully on `main`
+- `gh repo view ancapcloud/ancap-docs` now succeeds, the repo is public, and the exported bundle has been pushed as the first seed commit
+- `gh run list --repo ancapcloud/ancap-docs --limit 5` shows the exported `Docs CI` workflow already ran successfully on `main`
 - repo settings/labels/milestones and default-branch protection are now applied live; the helper can also verify that live repo state still matches the checked-in seeds via `python scripts/bootstrap_ancap_docs_repo.py --repo <owner>/ancap-docs --verify-live`
 - `python scripts/generate_ancap_docs_live_followup.py --repo <owner>/ancap-docs` now wraps the paired markdown + JSON handoff into one repeatable command, keeping the preferred saved artifact pair `tmp/ancap-docs-live-follow-up-YYYY-MM-DD.md` and `tmp/ancap-docs-live-follow-up-YYYY-MM-DD.json` aligned and, by default, also refreshing the stable latest aliases `tmp/ancap-docs-live-follow-up-latest.md` and `tmp/ancap-docs-live-follow-up-latest.json`
 - those saved artifacts now embed artifact metadata (`artifactMetadata` in JSON plus an `Artifact metadata` appendix in markdown) including generator/bootstrap source paths, UTC generation time, and generator repo HEAD provenance

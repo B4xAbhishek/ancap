@@ -103,7 +103,7 @@ def test_generate_followup_script_writes_default_artifact_pair(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -135,11 +135,11 @@ def test_generate_followup_script_writes_default_artifact_pair(tmp_path: Path):
     markdown_latest_posix = markdown_latest.as_posix()
     json_latest_posix = json_latest.as_posix()
     markdown_text = markdown_output.read_text(encoding="utf-8")
-    assert "# ANCAP docs live follow-up checklist for dragoncattrx-hub/ancap-docs" in markdown_text
+    assert "# ANCAP docs live follow-up checklist for ancapcloud/ancap-docs" in markdown_text
     assert "## Discussion UI targets" in markdown_text
-    assert "Tracked cleanup issue: [`Align Discussions categories and pin seeded bootstrap topics`](https://github.com/dragoncattrx-hub/ancap-docs/issues/5)" in markdown_text
+    assert "Tracked cleanup issue: [`Align Discussions categories and pin seeded bootstrap topics`](https://github.com/ancapcloud/ancap-docs/issues/5)" in markdown_text
     assert "## Discussions admin checklist" in markdown_text
-    assert "Pin seeded bootstrap discussion [`Welcome / how to use this repo`](https://github.com/dragoncattrx-hub/ancap-docs/discussions/2)." in markdown_text
+    assert "Pin seeded bootstrap discussion [`Welcome / how to use this repo`](https://github.com/ancapcloud/ancap-docs/discussions/2)." in markdown_text
     assert "## Project board seed targets" in markdown_text
     assert "Auth refresh command: `gh auth refresh -h github.com -s read:project`" in markdown_text
     assert "## Project board checklist" in markdown_text
@@ -154,9 +154,9 @@ def test_generate_followup_script_writes_default_artifact_pair(tmp_path: Path):
     assert f"- Latest markdown alias: `{markdown_latest_posix}`" in markdown_text
     assert f"- Latest JSON alias: `{json_latest_posix}`" in markdown_text
     json_payload = json.loads(json_output.read_text(encoding="utf-8"))
-    assert json_payload["repo"] == "dragoncattrx-hub/ancap-docs"
+    assert json_payload["repo"] == "ancapcloud/ancap-docs"
     assert json_payload["artifactMetadata"] == {
-        "repo": "dragoncattrx-hub/ancap-docs",
+        "repo": "ancapcloud/ancap-docs",
         "generatedAt": json_payload["artifactMetadata"]["generatedAt"],
         "dateLabel": "2026-06-01",
         "basename": "ancap-docs-live-follow-up",
@@ -205,7 +205,7 @@ def test_generate_followup_script_verbose_mode_echoes_child_output(tmp_path: Pat
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -229,7 +229,7 @@ def test_generate_followup_script_rejects_blank_basename(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--basename",
@@ -271,7 +271,7 @@ def test_generate_followup_script_rejects_blank_date_label(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -294,7 +294,7 @@ def test_generate_followup_script_rejects_path_like_basename(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--basename",
@@ -317,7 +317,7 @@ def test_generate_followup_script_rejects_path_like_date_label(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -384,7 +384,7 @@ def test_generate_followup_script_fail_on_not_ok_returns_nonzero_and_writes_arti
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -417,7 +417,7 @@ def test_generate_followup_script_can_skip_latest_alias_writes(tmp_path: Path):
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -451,7 +451,7 @@ def test_generate_followup_script_rejects_date_label_that_collides_with_latest_a
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--date-label",
@@ -477,7 +477,7 @@ def test_generate_followup_script_rejects_missing_bootstrap_script(tmp_path: Pat
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--bootstrap-script",
@@ -502,7 +502,7 @@ def test_generate_followup_script_rejects_non_file_bootstrap_script(tmp_path: Pa
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(tmp_path),
             "--bootstrap-script",
@@ -527,7 +527,7 @@ def test_generate_followup_script_rejects_output_dir_that_is_a_file(tmp_path: Pa
             sys.executable,
             str(SCRIPT_PATH),
             "--repo",
-            "dragoncattrx-hub/ancap-docs",
+            "ancapcloud/ancap-docs",
             "--output-dir",
             str(output_file),
         ],

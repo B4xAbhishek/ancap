@@ -11,7 +11,7 @@ import { buildAcpTxHref } from "@/lib/acpExplorer";
 
 /** Canonical spec in the public ANCAP repo (same path as local `docs/`). */
 const BRIDGE_SPEC_DOC_HREF =
-  "https://github.com/dragoncattrx-hub/ancap/blob/master/docs/bridge-spec-v1.md";
+  "https://github.com/ancapcloud/ancap/blob/master/docs/bridge-spec-v1.md";
 type BridgeStatus = {
   bridge_rail_enabled: boolean;
   bridge_rail_paused: boolean;
