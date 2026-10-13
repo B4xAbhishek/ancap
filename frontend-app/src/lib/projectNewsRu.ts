@@ -6,8 +6,16 @@ export type ProjectNewsItem = {
   href: string;
 };
 
-/** Последние новости проекта ANCAP (RU). */
+/** Latest ANCAP project news (widget left-bottom; EN preferred for launch posts). */
 export const PROJECT_NEWS_RU: ProjectNewsItem[] = [
+  {
+    id: "fundraising-advisor-ir-2026-10",
+    date: "2026-10-13",
+    title: "Hiring: Fundraising Advisor / Investor Relations",
+    summary:
+      "ANCAP (AI & Web3) seeks a Fundraising Advisor / IR Specialist to open serious capital conversations — investor narrative, warm intros, honest IR. Apply: /careers.",
+    href: "/careers",
+  },
   {
     id: "ancap-dating-mesh",
     date: "2026-10-02",

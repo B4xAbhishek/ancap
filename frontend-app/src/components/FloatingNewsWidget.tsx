@@ -75,9 +75,9 @@ export function FloatingNewsWidget() {
           type="button"
           onClick={() => setOpenPersist(true)}
           className="pointer-events-auto ancap-fab-slide-in rounded-full border border-emerald-400/30 bg-[#071020]/94 px-3.5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-100 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md hover:border-emerald-300/45"
-          aria-label="Открыть новости ANCAP"
+          aria-label="Open ANCAP news"
         >
-          Новости
+          News
         </button>
       </div>
     );
@@ -85,14 +85,14 @@ export function FloatingNewsWidget() {
 
   return (
     <aside
-      aria-label="Новости проекта ANCAP"
+      aria-label="ANCAP project news"
       className="pointer-events-none fixed bottom-[max(0.85rem,env(safe-area-inset-bottom))] left-3 z-[90] w-[min(18.5rem,calc(100vw-1.5rem))] sm:left-4"
     >
       <div className="pointer-events-auto ancap-panel-rise overflow-hidden rounded-2xl border border-white/12 bg-[#071020]/95 text-white shadow-[0_18px_50px_rgba(0,0,0,0.48)] backdrop-blur-xl">
         <div className="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-2">
           <div className="min-w-0">
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200/90">
-              Новости
+              News
             </div>
             <div className="truncate text-xs text-white/45">
               {index + 1} / {items.length} · ANCAP
@@ -102,9 +102,9 @@ export function FloatingNewsWidget() {
             type="button"
             onClick={() => setOpenPersist(false)}
             className="rounded-md border border-white/10 px-2 py-1 text-[11px] text-white/55 hover:border-white/25 hover:text-white"
-            aria-label="Свернуть новости"
+            aria-label="Collapse news"
           >
-            {isMobile ? "Закрыть" : "Свернуть"}
+            {isMobile ? "Close" : "Collapse"}
           </button>
         </div>
 
@@ -126,7 +126,7 @@ export function FloatingNewsWidget() {
             <button
               key={item.id}
               type="button"
-              aria-label={`Новость ${i + 1}`}
+              aria-label={`News item ${i + 1}`}
               onClick={() => setIndex(i)}
               className={`h-1.5 flex-1 rounded-full transition ${
                 i === index ? "bg-emerald-300/80" : "bg-white/15 hover:bg-white/30"
