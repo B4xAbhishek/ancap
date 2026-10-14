@@ -5,18 +5,22 @@ import { useLanguage } from "./LanguageProvider";
 import { solutionPortfolio, portfolioByLang } from "@/lib/solutionPortfolio";
 import { offerForRoute, OFFER_KIND_LABEL } from "@/lib/projectOffers";
 import { positioningByLang } from "@/locales/positioning";
+import { fallbackWorkflowBundles } from "@/lib/workflowStore";
 
 /** Existing project pages retain their routes, with an explicit buyer→receipt chain. */
 export function ProjectWorkflowContext() {
   const pathname = usePathname();
   const { lang } = useLanguage();
   const index = solutionPortfolio.findIndex((area) => area.routes.some(([href]) => href === pathname));
-  if (index < 0) return null;
+  if (!pathname || index < 0) return null;
   const area = solutionPortfolio[index];
   const p = portfolioByLang[lang];
   const c = positioningByLang[lang];
   const offer = offerForRoute(pathname);
   const primarySlug = offer?.workflowSlugs[0];
+  const primaryHref = primarySlug
+    ? `${fallbackWorkflowBundles.some(bundle => bundle.slug === primarySlug) ? "/ai/bundles" : "/ai/run"}/${encodeURIComponent(primarySlug)}`
+    : "/ai/workflows";
 
   return (
     <aside
@@ -37,7 +41,7 @@ export function ProjectWorkflowContext() {
         </div>
         <div className="flex flex-wrap gap-3">
           {primarySlug ? (
-            <Link href={`/ai/workflows?q=${encodeURIComponent(primarySlug)}`} className="text-sm text-[var(--accent)]">
+            <Link href={primaryHref} className="text-sm text-[var(--accent)]">
               {c.browse} →
             </Link>
           ) : (

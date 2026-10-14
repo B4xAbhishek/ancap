@@ -22,16 +22,17 @@ export default function InvestorBudgetPage() {
 
         <h2 className="mt-10 text-xl font-semibold">Discussion ask band</h2>
         <p className="mt-3 text-[var(--text-muted)]">
-          Until jurisdiction and quotes are fixed: <strong className="text-[var(--text)]">€250,000–€400,000</strong> cash
-          for a standard release team over 12 months (formation, engineering/QA, ops/IR, infra/LLM, security review
-          slice, pilot bag, reserve). Lean core planning lands nearer €180k–€220k before reserve.
+          Unverified cost scenarios including a 15–20% reserve:
+          <strong className="text-[var(--text)]"> lean €129,950–€247,920; standard €277,265–€539,760</strong>.
+          These ranges follow the line items, not an approved funding ask. The lean plan includes one engineer;
+          the standard plan includes two engineers plus ops and sales. Payroll on-costs and quotes remain open.
         </p>
 
         <h2 className="mt-10 text-xl font-semibold">Cost buckets</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-[var(--text-muted)]">
           <li>One-time: company formation, accounting setup, legal refresh, independent security review.</li>
           <li>Monthly: engineering, ops/IR, optional sales, hosting, LLM inference, SaaS tools.</li>
-          <li>Pilot bag: test credits / discounts and optional distribution experiments (ACP credits ≠ cash revenue).</li>
+          <li>Pilot bag: cash travel / content experiments. Promotional ACP credits are non-cash and excluded from EUR totals.</li>
           <li>Reserve: 15–20% working capital.</li>
         </ul>
 

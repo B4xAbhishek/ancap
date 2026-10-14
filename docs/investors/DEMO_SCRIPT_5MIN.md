@@ -1,7 +1,7 @@
 # ANCAP — 5-minute investor demo script
 
 Date: 2026-10-14.  
-**Samples and UI walks are not paid production runs** unless you explicitly show a test-ledger receipt from the smoke path.
+**Samples, UI walks and test-ledger runs are not production customer sales.** A test receipt demonstrates test accounting only. For a live AI demo, verify provider/model/status and `fallback_used=false`; preserve the generated artifact and receipt.
 
 ## Prep (before the call)
 
@@ -19,7 +19,7 @@ Date: 2026-10-14.
 | 1:30–2:30 | Sample or live test run | Prefer **illustrative** sample: `/sample-reports/token-risk-report-pro`. If showing a live test: register → credits deposit → create run → pay with credits → execute → open run receipt. Label it **test ledger**, not a customer sale. |
 | 2:30–3:10 | Receipt / proof | Show run receipt fields: price snapshot, status, payment proof. Clarify: receipt records execution; it does **not** certify factual accuracy of the AI text. |
 | 3:10–3:50 | `/dashboard/seller` or creators | Creator packaging: build once, sell repeatable runs. Do not claim live GMV. |
-| 3:50–4:40 | `/investors` | Stage honesty: product implemented; release + commercial validation open. Metrics not supplied. Funding for formation, team, audit, pilots. Point to budget assumptions and ask band. |
+| 3:50–4:40 | `/investors` | Stage honesty: product implemented; release + commercial validation open. Metrics not supplied. Funding for formation, team, audit, pilots. Point to reconciled cost assumptions; final funding ask is pending quotes. |
 | 4:40–5:00 | Ask | “We are raising to fund the 12-month plan in the budget memo — not a made-up valuation. Next proof: paid pilots with measured runs.” |
 
 ## Do not say

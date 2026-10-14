@@ -65,8 +65,9 @@ test("research project heroes describe briefs instead of physical capabilities",
   for (const route of ["/aeterna", "/cryo", "/saliva-rx", "/galaxy", "/lunar", "/stardust"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Research briefs");
-    await expect(page.getByText("Buyer", { exact: true })).toBeVisible();
-    await expect(page.getByText("Receipt", { exact: true })).toBeVisible();
+    const offerChain = page.getByRole("complementary", { name: "Solutions" });
+    await expect(offerChain.getByText("Buyer", { exact: true })).toBeVisible();
+    await expect(offerChain.getByText("Receipt", { exact: true })).toBeVisible();
   }
 });
 
@@ -90,4 +91,11 @@ test("the investor overview supports the light theme", async ({ page, context })
   await page.goto("/investors");
   await expect(page.locator("html")).toHaveClass(/light/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("color", "rgb(15, 23, 42)");
+});
+
+test("project offers link directly to the correct workflow or bundle", async ({ page }) => {
+  await page.goto("/agency");
+  await expect(page.locator('aside a[href="/ai/bundles/launch-pack"]')).toBeVisible();
+  await page.goto("/markets");
+  await expect(page.locator('aside a[href="/ai/run/market-direction-brief"]')).toBeVisible();
 });

@@ -17,15 +17,16 @@ Derive a funding ask from **costs and measurable milestones**, without inventing
 
 All EUR figures below are **assumptions** unless marked as a public list price. Local counsel / accountant quotes will replace them.
 
-## Ask range (derived from budget)
+## Scenario ranges (derived from line items)
 
-| Scenario | 12-month cash need (EUR) | What it buys |
-| --- | --- | --- |
-| Lean core | **180,000–220,000** | Formation + 2 FT engineering + part-time ops/IR + infra + first audit slice + pilot budget |
-| Standard release team | **320,000–420,000** | Formation + 4 FT (eng/QA/ops/sales) + fuller audit + LLM/infra + pilots |
-| With reserve | **add 15–20%** | Working-capital buffer for delayed pilots / FX |
+These are arithmetic totals of unverified assumptions, not an approved funding ask.
 
-**Recommended discussion band until owner confirms jurisdiction:** **€250,000–€400,000**, justified by the standard-team column below. Final ask = sum of confirmed quotes + reserve, tied to milestones in `/investors`.
+| Scenario | Before reserve (EUR) | Including 15–20% reserve (EUR) | Staffing assumption |
+| --- | --- | --- | --- |
+| Lean core | 113,000–206,600 | 129,950–247,920 | 1 engineer plus part-time ops and sales |
+| Standard release team | 241,100–449,800 | 277,265–539,760 | 2 engineers plus ops and sales |
+
+Final ask = selected, confirmed cash budget + a separately justified reserve. The earlier €250k–€400k discussion band did not describe the full line-item range and is superseded by the scenarios above. Employer payroll costs, tax treatment and audit scope still need quotes; these totals are incomplete where such costs are excluded.
 
 ## One-time (year 0) costs
 
@@ -36,7 +37,7 @@ All EUR figures below are **assumptions** unless marked as a public list price. 
 | Legal: terms/privacy refresh + commercial review | 3,000–8,000 | 6,000–15,000 | Counsel quote |
 | Independent security review (app + wallet surface) | 8,000–15,000 | 15,000–35,000 | Scope in `docs/DEVELOPER_HANDOFF_RU.md`; **quote required** |
 | Brand / investor deck production | 1,000–3,000 | 2,000–5,000 | Optional |
-| **Subtotal one-time** | **≈15k–33k** | **≈28k–69k** | |
+| **Subtotal one-time** | **14,700–33,000** | **27,900–69,000** | |
 
 ## Monthly run-rate (×12)
 
@@ -50,26 +51,29 @@ All EUR figures below are **assumptions** unless marked as a public list price. 
 | LLM / API inference budget | 300–1,200 | 800–3,000 | Depends on paid-run volume; **not revenue** |
 | Domains, email, SaaS tools | 150–350 | 250–600 | |
 | Contingency (ops) | 300–600 | 500–1,000 | |
-| **Monthly subtotal** | **≈8.2k–14k** | **≈17.4k–30.4k** | |
-| **×12** | **≈98k–168k** | **≈209k–365k** | |
+| **Monthly subtotal** | **8,150–14,050** | **17,350–30,400** | |
+| **×12** | **97,800–168,600** | **208,200–364,800** | |
 
 ## Pilots / sales (year bag, not monthly)
 
 | Line | Lean (EUR) | Standard (EUR) | Notes |
 | --- | --- | --- | --- |
-| Pilot customer discounts / credits (ACP treasury accounting) | 2,000–5,000 | 5,000–15,000 | ACP credits ≠ cash revenue |
+| Pilot customer discounts / credits (non-cash, outside cash totals) | 2,000–5,000 | 5,000–15,000 | Illustrative allocation only; ACP credits are not EUR cash. Incremental inference cost is budgeted in LLM/API above |
 | Travel / conferences (optional) | 0–3,000 | 3,000–10,000 | Only if owner prioritizes |
 | Content / listing experiments | 500–2,000 | 2,000–6,000 | |
 
-## Totals (illustrative)
+## Cash totals (illustrative; exact arithmetic)
 
-| | Lean | Standard |
+| | Lean (EUR) | Standard (EUR) |
 | --- | --- | --- |
-| One-time | 15–33k | 28–69k |
-| Run-rate ×12 | 98–168k | 209–365k |
-| Pilots bag | 2.5–10k | 10–31k |
-| **Cash need before reserve** | **≈116–211k** | **≈247–465k** |
-| +15% reserve | **≈133–243k** | **≈284–535k** |
+| One-time | 14,700–33,000 | 27,900–69,000 |
+| Run-rate ×12 | 97,800–168,600 | 208,200–364,800 |
+| Cash pilot spending (travel + content) | 500–5,000 | 5,000–16,000 |
+| **Cash need before reserve** | **113,000–206,600** | **241,100–449,800** |
+| **Including 15% reserve** | **129,950–237,590** | **277,265–517,270** |
+| **Including 20% reserve** | **135,600–247,920** | **289,320–539,760** |
+
+ACP promotional credits are excluded from EUR cash totals. Do not count them again as cash expenditure or income. Monthly ops contingency is already included; the separate 15–20% reserve must be justified to avoid budgeting the same risk twice.
 
 ## Milestone mapping (use of funds)
 

@@ -5,7 +5,7 @@
 
 ## Current truth
 
-**Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. Portfolio pages expose buyer→task→inputs→AI result→limits→pay→receipt chains (`projectOffers`). Demo script + 12‑month budget assumptions published under `/docs/investors/*` (ask discussion band €250k–€400k until jurisdiction/quotes). No verified revenue/customer metrics supplied. Not deployed; does not close mobile/security release checks. Tracker: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
+**Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. Portfolio pages expose buyer→task→inputs→AI result→limits→pay→receipt chains (`projectOffers`). Demo script + 12‑month budget assumptions published under `/docs/investors/*` (unverified cost scenarios; final ask pending jurisdiction/quotes). No verified revenue/customer metrics supplied. Not deployed; does not close mobile/security release checks. Tracker: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
 
 Presentation verification: portfolio/offer-chain vitest; Playwright investor checks (languages, filters, research heroes, budget/demo links); API smoke `tests/api/test_investor_paid_path_smoke.py` (credits ledger — no Stripe/broadcast). Screenshots: `tmp/investor-preview-2026-10-14/`.
 
