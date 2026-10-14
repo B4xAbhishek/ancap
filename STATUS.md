@@ -1,9 +1,13 @@
 # ANCAP Status
 
-> Updated: 2026-10-13
+> Updated: 2026-10-14
 > Fast truth: this is the shortest current status entry point.
 
 ## Current truth
+
+**Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. No verified revenue/customer metrics or funding amount supplied. These presentation changes are not yet deployed and do not close mobile/security/paid-execution release checks. Next steps: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
+
+Presentation verification: production frontend build passed; portfolio/i18n/classification tests **3 passed**; Playwright investor presentation checks **6 passed** (five languages, filters, mobile width, research heroes and light theme). Screenshots: `tmp/investor-preview-2026-10-14/`.
 
 ANCAP is **largely built**, but it is **not fully release-complete end-to-end**.
 

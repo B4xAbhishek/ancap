@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { solutionPortfolio, portfolioByLang, workflowArea } from "@/lib/solutionPortfolio";
+import { positioningByLang } from "@/locales/positioning";
 import { Navigation } from "@/components/Navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { WorkflowBundle, WorkflowTemplate } from "@/lib/workflowStore";
@@ -17,11 +20,22 @@ const PREMIUM_SLUGS = [
 export function WorkflowsCatalog({
   workflows,
   bundles,
+  isFallback = false,
 }: {
   workflows: WorkflowTemplate[];
   bundles: WorkflowBundle[];
+  isFallback?: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const c = positioningByLang[lang];
+  const p = portfolioByLang[lang];
+  const [query, setQuery] = useState("");
+  const [area, setArea] = useState("crypto");
+  const isFiltering = area !== "all" || query.trim().length > 0;
+  const visibleWorkflows = workflows.filter(workflow => {
+    const text = [workflow.title, workflow.summary, workflow.description, workflow.category, ...workflow.tags].join(" ").toLocaleLowerCase();
+    return (area === "all" || workflowArea(workflow.category) === area) && text.includes(query.trim().toLocaleLowerCase());
+  });
   const premiumWorkflows = workflows.filter((workflow) => PREMIUM_SLUGS.includes(workflow.slug));
   const steps = [
     [t("workflowsPage.step1Title"), t("workflowsPage.step1Text")],
@@ -34,6 +48,13 @@ export function WorkflowsCatalog({
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <Navigation />
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        {isFallback && <p role="status" className="mb-6 rounded-xl border border-amber-300/25 bg-amber-300/5 p-4 text-sm text-[var(--text-muted)]">{{
+          en: "The live catalog could not be confirmed. Reference offers are shown; confirm availability and price before paying.",
+          ru: "Живой каталог не подтверждён. Показаны справочные предложения; перед оплатой проверьте доступность и цену.",
+          uk: "Живий каталог не підтверджено. Показано довідкові пропозиції; перед оплатою перевірте доступність і ціну.",
+          de: "Der Live-Katalog konnte nicht bestätigt werden. Referenzangebote werden angezeigt; Verfügbarkeit und Preis vor der Zahlung prüfen.",
+          "zh-Hant": "無法確認即時目錄。目前顯示參考方案；付款前請確認供應情況與價格。",
+        }[lang]}</p>}
         <section className="mb-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
           <div className="mb-3 inline-flex rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
             {t("workflowsPage.kicker")}
@@ -72,7 +93,7 @@ export function WorkflowsCatalog({
           ))}
         </section>
 
-        {premiumWorkflows.length > 0 && (
+        {!isFiltering && premiumWorkflows.length > 0 && (
           <section className="mb-10 rounded-3xl border border-emerald-400/20 bg-emerald-400/[0.05] p-6">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -147,7 +168,7 @@ export function WorkflowsCatalog({
           </div>
         </section>
 
-        {bundles.length > 0 && (
+        {!isFiltering && bundles.length > 0 && (
           <section className="mb-10">
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
@@ -214,8 +235,26 @@ export function WorkflowsCatalog({
             <div className="text-sm text-white/45">{t("workflowsPage.catalogAside")}</div>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-            {workflows.map((workflow) => (
+          <div className="mb-6 flex flex-wrap gap-3">
+            <label className="flex min-w-0 flex-1 flex-col gap-2 text-sm text-white/70">
+              {c.search}<input value={query} onChange={event => setQuery(event.target.value)} type="search" className="rounded-xl border border-white/20 bg-[var(--bg-card)] px-4 py-3 text-[var(--text)]" />
+            </label>
+            <label className="flex min-w-0 flex-col gap-2 text-sm text-white/70">
+              {c.solutions}<select value={area} onChange={event => setArea(event.target.value)} className="max-w-full rounded-xl border border-white/20 bg-[var(--bg-card)] px-4 py-3 text-[var(--text)]">
+                <option value="all">{c.all}</option>
+                {solutionPortfolio.map((item, index) => <option key={item.id} value={item.id}>{p.areas[index].title}</option>)}
+              </select>
+            </label>
+          </div>
+          {visibleWorkflows.length === 0 && <p role="status" className="py-8 text-white/70">{c.empty}</p>}
+          {solutionPortfolio.map((group, index) => {
+            const grouped = visibleWorkflows.filter(workflow => workflowArea(workflow.category) === group.id);
+            if (grouped.length === 0) return null;
+            return <section key={group.id} className="mb-10" aria-labelledby={`catalog-${group.id}`}>
+              <h3 id={`catalog-${group.id}`} className="mb-4 text-xl font-semibold">{p.areas[index].title} <span className="text-sm font-normal text-white/45">({grouped.length})</span></h3>
+              {group.kind !== "core" && <p className="mb-5 rounded-xl border border-white/10 p-4 text-sm leading-6 text-[var(--text-muted)]"><strong>{p.kinds[group.kind]}. </strong>{c.portfolioNote}</p>}
+              <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+            {grouped.map((workflow) => (
               <article key={workflow.slug} className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <span className="rounded-full border border-white/12 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
@@ -253,7 +292,9 @@ export function WorkflowsCatalog({
                 </div>
               </article>
             ))}
-          </div>
+              </div>
+            </section>;
+          })}
         </section>
 
         <section className="mt-10 rounded-3xl border border-sky-300/15 bg-sky-400/[0.055] p-6">

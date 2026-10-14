@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { HomePage } from "./HomePage";
 
 export const metadata: Metadata = {
-  title: "ANCAP — AI Native Capital Allocation Platform",
+  title: "ANCAP — AI Workflow Commerce",
   description:
-    "ANCAP is an AI-native capital allocation platform for smart payments, AI-assisted payment decoding, ACP settlement, verifiable execution, and crypto-native financial workflows.",
+    "Buy defined AI workflow outputs, create paid workflows and inspect execution receipts. ANCAP connects customers, creators and AI agents with ACP settlement.",
 };
 
 export default function Page() {

@@ -27,160 +27,46 @@ function navItemLabel(item: NavItem, t: (key: string) => string): string {
   return item.i18nKey ? t(item.i18nKey) : item.label;
 }
 
-/** Short magnetic strip — fits one row without clipping. */
 const spotlightPublic: NavItem[] = [
-  { label: "Enter now", href: "/#product", i18nKey: "nav.product" },
-  { label: "Buy a result", href: "/ai/workflows", i18nKey: "nav.workflows" },
-  { label: "Open market", href: "/marketplace", i18nKey: "nav.marketplace" },
-  { label: "AETERNA", href: "/aeterna", i18nKey: "nav.aeterna" },
-  { label: "Counsel anywhere", href: "/counsel", i18nKey: "nav.counsel" },
-  { label: "Field services", href: "/field-services", i18nKey: "nav.fieldServices" },
-  { label: "Any flower", href: "/flora", i18nKey: "nav.flora" },
-  { label: "Own the weather", href: "/stardust", i18nKey: "nav.stardust" },
-  { label: "Win here", href: "/arena", i18nKey: "nav.arena" },
-  { label: "ACP rail", href: "/whitepaper/acp", i18nKey: "nav.acpPaper" },
+  { label: "Workflows", href: "/ai/workflows", i18nKey: "positioning.workflows" },
+  { label: "Solutions", href: "/projects", i18nKey: "positioning.solutions" },
+  { label: "Creators", href: "/creators", i18nKey: "positioning.creators" },
+  { label: "Developers", href: "/developers", i18nKey: "nav.developers" },
+  { label: "Investors", href: "/investors", i18nKey: "positioning.investors" },
 ];
-
 const spotlightAuth: NavItem[] = [
-  { label: "Buy a result", href: "/ai/workflows", i18nKey: "nav.workflows" },
-  { label: "Your command", href: "/dashboard", i18nKey: "nav.dashboard" },
-  { label: "Open market", href: "/marketplace", i18nKey: "nav.marketplace" },
-  { label: "Your agents", href: "/agents", i18nKey: "nav.agents" },
-  { label: "AETERNA", href: "/aeterna", i18nKey: "nav.aeterna" },
-  { label: "Counsel anywhere", href: "/counsel", i18nKey: "nav.counsel" },
-  { label: "Field services", href: "/field-services", i18nKey: "nav.fieldServices" },
-  { label: "Any flower", href: "/flora", i18nKey: "nav.flora" },
-  { label: "Win here", href: "/arena", i18nKey: "nav.arena" },
-  { label: "Feel the pulse", href: "/feed", i18nKey: "nav.feed" },
+  { label: "Dashboard", href: "/dashboard", i18nKey: "nav.dashboard" },
+  ...spotlightPublic,
 ];
-
 const explorePublicGroups: NavGroup[] = [
-  {
-    titleKey: "nav.groupDesks",
-    items: [
-      { label: "Scale with agents", href: "/agency", i18nKey: "nav.agency" },
-      { label: "DNA vault", href: "/dna-bank", i18nKey: "nav.dnaBank" },
-      { label: "Clear perimeter", href: "/perimeter", i18nKey: "nav.perimeter" },
-      { label: "Fire restore", href: "/antique-fire-restore", i18nKey: "nav.antiqueFireRestore" },
-      { label: "Cryo future", href: "/cryo", i18nKey: "nav.cryo" },
-      { label: "Help now", href: "/humanitarian", i18nKey: "nav.humanitarian" },
-      { label: "Field services", href: "/field-services", i18nKey: "nav.fieldServices" },
-      { label: "Starlink install", href: "/field-services?group=starlink", i18nKey: "nav.starlinkInstall" },
-      { label: "Orbital AI centers", href: "/field-services?group=space", i18nKey: "nav.spaceAiDatacenter" },
-      { label: "Saliva Rx", href: "/saliva-rx", i18nKey: "nav.salivaRx" },
-      { label: "Quantum SIM", href: "/quantum-sim", i18nKey: "nav.quantumSim" },
-      { label: "Own the story", href: "/literary", i18nKey: "nav.literary" },
-      { label: "Meet Nexus", href: "/nexus", i18nKey: "nav.nexus" },
-      { label: "ANCAP Dating", href: "/dating", i18nKey: "nav.dating" },
-      { label: "Feel the show", href: "/entertainment", i18nKey: "nav.entertainment" },
-    ],
-  },
-  {
-    titleKey: "nav.groupWorlds",
-    items: [
-      { label: "Claim the Moon", href: "/lunar", i18nKey: "nav.lunar" },
-      { label: "Go farther", href: "/galaxy", i18nKey: "nav.galaxy" },
-      { label: "Living world", href: "/fauna", i18nKey: "nav.fauna" },
-      { label: "Build tech", href: "/tech", i18nKey: "nav.tech" },
-      { label: "Fund startups", href: "/startups", i18nKey: "nav.startups" },
-      { label: "Cover risk", href: "/insurance", i18nKey: "nav.insurance" },
-    ],
-  },
-  {
-    titleKey: "nav.groupTrust",
-    items: [
-      { label: "ACP Explorer", href: "/explorer", i18nKey: "nav.explorer" },
-      { label: "See the path", href: "/#vision", i18nKey: "nav.vision" },
-      { label: "Clear prices", href: "/pricing", i18nKey: "nav.pricing" },
-      { label: "Read the thesis", href: "/whitepaper", i18nKey: "nav.whitepaper" },
-      { label: "Trust & terms", href: "/legal", i18nKey: "nav.legal" },
-    ],
-  },
+  { titleKey: "positioning.platform", items: [
+    { label: "Pricing", href: "/pricing", i18nKey: "nav.pricing" },
+    { label: "Free snapshot", href: "/token-snapshot", i18nKey: "nav.freeSnapshot" },
+    { label: "MCP", href: "/mcp" },
+    { label: "ACP", href: "/acp" },
+    { label: "Wallet", href: "/wallet/acp", i18nKey: "nav.acpWallet" },
+    { label: "Bridge", href: "/bridge/acp-bsc", i18nKey: "nav.bridgeAcpBsc" },
+  ] },
+  { titleKey: "positioning.trust", items: [
+    { label: "Proof Center", href: "/proof-center", i18nKey: "nav.proofCenter" },
+    { label: "Explorer", href: "/explorer", i18nKey: "nav.explorer" },
+    { label: "Whitepaper", href: "/whitepaper", i18nKey: "nav.whitepaper" },
+    { label: "Legal", href: "/legal", i18nKey: "nav.legal" },
+    { label: "Status", href: "/status", i18nKey: "nav.system" },
+  ] },
 ];
-
 const exploreAuthGroups: NavGroup[] = [
-  {
-    titleKey: "nav.groupBuild",
-    items: [
-      { label: "Your edge", href: "/strategies", i18nKey: "nav.strategies" },
-      { label: "Verticals", href: "/verticals", i18nKey: "nav.verticals" },
-      { label: "Scale with agents", href: "/agency", i18nKey: "nav.agency" },
-      { label: "Builder", href: "/strategy-builder", i18nKey: "nav.builder" },
-      { label: "Flows", href: "/flows", i18nKey: "nav.flows" },
-      { label: "Runs", href: "/runs", i18nKey: "nav.runs" },
-      { label: "Contracts", href: "/contracts", i18nKey: "nav.contracts" },
-      { label: "Listings", href: "/listings", i18nKey: "nav.listings" },
-      { label: "Seller", href: "/dashboard/seller", i18nKey: "nav.sellerDashboard" },
-    ],
-  },
-  {
-    titleKey: "nav.groupDesks",
-    items: [
-      { label: "DNA vault", href: "/dna-bank", i18nKey: "nav.dnaBank" },
-      { label: "Clear perimeter", href: "/perimeter", i18nKey: "nav.perimeter" },
-      { label: "Fire restore", href: "/antique-fire-restore", i18nKey: "nav.antiqueFireRestore" },
-      { label: "Cryo future", href: "/cryo", i18nKey: "nav.cryo" },
-      { label: "Help now", href: "/humanitarian", i18nKey: "nav.humanitarian" },
-      { label: "Field services", href: "/field-services", i18nKey: "nav.fieldServices" },
-      { label: "Starlink install", href: "/field-services?group=starlink", i18nKey: "nav.starlinkInstall" },
-      { label: "Orbital AI centers", href: "/field-services?group=space", i18nKey: "nav.spaceAiDatacenter" },
-      { label: "Own the weather", href: "/stardust", i18nKey: "nav.stardust" },
-      { label: "Saliva Rx", href: "/saliva-rx", i18nKey: "nav.salivaRx" },
-      { label: "Quantum SIM", href: "/quantum-sim", i18nKey: "nav.quantumSim" },
-      { label: "Own the story", href: "/literary", i18nKey: "nav.literary" },
-      { label: "Meet Nexus", href: "/nexus", i18nKey: "nav.nexus" },
-      { label: "ANCAP Dating", href: "/dating", i18nKey: "nav.dating" },
-      { label: "Feel the show", href: "/entertainment", i18nKey: "nav.entertainment" },
-      { label: "Claim the Moon", href: "/lunar", i18nKey: "nav.lunar" },
-      { label: "Connect mail", href: "/mail/connect", i18nKey: "nav.mail" },
-      { label: "Your passport", href: "/passport", i18nKey: "nav.passport" },
-      { label: "Go farther", href: "/galaxy", i18nKey: "nav.galaxy" },
-      { label: "Living world", href: "/fauna", i18nKey: "nav.fauna" },
-      { label: "Build tech", href: "/tech", i18nKey: "nav.tech" },
-      { label: "Fund startups", href: "/startups", i18nKey: "nav.startups" },
-      { label: "Cover risk", href: "/insurance", i18nKey: "nav.insurance" },
-    ],
-  },
-  {
-    titleKey: "nav.groupSystem",
-    items: [
-      { label: "Search", href: "/search", i18nKey: "nav.search" },
-      { label: "Clear prices", href: "/pricing", i18nKey: "nav.pricing" },
-      { label: "Developers", href: "/developers", i18nKey: "nav.developers" },
-      { label: "Webhooks", href: "/developers/webhooks", i18nKey: "nav.webhooks" },
-      { label: "Billing", href: "/billing", i18nKey: "nav.billing" },
-      { label: "Credits", href: "/wallet/credits", i18nKey: "nav.credits" },
-      { label: "Analytics", href: "/dashboard/analytics", i18nKey: "nav.analytics" },
-      { label: "Organizations", href: "/organizations", i18nKey: "nav.organizations" },
-      { label: "AI Console", href: "/ai-console", i18nKey: "nav.aiConsole" },
-      { label: "Referrals", href: "/referrals", i18nKey: "nav.referrals" },
-      { label: "Grow faster", href: "/growth", i18nKey: "nav.growth" },
-      { label: "Pools", href: "/pools", i18nKey: "nav.pools" },
-      { label: "Funds", href: "/funds", i18nKey: "nav.funds" },
-      { label: "Staking", href: "/staking", i18nKey: "nav.staking" },
-      { label: "Orders", href: "/orders", i18nKey: "nav.orders" },
-      { label: "Access", href: "/access", i18nKey: "nav.access" },
-      { label: "Prove trust", href: "/reputation", i18nKey: "nav.reputation" },
-      { label: "Ledger", href: "/ledger", i18nKey: "nav.ledger" },
-      { label: "ACP Explorer", href: "/explorer", i18nKey: "nav.explorer" },
-      { label: "Proof Center", href: "/proof-center", i18nKey: "nav.proofCenter" },
-      { label: "Chain Receipts", href: "/chain-receipts", i18nKey: "nav.chainReceipts" },
-      { label: "Read the thesis", href: "/whitepaper", i18nKey: "nav.whitepaper" },
-      { label: "ACP rail", href: "/whitepaper/acp", i18nKey: "nav.acpPaper" },
-      { label: "Trust & terms", href: "/legal", i18nKey: "nav.legal" },
-      { label: "Evolution", href: "/evolution", i18nKey: "nav.evolution" },
-      { label: "Tournaments", href: "/tournaments", i18nKey: "nav.tournaments" },
-      { label: "Bounties", href: "/bounties", i18nKey: "nav.bounties" },
-      { label: "Free Snapshot", href: "/token-snapshot", i18nKey: "nav.freeSnapshot" },
-      { label: "Operations NOC", href: "/operations-noc", i18nKey: "nav.operationsNoc" },
-      { label: "AI Council", href: "/ai-council", i18nKey: "nav.aiCouncil" },
-      { label: "Strategy Compiler", href: "/strategy-compiler", i18nKey: "nav.strategyCompiler" },
-      { label: "Governance", href: "/governance", i18nKey: "nav.governance" },
-      { label: "Onboarding", href: "/onboarding", i18nKey: "nav.onboarding" },
-      { label: "Notifications", href: "/notifications", i18nKey: "nav.notifications" },
-      { label: "Leaderboards", href: "/leaderboards", i18nKey: "nav.leaderboards" },
-    ],
-  },
+  { titleKey: "positioning.workspace", items: [
+    { label: "Runs", href: "/ai/runs", i18nKey: "nav.runs" },
+    { label: "Seller", href: "/dashboard/seller", i18nKey: "nav.sellerDashboard" },
+    { label: "Builder", href: "/strategy-builder", i18nKey: "nav.builder" },
+    { label: "Agents", href: "/agents", i18nKey: "nav.agents" },
+    { label: "Organizations", href: "/organizations", i18nKey: "nav.organizations" },
+    { label: "Billing", href: "/billing", i18nKey: "nav.billing" },
+    { label: "Analytics", href: "/dashboard/analytics", i18nKey: "nav.analytics" },
+    { label: "Notifications", href: "/notifications", i18nKey: "nav.notifications" },
+  ] },
+  ...explorePublicGroups,
 ];
 
 function cn(...classes: Array<string | false | null | undefined>) {
@@ -495,7 +381,7 @@ export function Navigation() {
 
   return (
     <header className="sticky top-0 z-[100] border-b border-white/[0.06] bg-[#070b16]/78 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#070b16]/65">
-      <MarketRateBar />
+      {pathname?.startsWith("/wallet") || pathname?.startsWith("/bridge") || pathname?.startsWith("/markets") ? <MarketRateBar /> : null}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/40 to-transparent"
         aria-hidden
@@ -507,7 +393,7 @@ export function Navigation() {
 
       <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex min-h-[64px] items-center justify-between gap-2 py-2 sm:gap-3 lg:min-h-[60px]">
-          <div className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-5">
+          <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-5">
             <BrandMark />
           </div>
 
@@ -586,7 +472,7 @@ export function Navigation() {
               href="/wallet/acp"
               aria-label={t("nav.acpWallet")}
               title={t("nav.acpWallet")}
-              className="inline-flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-400/35 bg-emerald-400/[0.1] px-2 text-[10px] font-semibold text-emerald-50 transition hover:bg-emerald-400/[0.18] sm:h-9 sm:px-2.5 sm:text-[11px]"
+              className="hidden h-9 min-w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-400/35 bg-emerald-400/[0.1] px-2 text-[10px] font-semibold text-emerald-50 transition hover:bg-emerald-400/[0.18] sm:inline-flex sm:h-9 sm:px-2.5 sm:text-[11px]"
             >
               <span className="sm:hidden">ACP</span>
               <span className="hidden sm:inline">{t("nav.acpWallet")}</span>

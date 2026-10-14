@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pathname = usePathname();
+  const presentation = pathname === "/" || pathname === "/projects" || pathname === "/investors";
 
   useEffect(() => {
+    if (presentation) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -193,9 +197,9 @@ export function NetworkBackground() {
       if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
       cancelLoop();
     };
-  }, []);
+  }, [presentation]);
 
-  return (
+  return presentation ? null : (
     <div className="canvas-wrap" aria-hidden="true">
       <canvas ref={canvasRef} id="network"></canvas>
     </div>

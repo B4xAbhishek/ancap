@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { projectPresentation } from "@/lib/solutionPortfolio";
+import { positioningByLang } from "@/locales/positioning";
+import { useLanguage } from "@/components/LanguageProvider";
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { stardustDesk, techAuction } from "@/lib/api";
@@ -54,6 +57,8 @@ function formatAcp(value: string) {
 }
 
 export default function StardustPage() {
+  const { lang } = useLanguage();
+  const projectCopy = projectPresentation(lang, "/stardust");
   const { user, isAuthenticated } = useAuth();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [lotsById, setLotsById] = useState<Record<string, AuctionLot>>({});
@@ -157,21 +162,20 @@ export default function StardustPage() {
         </div>
         <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-14 sm:pt-20">
           <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/90">
-            {catalog?.brand || "StardustSRT"} · Auction pricing · Software for a smarter planet
+            Stardust · {positioningByLang[lang].output}
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl md:text-6xl">
-            {catalog?.title || "Earth Software for Weather Control"}
+            {projectCopy.title}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200/85 sm:text-lg">
-            {catalog?.tagline || "Predict. Analyze. Influence. Worldwide weather control — settled in ACP."}
+            {projectCopy.lead}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/tech"
+              href="/ai/workflows"
               className="inline-flex rounded-md bg-cyan-400 px-5 py-3 text-sm font-semibold text-[#041018] transition hover:bg-cyan-300"
             >
-              Open weather auction · from{" "}
-              {formatAcp(headlineLot?.current_acp || headline?.price_from_acp || "58000")}
+              {positioningByLang[lang].browse}
             </Link>
             <Link
               href="/insurance"

@@ -7,20 +7,20 @@ export const runtime = "nodejs";
 
 const API_BASE = getServerApiBase();
 
-async function getWorkflowTemplates(): Promise<WorkflowTemplate[]> {
+async function getWorkflowTemplates(): Promise<{ items: WorkflowTemplate[]; fallback: boolean }> {
   try {
     const res = await serverApiFetch(`${API_BASE}/workflow-store/templates`, {
       cache: "no-store",
     });
 
     if (!res.ok) {
-      return fallbackWorkflowTemplates;
+      return { items: fallbackWorkflowTemplates, fallback: true };
     }
 
     const data = (await res.json()) as { items: WorkflowTemplate[] };
-    return data.items?.length ? data.items : fallbackWorkflowTemplates;
+    return data.items?.length ? { items: data.items, fallback: false } : { items: fallbackWorkflowTemplates, fallback: true };
   } catch {
-    return fallbackWorkflowTemplates;
+    return { items: fallbackWorkflowTemplates, fallback: true };
   }
 }
 
@@ -43,5 +43,5 @@ async function getWorkflowBundles(): Promise<WorkflowBundle[]> {
 
 export default async function WorkflowsPage() {
   const [workflows, bundles] = await Promise.all([getWorkflowTemplates(), getWorkflowBundles()]);
-  return <WorkflowsCatalog workflows={workflows} bundles={bundles} />;
+  return <WorkflowsCatalog workflows={workflows.items} bundles={bundles} isFallback={workflows.fallback} />;
 }

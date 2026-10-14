@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { projectPresentation } from "@/lib/solutionPortfolio";
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -33,7 +34,8 @@ type LunarParcel = {
 };
 
 export default function LunarPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const projectCopy = projectPresentation(lang, "/lunar");
   const { isAuthenticated } = useAuth();
   const [status, setStatus] = useState<LunarStatus | null>(null);
   const [parcels, setParcels] = useState<LunarParcel[]>([]);
@@ -136,9 +138,9 @@ export default function LunarPage() {
             {t("lunarPage.brand")}
           </p>
           <h1 className="mt-5 max-w-xl text-xl font-medium tracking-[-0.02em] text-[#f7f3ea]/90 sm:text-2xl">
-            {t("lunarPage.heroTitle")}
+            {projectCopy.title}
           </h1>
-          <p className="mt-4 max-w-lg text-sm leading-7 text-[#f7f3ea]/65">{t("lunarPage.heroLead")}</p>
+          <p className="mt-4 max-w-lg text-sm leading-7 text-[#f7f3ea]/65">{projectCopy.lead}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="#catalog"
