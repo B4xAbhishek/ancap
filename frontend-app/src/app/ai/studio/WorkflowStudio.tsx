@@ -9,6 +9,7 @@ import { workflowOpsCopy } from "@/locales/workflowOps";
 import {
   downloadWorkflowJson,
   parseWorkflowCsv,
+  validateWorkflowPlan,
   quoteWorkflowPlan,
   resultSummary,
 } from "@/lib/workflowOps";
@@ -55,6 +56,7 @@ type Automation = {
 };
 type Operation = {
   id: string;
+  owner_user_id: string;
   automation_id: string | null;
   kind: string;
   state: string;
@@ -143,8 +145,8 @@ export function WorkflowStudio() {
     [batchRows, setBatchRows] = useState<Record<string, string>[]>([]),
     [trialName, setTrialName] = useState(""),
     [trialDescription, setTrialDescription] = useState(""),
-    [reviewNote, setReviewNote] = useState(""),
-    [edited, setEdited] = useState(""),
+    [reviewNotes, setReviewNotes] = useState<Record<string, string>>({}),
+    [editedResults, setEditedResults] = useState<Record<string, string>>({}),
     [economics, setEconomics] = useState<Record<string, unknown> | null>(null);
   const project = data.projects.find((p) => p.id === projectId);
   const automation = data.automations.find((a) => a.id === automationId);
@@ -224,7 +226,13 @@ export function WorkflowStudio() {
     setSpendConsent(false);
   }
   function selectAutomation(a: Automation) {
-    applyDefinition(a.versions[a.versions.length - 1].definition, a.id);
+    applyDefinition(
+      (
+        a.versions.find((v) => v.version === a.published_version) ||
+        a.versions[a.versions.length - 1]
+      ).definition,
+      a.id,
+    );
     setVersion(
       a.published_version || a.versions[a.versions.length - 1].version,
     );
@@ -261,6 +269,14 @@ export function WorkflowStudio() {
         ]
       : [],
   });
+  function canReview(run: Operation) {
+    if (run.owner_user_id === data.user_id) return true;
+    const a = data.automations.find((a) => a.id === run.automation_id);
+    const p = data.projects.find((p) => p.id === a?.project_id);
+    return (
+      p?.owner_user_id === data.user_id || p?.members[data.user_id] === "editor"
+    );
+  }
   async function uploadDocuments(files: FileList | null) {
     if (!files) return;
     const next = [...documents];
@@ -1030,7 +1046,15 @@ export function WorkflowStudio() {
                         aria-label={c.version}
                         className={`${field} w-28`}
                         value={version}
-                        onChange={(e) => setVersion(Number(e.target.value))}
+                        onChange={(e) => {
+                          const selectedVersion = Number(e.target.value);
+                          const revision = automation.versions.find(
+                            (v) => v.version === selectedVersion,
+                          );
+                          if (revision)
+                            applyDefinition(revision.definition, automationId);
+                          setVersion(selectedVersion);
+                        }}
                       >
                         {automation.versions.map((v) => (
                           <option value={v.version} key={v.version}>
@@ -1081,8 +1105,7 @@ export function WorkflowStudio() {
                         if (!f || f.size > 200000)
                           throw new Error("Plan exceeds limit");
                         const plan = JSON.parse(await f.text());
-                        if (plan.format !== "ancap-workflow-plan/v1")
-                          throw new Error("Unsupported plan");
+                        validateWorkflowPlan(plan);
                         applyDefinition({
                           ...plan.definition,
                           project_id: projectId,
@@ -1157,8 +1180,8 @@ export function WorkflowStudio() {
               <section className={panel}>
                 <h2 className="mb-5 text-xl font-semibold">{c.run}</h2>
                 <p className="mb-4 text-sm">
-                  {c.estimated}: {estimate ?? "—"} ACP ·{" "}
-                  {batchRows.length || 1} {c.rows}
+                  {c.estimated}: {estimate ?? "—"} ACP · {batchRows.length || 1}{" "}
+                  {c.rows}
                 </p>
                 <div className="space-y-4">
                   {label(
@@ -1225,7 +1248,8 @@ export function WorkflowStudio() {
                       disabled={busy || !spendConsent || !maxCost}
                       onClick={() => action(() => queue("test"))}
                     >
-                      {c.test}
+                      {c.test} · {c.version}{" "}
+                      {automation?.versions.at(-1)?.version ?? "—"}
                     </button>
                     <a
                       className={button}
@@ -1326,25 +1350,31 @@ export function WorkflowStudio() {
                     </details>
                   </section>
                 ))}
-                {run.state === "queued" && (
-                  <button
-                    className={`${button} mt-4`}
-                    disabled={busy}
-                    onClick={() =>
-                      action(() => request(`/runs/${run.id}/cancel`, {}))
-                    }
-                  >
-                    {c.cancel}
-                  </button>
-                )}
-                {run.state === "awaiting_review" && (
+                {run.state === "queued" &&
+                  run.owner_user_id === data.user_id && (
+                    <button
+                      className={`${button} mt-4`}
+                      disabled={busy}
+                      onClick={() =>
+                        action(() => request(`/runs/${run.id}/cancel`, {}))
+                      }
+                    >
+                      {c.cancel}
+                    </button>
+                  )}
+                {run.state === "awaiting_review" && canReview(run) && (
                   <div className="mt-5 space-y-4">
                     {label(
                       c.note,
                       <textarea
                         className={field}
-                        value={reviewNote}
-                        onChange={(e) => setReviewNote(e.target.value)}
+                        value={reviewNotes[run.id] || ""}
+                        onChange={(e) =>
+                          setReviewNotes((notes) => ({
+                            ...notes,
+                            [run.id]: e.target.value,
+                          }))
+                        }
                         rows={2}
                       />,
                     )}
@@ -1352,8 +1382,13 @@ export function WorkflowStudio() {
                       c.edited,
                       <textarea
                         className={field}
-                        value={edited}
-                        onChange={(e) => setEdited(e.target.value)}
+                        value={editedResults[run.id] || ""}
+                        onChange={(e) =>
+                          setEditedResults((results) => ({
+                            ...results,
+                            [run.id]: e.target.value,
+                          }))
+                        }
                         rows={3}
                       />,
                     )}
@@ -1367,13 +1402,19 @@ export function WorkflowStudio() {
                             action(async () => {
                               await request(`/runs/${run.id}/review`, {
                                 decision,
-                                note: reviewNote,
-                                edited_output: edited
-                                  ? JSON.parse(edited)
+                                note: reviewNotes[run.id] || "",
+                                edited_output: editedResults[run.id]
+                                  ? JSON.parse(editedResults[run.id])
                                   : null,
                               });
-                              setEdited("");
-                              setReviewNote("");
+                              setEditedResults((results) => ({
+                                ...results,
+                                [run.id]: "",
+                              }));
+                              setReviewNotes((notes) => ({
+                                ...notes,
+                                [run.id]: "",
+                              }));
                             })
                           }
                         >
@@ -1391,22 +1432,24 @@ export function WorkflowStudio() {
                         ? c.delivered
                         : c.deliveryUnknown}
                     </p>
-                    {d.state !== "delivered" && run.state === "completed" && (
-                      <button
-                        className={`${button} mt-2`}
-                        disabled={busy}
-                        onClick={() =>
-                          action(() =>
-                            request(`/runs/${run.id}/retry-delivery`, {
-                              connection_id: d.connection_id,
-                              confirm_retry: true,
-                            }),
-                          )
-                        }
-                      >
-                        {c.retryDelivery}
-                      </button>
-                    )}
+                    {d.state === "unknown_or_failed" &&
+                      run.state === "completed" &&
+                      run.owner_user_id === data.user_id && (
+                        <button
+                          className={`${button} mt-2`}
+                          disabled={busy}
+                          onClick={() =>
+                            action(() =>
+                              request(`/runs/${run.id}/retry-delivery`, {
+                                connection_id: d.connection_id,
+                                confirm_retry: true,
+                              }),
+                            )
+                          }
+                        >
+                          {c.retryDelivery}
+                        </button>
+                      )}
                   </div>
                 ))}
               </article>

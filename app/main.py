@@ -153,7 +153,7 @@ async def lifespan(app: FastAPI):
     except Exception:
         logger.exception("Failed to schedule ACP UTXO index catch-up on startup")
     try:
-        yield
+        yield {}
     finally:
         if workflow_task:
             workflow_task.cancel()

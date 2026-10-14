@@ -1,3 +1,47 @@
+export function validateWorkflowPlan(plan: unknown): void {
+  const object = (v: unknown): v is Record<string, unknown> =>
+    !!v && typeof v === "object" && !Array.isArray(v);
+  const strings = (v: unknown, max: number): v is string[] =>
+    Array.isArray(v) &&
+    v.length <= max &&
+    v.every((x) => typeof x === "string" && x.length <= 200);
+  if (
+    !object(plan) ||
+    plan.format !== "ancap-workflow-plan/v1" ||
+    !object(plan.definition)
+  )
+    throw new Error("Unsupported workflow plan");
+  const d = plan.definition;
+  if (
+    typeof d.name !== "string" ||
+    !d.name.trim() ||
+    d.name.length > 120 ||
+    typeof d.project_id !== "string" ||
+    !object(d.inputs) ||
+    !Array.isArray(d.steps) ||
+    d.steps.length < 1 ||
+    d.steps.length > 5 ||
+    !d.steps.every(
+      (s) =>
+        object(s) &&
+        typeof s.slug === "string" &&
+        s.slug.length <= 100 &&
+        object(s.inputs),
+    ) ||
+    !strings(d.coin_ids, 10) ||
+    !Array.isArray(d.test_cases) ||
+    d.test_cases.length > 10 ||
+    !d.test_cases.every(
+      (t) =>
+        object(t) &&
+        typeof t.name === "string" &&
+        t.name.length <= 120 &&
+        strings(t.required_text, 10),
+    )
+  )
+    throw new Error("Invalid workflow plan fields");
+}
+
 export function parseWorkflowCsv(raw: string): Record<string, string>[] {
   if (new TextEncoder().encode(raw).length > 64000)
     throw new Error("CSV exceeds 64 KB");

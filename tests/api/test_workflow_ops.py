@@ -46,7 +46,8 @@ def test_paid_queue_review_receipt_and_idempotency(client, monkeypatch):
     monkeypatch.setattr(workflow_ops, "execute_paid_workflow_with_llm", execute)
     monkeypatch.setenv("PLATFORM_ADMIN_USER_IDS", user["id"])
     get_settings.cache_clear()
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     op = client.get(f"/v1/workflow-ops/runs/{op_id}", headers=headers).json()
     assert op["state"] == "awaiting_review", op
     assert Decimal(op["cost_acp"]) > 0
@@ -57,12 +58,14 @@ def test_paid_queue_review_receipt_and_idempotency(client, monkeypatch):
     review = client.post(f"/v1/workflow-ops/runs/{op_id}/review", json={"decision": "approve", "edited_output": {"summary": "Human-reviewed"}}, headers=headers)
     assert review.status_code == 200, review.text
     assert review.json()["progress"]["reviewed_output_hash"]
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert client.get(f"/v1/workflow-ops/runs/{op_id}", headers=headers).json()["state"] == "completed"
     metrics = client.get("/v1/workflow-ops/admin/economics", headers=headers).json()
     assert metrics["cash_revenue_eur"] is None
     assert metrics["paid_operations"] >= 1
-    assert client.delete(f"/v1/workflow-ops/projects/{project['id']}", headers=headers).status_code == 200
+    mutation_response = client.delete(f"/v1/workflow-ops/projects/{project['id']}", headers=headers)
+    assert mutation_response.status_code == 200
     assert client.get(f"/v1/workflow-ops/runs/{op_id}", headers=headers).json()["state"] == "expired"
     get_settings.cache_clear()
 
@@ -71,13 +74,16 @@ def test_owner_isolation_publish_rollback_limits_and_cancel(client):
     _, headers = register(client)
     _, other = register(client)
     project, automation, definition = create(client, headers)
-    assert client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "Stolen"}, headers=other).status_code == 404
-    assert client.post(f"/v1/workflow-ops/automations/{automation['id']}/publish", json={"version": 1}, headers=other).status_code == 404
+    mutation_response = client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "Stolen"}, headers=other)
+    assert mutation_response.status_code == 404
+    mutation_response = client.post(f"/v1/workflow-ops/automations/{automation['id']}/publish", json={"version": 1}, headers=other)
+    assert mutation_response.status_code == 404
     updated = client.post(f"/v1/workflow-ops/automations/{automation['id']}/versions", json={**definition, "name": "Version two"}, headers=headers)
     assert updated.status_code == 201
     publish(client, headers, automation, 2)
     publish(client, headers, automation, 1)
-    assert client.put(f"/v1/workflow-ops/automations/{automation['id']}/schedule", json={"enabled": True, "interval_minutes": 1, "monthly_budget_acp": "100"}, headers=headers).status_code == 422
+    mutation_response = client.put(f"/v1/workflow-ops/automations/{automation['id']}/schedule", json={"enabled": True, "interval_minutes": 1, "monthly_budget_acp": "100"}, headers=headers)
+    assert mutation_response.status_code == 422
     insufficient = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "too-low-test", "max_cost_acp": "0.001"}, headers=headers)
     assert insufficient.status_code == 409
     run = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "cancel-test", "max_cost_acp": "100"}, headers=headers).json()
@@ -94,7 +100,8 @@ def test_connections_no_secret_echo_and_ssrf_denied(client):
     assert response.status_code == 201, response.text
     assert "test-only-provider-credential" not in response.text
     assert "secret_box" not in response.text
-    assert client.delete(f"/v1/workflow-ops/connections/{response.json()['id']}", headers=other).status_code == 404
+    mutation_response = client.delete(f"/v1/workflow-ops/connections/{response.json()['id']}", headers=other)
+    assert mutation_response.status_code == 404
     blocked = client.post("/v1/workflow-ops/connections", json={"name": "Unsafe", "kind": "webhook", "config": {"url": "http://127.0.0.1:5432/"}}, headers=headers)
     assert blocked.status_code == 422
     blocked_tls = client.post("/v1/workflow-ops/connections", json={"name": "Unsafe TLS", "kind": "webhook", "config": {"url": "https://127.0.0.1/"}}, headers=headers)
@@ -124,7 +131,8 @@ def test_unauthenticated_and_admin_gates(client):
     assert client.get("/v1/workflow-ops", headers={"Authorization": ""}).status_code == 401
     assert client.get("/v1/workflow-ops/admin/economics", headers={"Authorization": ""}).status_code == 401
     _, headers = register(client)
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code in (403, 503)
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code in (403, 503)
 
 
 def funded_setup(client, monkeypatch, *, review=True):
@@ -158,15 +166,22 @@ def test_members_view_edit_revoke_and_cannot_spend_owners_credits(client, monkey
     _, headers, project, automation, definition, _ = funded_setup(client, monkeypatch)
     member, member_headers = register(client)
     path = f"/v1/workflow-ops/projects/{project['id']}/members"
-    assert client.post(path, json={"email": member["email"], "role": "viewer"}, headers=headers).status_code == 200
+    mutation_response = client.post(path, json={"email": member["email"], "role": "viewer"}, headers=headers)
+    assert mutation_response.status_code == 200
     visible = client.get("/v1/workflow-ops", headers=member_headers).json()
     assert any(p["id"] == project["id"] for p in visible["projects"])
-    assert client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "No"}, headers=member_headers).status_code == 404
-    assert client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "member-cannot-spend", "max_cost_acp": "100"}, headers=member_headers).status_code == 404
-    assert client.post(path, json={"email": member["email"], "role": "editor"}, headers=headers).status_code == 200
-    assert client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "Shared", "context": "Shared context"}, headers=member_headers).status_code == 200
-    assert client.delete(f"/v1/workflow-ops/projects/{project['id']}", headers=member_headers).status_code == 404
-    assert client.post(path, json={"email": member["email"], "role": "remove"}, headers=headers).status_code == 200
+    mutation_response = client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "No"}, headers=member_headers)
+    assert mutation_response.status_code == 404
+    mutation_response = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "member-cannot-spend", "max_cost_acp": "100"}, headers=member_headers)
+    assert mutation_response.status_code == 404
+    mutation_response = client.post(path, json={"email": member["email"], "role": "editor"}, headers=headers)
+    assert mutation_response.status_code == 200
+    mutation_response = client.put(f"/v1/workflow-ops/projects/{project['id']}", json={"name": "Shared", "context": "Shared context"}, headers=member_headers)
+    assert mutation_response.status_code == 200
+    mutation_response = client.delete(f"/v1/workflow-ops/projects/{project['id']}", headers=member_headers)
+    assert mutation_response.status_code == 404
+    mutation_response = client.post(path, json={"email": member["email"], "role": "remove"}, headers=headers)
+    assert mutation_response.status_code == 200
     assert not any(p["id"] == project["id"] for p in client.get("/v1/workflow-ops", headers=member_headers).json()["projects"])
 
 
@@ -176,12 +191,15 @@ def test_batch_charges_per_finished_row_and_cancel_stops_remaining(client, monke
     queued = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "batch-cancel-test", "max_cost_acp": "100", "kind": "batch", "rows": [{"project_name": "One"}, {"project_name": "Two"}, {"project_name": "Three"}]}, headers=headers)
     assert queued.status_code == 202, queued.text
     op_id = queued.json()["id"]
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     partial = client.get(f"/v1/workflow-ops/runs/{op_id}", headers=headers).json()
     assert partial["state"] == "queued"
     assert len(partial["progress"]["items"]) == 2
-    assert client.post(f"/v1/workflow-ops/runs/{op_id}/cancel", headers=headers).status_code == 200
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post(f"/v1/workflow-ops/runs/{op_id}/cancel", headers=headers)
+    assert mutation_response.status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert len(calls) == 2
     assert client.get(f"/v1/workflow-ops/runs/{op_id}", headers=headers).json()["cost_acp"] == partial["cost_acp"]
 
@@ -194,7 +212,8 @@ def test_fallback_refunds_current_step_and_never_delivers(client, monkeypatch):
     monkeypatch.setattr(workflow_ops, "execute_paid_workflow_with_llm", degraded)
     publish(client, headers, automation)
     queued = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "fallback-refund-test", "max_cost_acp": "100"}, headers=headers).json()
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     result = client.get(f"/v1/workflow-ops/runs/{queued['id']}", headers=headers).json()
     assert result["state"] == "failed"
     assert Decimal(result["cost_acp"]) == 0
@@ -228,14 +247,18 @@ def test_byok_request_local_and_delivery_only_after_review(client, monkeypatch):
     monkeypatch.setattr(workflow_ops, "execute_paid_workflow_with_llm", execute)
     monkeypatch.setattr(workflow_ops, "deliver", fake_deliver)
     queued = client.post(f"/v1/workflow-ops/automations/{automation['id']}/runs", json={"idempotency_key": "byok-review-test", "max_cost_acp": "100"}, headers=headers).json()
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert observed[0]["api_key"] == key
     assert workflow_provider_credentials.get() is None
     assert not deliveries
-    assert client.post(f"/v1/workflow-ops/runs/{queued['id']}/review", json={"decision": "approve"}, headers=headers).status_code == 200
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post(f"/v1/workflow-ops/runs/{queued['id']}/review", json={"decision": "approve"}, headers=headers)
+    assert mutation_response.status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert len(deliveries) == 1
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert len(deliveries) == 1
     result = client.get(f"/v1/workflow-ops/runs/{queued['id']}", headers=headers)
     assert key not in result.text
@@ -251,11 +274,14 @@ def test_schedule_due_idempotency_spending_cap_and_expired_content(client, monke
     response = client.put(f"/v1/workflow-ops/automations/{automation['id']}/schedule", json={"enabled": True, "interval_minutes": 60, "monthly_budget_acp": "10"}, headers=headers)
     assert response.status_code == 200
     db_edit(WorkflowAutomation, automation["id"], lambda row: setattr(row, "next_run_at", now()-timedelta(seconds=1)))
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert len(calls) == 1
     db_edit(WorkflowAutomation, automation["id"], lambda row: setattr(row, "next_run_at", now()-timedelta(minutes=2)))
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     assert len(calls) == 1, "Budget must stop a second model call"
     workspace = client.get("/v1/workflow-ops", headers=headers).json()
     runs = [r for r in workspace["runs"] if r["automation_id"] == automation["id"]]
@@ -263,7 +289,8 @@ def test_schedule_due_idempotency_spending_cap_and_expired_content(client, monke
     assert any(r["state"] == "failed" and Decimal(r["cost_acp"]) == 0 for r in runs)
     first = next(r for r in runs if Decimal(r["cost_acp"]) > 0)
     db_edit(WorkflowOperationRun, first["id"], lambda row: setattr(row, "expires_at", now()-timedelta(seconds=1)))
-    assert client.post("/v1/workflow-ops/tick", headers=headers).status_code == 200
+    mutation_response = client.post("/v1/workflow-ops/tick", headers=headers)
+    assert mutation_response.status_code == 200
     expired = client.get(f"/v1/workflow-ops/runs/{first['id']}", headers=headers).json()
     assert expired["state"] == "expired"
     assert "items" not in expired["progress"]
@@ -273,7 +300,8 @@ def test_first_step_quality_failure_requires_review_even_if_last_passes(client, 
     from app.services import workflow_ops
     _, headers, _, automation, definition, _ = funded_setup(client, monkeypatch)
     revision = {**definition, "require_review": False, "steps": [{"slug": "token-listing-pack"}] * 2}
-    assert client.post(f"/v1/workflow-ops/automations/{automation['id']}/versions", json=revision, headers=headers).status_code == 201
+    mutation_response = client.post(f"/v1/workflow-ops/automations/{automation['id']}/versions", json=revision, headers=headers)
+    assert mutation_response.status_code == 201
     publish(client, headers, automation, 2)
     calls = []
     async def execute(*args, **kwargs):

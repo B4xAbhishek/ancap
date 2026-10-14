@@ -43,7 +43,7 @@ test("import preserves step inputs and extra context; publishing alone cannot sp
   await page.goto("/ai/studio");
   await page.getByRole("button", { name: "Builder", exact: true }).click();
   await page.getByRole("button", { name: "Agency report", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Queue paid run", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /^Queue paid run/ })).toBeDisabled();
   await page.getByLabel("Import workflow plan", { exact: true }).setInputFiles({ name: "plan.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify({ format: "ancap-workflow-plan/v1", definition })) });
   await expect(page.getByRole("button", { name: "Save", exact: true })).toBeEnabled();
   await page.getByRole("button", { name: "Save", exact: true }).click();
@@ -52,4 +52,30 @@ test("import preserves step inputs and extra context; publishing alone cannot sp
   expect(saved.steps[0].inputs.audience).toBe("Founders");
   expect(saved.inputs.custom_field).toBe("Keep me");
   expect(saved.require_review).toBe(true);
+});
+
+test("review edits stay isolated to their report", async ({ page }) => {
+  const runs = ["report-one", "report-two"].map(id => ({ id, owner_user_id: owner, automation_id: null, state: "awaiting_review", kind: "manual", cost_acp: "10", progress: {} }));
+  const reviews: { path: string; body: Record<string, unknown> }[] = [];
+  await page.route("**/v1/**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/users/me")) return route.fulfill({ json: { id: owner, email: "ui-fixture@example.test" } });
+    if (path.endsWith("/workflow-ops/capabilities")) return route.fulfill({ json: { workflow_slugs: [] } });
+    if (path.endsWith("/workflow-store/templates")) return route.fulfill({ json: { items: [] } });
+    if (path.endsWith("/workflow-ops")) return route.fulfill({ json: { user_id: owner, is_operator: false, projects: [], connections: [], automations: [], runs } });
+    if (path.endsWith("/review")) reviews.push({ path, body: route.request().postDataJSON() });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto("/ai/studio");
+  await page.getByRole("button", { name: "Runs & review", exact: true }).click();
+  const first = page.locator("article").filter({ hasText: "report-one" });
+  const second = page.locator("article").filter({ hasText: "report-two" });
+  await first.getByLabel("Review note", { exact: true }).fill("Only first report");
+  await first.getByLabel("Edited result (optional JSON)", { exact: true }).fill('{"summary":"First edit"}');
+  await expect(second.getByLabel("Review note", { exact: true })).toHaveValue("");
+  await expect(second.getByLabel("Edited result (optional JSON)", { exact: true })).toHaveValue("");
+  await second.getByRole("button", { name: "Reject", exact: true }).click();
+  await expect.poll(() => reviews.length).toBe(1);
+  expect(reviews[0].path).toMatch(/report-two\/review$/);
+  expect(reviews[0].body).toEqual({ decision: "reject", note: "", edited_output: null });
 });

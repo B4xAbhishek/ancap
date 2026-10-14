@@ -3,7 +3,7 @@ from uuid import uuid4
 from datetime import timedelta
 from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select, delete, func, or_
+from sqlalchemy import select, func, or_
 from app.api.deps import DbSession, require_auth, require_platform_admin
 from app.db.models import WorkflowProject, WorkflowConnection, WorkflowAutomation, WorkflowOperationRun
 from app.schemas.workflow_ops import ProjectWrite, ConnectionWrite, AutomationWrite, ScheduleWrite, EnqueueRequest, ReviewWrite, TrialWrite, VersionSelect, DeliveryRetry, ProjectMemberWrite

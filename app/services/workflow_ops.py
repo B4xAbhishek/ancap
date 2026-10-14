@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from decimal import Decimal
 from uuid import UUID, uuid4
-from sqlalchemy import select, func, delete, text
+from sqlalchemy import select, func, text
 from sqlalchemy.dialects.postgresql import insert
 from fastapi import HTTPException
 from app.db.models import WorkflowProject, WorkflowConnection, WorkflowAutomation, WorkflowOperationRun, WorkflowRunRecord
@@ -67,7 +67,7 @@ def public_automation(row):
 
 
 def public_run(row):
-    return {"id": str(row.id), "automation_id": str(row.automation_id) if row.automation_id else None, "kind": row.kind, "state": row.state, "progress": row.progress_json, "cost_acp": str(row.cost_acp), "max_cost_acp": str(row.max_cost_acp), "created_at": row.created_at, "expires_at": row.expires_at}
+    return {"id": str(row.id), "owner_user_id": str(row.owner_user_id), "automation_id": str(row.automation_id) if row.automation_id else None, "kind": row.kind, "state": row.state, "progress": row.progress_json, "cost_acp": str(row.cost_acp), "max_cost_acp": str(row.max_cost_acp), "created_at": row.created_at, "expires_at": row.expires_at}
 
 
 async def enqueue(session, owner, automation, body: EnqueueRequest, *, scheduled=False):
@@ -190,7 +190,7 @@ async def _process_delivery(session, operation):
     pending = [cid for cid in definition.get("connection_ids", []) if cid not in completed]
     if not pending:
         operation.state = "completed"
-        return
+        return None
     cid = pending[0]
     attempt_id = str(uuid4())
     progress["deliveries"] = [*progress.get("deliveries", []), {"connection_id": cid, "attempt_id": attempt_id, "state": "attempting", "at": now().isoformat()}]
