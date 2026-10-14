@@ -382,8 +382,8 @@ Response:
     {
       "execution": {
         "id": "pe_123",
-        "status": "completed",
-        "recoverable": false,
+        "status": "pending_reconciliation",
+        "recoverable": true,
         "nextAction": null,
         "progress": {
           "totalRouteSteps": 3,
@@ -405,7 +405,7 @@ Response:
         "id": "spr_pe_123",
         "paymentExecutionId": "pe_123",
         "paymentIntentId": "pi_123",
-        "completedAt": "2026-05-25T10:54:00Z",
+        "completedAt": null,
         "sourceAssetSpent": "ACP",
         "sourceAmountSpent": "103.42",
         "targetAssetPaid": "USDT",
@@ -484,6 +484,16 @@ Response:
 
 ---
 
+### Settlement safety (fail closed)
+
+- Smart Pay `execute` currently prepares a non-custodial route plan; it does not broadcast a signed payment.
+- Client-submitted `clientKnownTxs` / `clientKnownRefs` and explorer URLs are **unverified observations**, even when all quoted route steps have a tx reference.
+- The `recover` endpoint therefore keeps the execution at `pending_reconciliation` (`recoverable: true`) instead of marking it `completed`. A zero `remainingRouteSteps` value means all route references are present, **not** that funds settled.
+- Receipts are preliminary snapshots with `completedAt: null` unless a trusted chain-confirmation path has established final settlement. The backend also masks previously stored unverified `completed` statuses and completion timestamps when reading them.
+- The trusted ACP/BSC transaction confirmation, route matching, finality and recipient/amount verification workflow is **not implemented by this change**. Until it exists, no recovery-supplied tx reference may finalize a payment.
+
+---
+
 ## 9. Recover endpoint
 
 ### `POST /v1/mobile/smart-pay/payments/{executionId}/recover`
@@ -525,8 +535,8 @@ Response:
 {
   "execution": {
     "id": "pe_123",
-    "status": "completed",
-    "recoverable": false,
+    "status": "pending_reconciliation",
+    "recoverable": true,
     "nextAction": null,
     "progress": {
       "totalRouteSteps": 3,
