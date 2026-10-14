@@ -291,7 +291,7 @@ class SmartPayReceiptItem(BaseModel):
     id: str
     payment_execution_id: str = Field(serialization_alias="paymentExecutionId")
     payment_intent_id: str = Field(serialization_alias="paymentIntentId")
-    completed_at: str = Field(serialization_alias="completedAt")
+    completed_at: str | None = Field(default=None, serialization_alias="completedAt")
     source_asset_spent: str = Field(serialization_alias="sourceAssetSpent")
     source_amount_spent: str = Field(serialization_alias="sourceAmountSpent")
     target_asset_paid: str = Field(serialization_alias="targetAssetPaid")
