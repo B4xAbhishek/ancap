@@ -330,7 +330,7 @@ export type SmartPayReceipt = {
   id: string;
   paymentExecutionId: string;
   paymentIntentId: string;
-  completedAt: string;
+  completedAt: string | null;
   sourceAssetSpent: string;
   sourceAmountSpent: string;
   targetAssetPaid: string;
