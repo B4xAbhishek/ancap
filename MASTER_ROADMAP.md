@@ -29,6 +29,8 @@ Completed in the `2026-07-01` hardening deploy:
 
 ## Consolidated project goals
 
+Execution / contractor handoff (2026-10-14): [`docs/DEVELOPER_HANDOFF_RU.md`](docs/DEVELOPER_HANDOFF_RU.md) defines mobile release acceptance and independent audit scope. Local backend import restored by syncing `.venv` cryptography to the pinned `50.0.1`; mobile public-docs / roadmap-sync / error-sanitization checks: **20 passed**. Physical-device and store-release items remain open.
+
 Ship ANCAP as a production ACP-first AI workflow platform:
 - real paid AI workflow execution
 - proof receipts and realtime status
