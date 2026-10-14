@@ -1,5 +1,9 @@
 # ANCAP Master Roadmap
 
+## Workflow Studio release — 2026-10-15
+
+Implementation and limits: [workflow operations](docs/WORKFLOW_OPERATIONS_RELEASE_2026-10-15.md). Durable schedules, review, delivery, context, versions, bounded trials/batches, API examples and BYOK are implemented. Final CI/deployment results belong in the release record. External account credentials and private infrastructure are customer supplied; wallet/bridge/consensus/SACP WIP is excluded.
+
 > Status: active | Major revision: 2026-05-25
 > Created: 2026-05-23 | Last updated: 2026-10-02
 
