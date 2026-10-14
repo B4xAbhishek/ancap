@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { projectPresentation } from "@/lib/solutionPortfolio";
 import { Navigation } from "@/components/Navigation";
 import { GalaxySolarSystem } from "@/components/GalaxySolarSystem";
 import { useAuth } from "@/components/AuthProvider";
@@ -50,7 +51,8 @@ function formatAcp(value: string) {
 }
 
 export default function GalaxyAuctionPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const projectCopy = projectPresentation(lang, "/galaxy");
   const { isAuthenticated } = useAuth();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState("");
@@ -150,10 +152,10 @@ export default function GalaxyAuctionPage() {
           <div className="container" style={{ padding: "28px 24px 12px" }}>
             <span className="section-num">{t("galaxy.kicker")}</span>
             <h1 className="section-title" style={{ marginBottom: 12 }}>
-              {t("galaxy.title")}
+              {projectCopy.title}
             </h1>
             <p className="section-subtitle" style={{ maxWidth: 720, marginBottom: 0 }}>
-              {t("galaxy.lead")}
+              {projectCopy.lead}
             </p>
           </div>
         </section>

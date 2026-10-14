@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { projectPresentation } from "@/lib/solutionPortfolio";
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -39,7 +40,8 @@ type Catalog = {
 };
 
 export default function SalivaRxPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const projectCopy = projectPresentation(lang, "/saliva-rx");
   const { user, isAuthenticated } = useAuth();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState("");
@@ -72,9 +74,9 @@ export default function SalivaRxPage() {
       <section className="mx-auto max-w-5xl px-4 py-10">
         <p className="text-sm uppercase tracking-[0.2em] text-emerald-400/80">{t("salivaRxPage.kicker")}</p>
         <h1 className="mt-2 font-serif text-4xl text-white md:text-5xl">
-          {catalog?.title || t("salivaRxPage.titleFallback")}
+          {projectCopy.title}
         </h1>
-        <p className="mt-3 max-w-2xl text-slate-300">{catalog?.tagline}</p>
+        <p className="mt-3 max-w-2xl text-slate-300">{projectCopy.lead}</p>
         <p className="mt-4 text-sm leading-6 text-slate-500">{catalog?.compliance_note}</p>
         <p className="mt-3 text-sm">
           <Link href={catalog?.legal_href || "/legal/saliva-rx-notice"} className="text-emerald-300 underline">

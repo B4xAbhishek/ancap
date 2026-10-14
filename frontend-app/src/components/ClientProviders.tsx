@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Language, isSupportedLanguage } from "@/locales/translations";
 import { LanguageProvider } from "./LanguageProvider";
 import { AuthProvider } from "./AuthProvider";
@@ -41,6 +42,7 @@ function ServiceWorkerRegister() {
 
 export function ClientProviders({ children, initialLang }: { children: React.ReactNode; initialLang?: string }) {
   const resolvedInitialLang: Language = isSupportedLanguage(initialLang) ? initialLang : "en";
+  const pathname = usePathname();
 
   return (
     <ThemeProvider>
@@ -49,8 +51,8 @@ export function ClientProviders({ children, initialLang }: { children: React.Rea
           <LanguageProvider initialLang={resolvedInitialLang}>
             <ServiceWorkerRegister />
             {children}
-            <FloatingNewsWidget />
-            <FloatingEarthSupportWidget />
+            {pathname === "/feed" || pathname === "/dashboard" ? <FloatingNewsWidget /> : null}
+            {pathname === "/stardust" ? <FloatingEarthSupportWidget /> : null}
             <CookieConsent />
           </LanguageProvider>
         </WalletProvider>

@@ -80,7 +80,12 @@ jobs:
               echo "git fetch failed (attempt ${attempt}/5), retrying..."
               sleep 15
             done
-            git reset --hard origin/master || true
+            # Never deploy an old checkout after a failed fetch/reset, or a different push.
+            test "$(git rev-parse origin/master)" = "${{ github.sha }}" || {
+              echo "::error::Fetched master does not match the requested deployment commit."
+              exit 1
+            }
+            git reset --hard origin/master
 
             if [ -n "${COINGECKO_API_KEY:-}" ]; then
               echo "== sync CoinGecko key into host .env (value redacted)"

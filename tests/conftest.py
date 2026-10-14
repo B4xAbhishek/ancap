@@ -27,6 +27,8 @@ _test_db_url = os.environ.get("TEST_DATABASE_URL", _default_test_db_url)
 if "+asyncpg" not in _test_db_url:
     _test_db_url = _test_db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 os.environ["DATABASE_URL"] = _test_db_url
+# Tests use an isolated signing key; empty HMAC keys are rejected by PyJWT.
+os.environ["SECRET_KEY"] = uuid.uuid4().hex + uuid.uuid4().hex
 # Disable daily agent registration limit in tests
 os.environ["REGISTRATION_MAX_AGENTS_PER_DAY"] = "0"
 # Disable tier-gating in tests so listings/orders/runs don't 403 because the

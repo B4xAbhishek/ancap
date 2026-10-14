@@ -13,14 +13,15 @@ import "./globals.css";
 import { ClientProviders } from "@/components/ClientProviders";
 import { ChunkErrorRecovery } from "@/components/ChunkErrorRecovery";
 import { NetworkBackground } from "@/components/NetworkBackground";
+import { ProjectWorkflowContext } from "@/components/ProjectWorkflowContext";
 import { detectPreferredLanguage } from "@/lib/language";
 
 // Build a sane absolute base for canonical/OG links. Override via NEXT_PUBLIC_SITE_URL
 // in Docker/CI when serving from a different host, otherwise default to ancap.cloud.
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ancap.cloud";
-const SITE_TITLE = "ANCAP — AI Native Capital Allocation Platform";
+const SITE_TITLE = "ANCAP — AI Workflow Commerce";
 const SITE_DESCRIPTION =
-  "ANCAP is an AI-native capital allocation platform for smart payments, ACP settlement, AI-assisted payment decoding, verifiable execution, and crypto-native financial workflows.";
+  "Buy defined AI workflow outputs, create paid workflows and inspect execution receipts. ANCAP connects customers, creators and AI agents with ACP settlement.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -86,6 +87,7 @@ export default async function RootLayout({
         <ChunkErrorRecovery />
         <ClientProviders initialLang={initialLang}>
           <NetworkBackground />
+          <ProjectWorkflowContext />
           {children}
         </ClientProviders>
       </body>

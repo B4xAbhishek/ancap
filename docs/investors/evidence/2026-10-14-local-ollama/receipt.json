@@ -1,0 +1,149 @@
+{
+  "workflow_slug": "token-risk-report",
+  "payment_currency": "ACP",
+  "quoted_price": {
+    "amount": "14.00",
+    "currency": "ACP"
+  },
+  "status": "completed",
+  "receipt_items": [
+    "workflow_slug",
+    "price_snapshot",
+    "asset_reference",
+    "status_timeline"
+  ],
+  "proof": {
+    "llm_usage": {
+      "model": "qwen2.5:3b",
+      "status": "succeeded",
+      "event_id": "ef9b64a3-ac9c-498d-8a28-44bb7ef7a3d3",
+      "provider": "ollama",
+      "fallback_used": false
+    },
+    "executed_at": "2026-10-14T17:05:00.614559+00:00",
+    "usd_sticker": {
+      "amount": "14.00",
+      "currency": "USD"
+    },
+    "billing_mode": "market_aligned_quote",
+    "platform_fee": {
+      "amount": "1.40000000",
+      "percent": "10",
+      "currency": "ACP",
+      "operator_share": "12.60000000"
+    },
+    "artifact_kind": null,
+    "pricing_basis": {
+      "amount": "14",
+      "currency": "ACP"
+    },
+    "template_slug": "token-risk-report",
+    "execution_mode": "llm_generated",
+    "template_title": "Token Risk Report",
+    "margin_snapshot": {
+      "gross": {
+        "amount": "14.00",
+        "currency": "ACP"
+      },
+      "usd_sticker": {
+        "amount": "14.00",
+        "currency": "USD"
+      },
+      "estimated_cost": {
+        "amount": "2.52",
+        "currency": "ACP"
+      },
+      "oracle_wacp_usd": "1",
+      "estimated_margin": {
+        "amount": "11.48",
+        "currency": "ACP"
+      }
+    },
+    "oracle_wacp_usd": "1",
+    "payment_intents": [
+      {
+        "note": "investor live llm demo",
+        "amount": {
+          "amount": "14.000000000000000000",
+          "currency": "ACP"
+        },
+        "status": "reserved",
+        "changed_at": "2026-10-14T17:04:56.042317+00:00",
+        "payment_method": "credits",
+        "ledger_event_id": "4a6ec7ea-43d4-4c79-b8d1-ce60e3b88dd4",
+        "payment_intent_id": "494f089d-0bee-409f-8484-37b048f999f3"
+      },
+      {
+        "note": "Workflow payment captured (platform fee 10%).",
+        "amount": {
+          "amount": "14.000000000000000000",
+          "currency": "ACP"
+        },
+        "status": "captured",
+        "changed_at": "2026-10-14T17:05:00.642286+00:00",
+        "payment_method": "credits",
+        "ledger_event_id": "750b5106-7f80-4ec2-8753-de5248ecfcfa",
+        "payment_intent_id": "494f089d-0bee-409f-8484-37b048f999f3"
+      }
+    ],
+    "status_timeline": [
+      {
+        "to": "quoted",
+        "from": null,
+        "changed_at": "2026-10-14T17:04:55.978852+00:00"
+      },
+      {
+        "to": "paid",
+        "from": "quoted",
+        "changed_at": "2026-10-14T17:04:56.042317+00:00"
+      },
+      {
+        "to": "queued",
+        "from": "paid",
+        "changed_at": "2026-10-14T17:04:56.065709+00:00"
+      },
+      {
+        "to": "running",
+        "from": "queued",
+        "changed_at": "2026-10-14T17:04:56.065709+00:00"
+      },
+      {
+        "to": "completed",
+        "from": "running",
+        "changed_at": "2026-10-14T17:05:00.614559+00:00"
+      }
+    ],
+    "referral_rewards": {
+      "reason": "no_attribution",
+      "status": "skipped"
+    },
+    "payment_intent_id": "494f089d-0bee-409f-8484-37b048f999f3",
+    "settlement_status": "captured",
+    "last_status_change": {
+      "to": "completed",
+      "from": "running",
+      "changed_at": "2026-10-14T17:05:00.614559+00:00"
+    },
+    "sections_generated": null,
+    "accepted_currencies": [
+      "ACP",
+      "wACP"
+    ],
+    "payment_confirmation": {
+      "note": "Workflow payment captured (platform fee 10%).",
+      "method": "credits",
+      "reference": "credits:494f089d-0bee-409f-8484-37b048f999f3",
+      "confirmed_at": "2026-10-14T17:05:00.642286+00:00",
+      "payment_amount": {
+        "amount": "14.000000000000000000",
+        "currency": "ACP"
+      }
+    },
+    "payment_intent_status": "captured",
+    "provider_cost_estimate": {
+      "basis": "default 18% fulfillment reserve until provider costs are connected",
+      "amount": "2.52",
+      "currency": "ACP"
+    }
+  }
+}

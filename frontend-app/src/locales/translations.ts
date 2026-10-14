@@ -1,3 +1,4 @@
+import { positioningByLang } from "./positioning";
 import { legalByLang } from "./legal";
 import { aeternaByLang } from "./aeterna";
 import { agencyByLang } from "./agency";
@@ -63,6 +64,9 @@ export function isSupportedLanguage(value: string | null | undefined): value is 
 }
 
 function resolveTranslation(lang: Language, key: string): string | undefined {
+  if (key.startsWith("positioning.")) {
+    return positioningByLang[lang][key.slice(12) as keyof typeof positioningByLang.en];
+  }
   const keys = key.split(".");
   let value: string | TranslationTree | undefined = translations[lang];
 

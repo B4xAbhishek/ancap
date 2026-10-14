@@ -61,7 +61,9 @@ def test_password_hash_verify():
     assert verify_password("wrong", h) is False
 
 
-def test_jwt_create_decode():
+def test_jwt_create_decode(monkeypatch):
+    from app.services import auth
+    monkeypatch.setattr(auth.settings, "secret_key", "local-test-signing-key-" * 3)
     token = create_access_token("user-123")
     assert isinstance(token, str)
     sub = decode_token(token)

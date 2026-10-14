@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { projectPresentation } from "@/lib/solutionPortfolio";
 import { Navigation } from "@/components/Navigation";
 import { DnaNanobotScissors } from "@/components/DnaNanobotScissors";
 import { DnaHelixSandbox } from "@/components/aeterna/DnaHelixSandbox";
@@ -78,7 +79,8 @@ const ORGAN_PRINT_SLUG = "aeterna-stem-cell-organ-print";
 
 /** Public landing — sandbox + local hash work with zero account. Cloud vault sync is optional. */
 export default function AeternaPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const projectCopy = projectPresentation(lang, "/aeterna");
   const [status, setStatus] = useState<AeternaStatus | null>(null);
   const [heroOk, setHeroOk] = useState(true);
 
@@ -124,10 +126,10 @@ export default function AeternaPage() {
             AETERNA
           </p>
           <h1 className="mt-5 max-w-xl text-xl font-medium tracking-[-0.02em] text-white/90 sm:text-2xl">
-            {t("aeternaPage.heroTitle")}
+            {projectCopy.title}
           </h1>
           <p className="mt-4 max-w-lg text-sm leading-7 text-white/65">
-            {t("aeternaPage.heroLead")}
+            {projectCopy.lead}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
