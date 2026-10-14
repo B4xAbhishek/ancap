@@ -29,7 +29,7 @@ Completed in the `2026-07-01` hardening deploy:
 
 ## Consolidated project goals
 
-Investor presentation (2026-10-14): local homepage and public navigation now focus on paid AI workflow outputs; `/projects` groups the expansion portfolio into six areas; `/investors` explains the business model, evidence and funding milestones without invented traction. Research project heroes for AETERNA, Cryo, Saliva Rx, Galaxy, Lunar and Stardust are framed as AI briefs. Deployment and paid end-to-end demonstration remain separate checks. Remaining handoff: [`docs/CURSOR_INVESTOR_FINISH_RU.md`](docs/CURSOR_INVESTOR_FINISH_RU.md).
+Investor presentation (2026-10-14): local homepage and public navigation focus on paid AI workflow outputs; `/projects` groups six areas; `/investors` explains model/evidence/milestones without invented traction. Portfolio routes carry an honest buyer→receipt offer chain; research heroes stay AI briefs/concepts. Demo script + 12‑month cost budget (assumptions; discussion band €250k–€400k) and test-env paid-path smoke (credits) are in-repo. Owner still must confirm jurisdiction, quotes, and any traction metrics. Handoff: [`docs/CURSOR_INVESTOR_FINISH_RU.md`](docs/CURSOR_INVESTOR_FINISH_RU.md).
 
 Execution / contractor handoff (2026-10-14): [`docs/DEVELOPER_HANDOFF_RU.md`](docs/DEVELOPER_HANDOFF_RU.md) defines mobile release acceptance and independent audit scope. Local backend import restored by syncing `.venv` cryptography to the pinned `50.0.1`; mobile public-docs / roadmap-sync / error-sanitization checks: **20 passed**. Physical-device and store-release items remain open.
 

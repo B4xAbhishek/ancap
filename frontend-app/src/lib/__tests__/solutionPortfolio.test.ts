@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { portfolioByLang, solutionPortfolio, workflowArea } from "../solutionPortfolio";
+import { offerForRoute, projectOffers } from "../projectOffers";
 import { positioningByLang } from "@/locales/positioning";
 import { t } from "@/locales/translations";
 
@@ -28,5 +29,24 @@ describe("public workflow presentation", () => {
     expect(workflowArea("Conservation")).toBe("commerce");
     expect(workflowArea("Entertainment")).toBe("community");
     expect(workflowArea("Agent Commerce")).toBe("infrastructure");
+  });
+  it("maps every portfolio route to an honest buyer→receipt offer chain", () => {
+    const links = solutionPortfolio.flatMap(area => area.routes.map(([href]) => href));
+    expect(projectOffers.map(o => o.href).sort()).toEqual([...links].sort());
+    for (const href of links) {
+      const offer = offerForRoute(href);
+      expect(offer, href).toBeTruthy();
+      expect(offer!.buyer.trim()).not.toBe("");
+      expect(offer!.task.trim()).not.toBe("");
+      expect(offer!.inputs.trim()).not.toBe("");
+      expect(offer!.aiResult.trim()).not.toBe("");
+      expect(offer!.constraints.trim()).not.toBe("");
+      expect(offer!.payment.trim()).not.toBe("");
+      expect(offer!.receipt.trim()).not.toBe("");
+      if (offer!.offerKind === "concept") {
+        // Concept pages may still list related brief slugs for literacy, but must not claim physical delivery.
+        expect(offer!.constraints.toLowerCase()).toMatch(/not |n\/a|pilot|concept|literacy|none/);
+      }
+    }
   });
 });

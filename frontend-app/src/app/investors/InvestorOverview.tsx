@@ -23,7 +23,11 @@ export function InvestorOverview() {
     </section>
     <section className={s.section}><h2 className={s.heading}>{c.funding}</h2><p className={s.lead}>{c.fundingBody}</p>
       <div className={s.grid}>{[[c.milestone1, c.milestone1Body], [c.milestone2, c.milestone2Body], [c.milestone3, c.milestone3Body]].map(([title, body]) => <article className={s.card} key={title}><h3>{title}</h3><p>{body}</p></article>)}</div>
-      <div className={s.actions}><a href="mailto:support@ancap.cloud?subject=ANCAP%20investment%20discussion" className={s.primary}>{c.contact} →</a></div>
+      <div className={s.actions}>
+        <Link href="/docs/investors/budget-12m" className={s.secondary}>{c.budgetLink}</Link>
+        <Link href="/docs/investors/demo-5min" className={s.secondary}>{c.demoLink}</Link>
+        <a href="mailto:support@ancap.cloud?subject=ANCAP%20investment%20discussion" className={s.primary}>{c.contact} →</a>
+      </div>
     </section>
   </main><WorkflowFooter /></div>;
 }

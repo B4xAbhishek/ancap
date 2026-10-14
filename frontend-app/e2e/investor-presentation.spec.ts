@@ -65,7 +65,20 @@ test("research project heroes describe briefs instead of physical capabilities",
   for (const route of ["/aeterna", "/cryo", "/saliva-rx", "/galaxy", "/lunar", "/stardust"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Research briefs");
+    await expect(page.getByText("Buyer", { exact: true })).toBeVisible();
+    await expect(page.getByText("Receipt", { exact: true })).toBeVisible();
   }
+});
+
+test("investors page links budget and demo without inventing metrics", async ({ page, context }) => {
+  await context.addCookies([{ name: "ancap-lang", value: "en", url: test.info().project.use.baseURL as string }]);
+  await page.addInitScript(() => localStorage.setItem("ancap-lang-v3", "en"));
+  await page.goto("/investors");
+  await expect(page.getByRole("link", { name: /12-month budget/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /5-minute demo/i })).toBeVisible();
+  await page.getByRole("link", { name: /12-month budget/i }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("12-month budget");
+  await expect(page.getByText(/not a revenue forecast/i)).toBeVisible();
 });
 
 test("the investor overview supports the light theme", async ({ page, context }) => {

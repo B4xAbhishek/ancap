@@ -5,9 +5,9 @@
 
 ## Current truth
 
-**Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. No verified revenue/customer metrics or funding amount supplied. These presentation changes are not yet deployed and do not close mobile/security/paid-execution release checks. Next steps: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
+**Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. Portfolio pages expose buyer→task→inputs→AI result→limits→pay→receipt chains (`projectOffers`). Demo script + 12‑month budget assumptions published under `/docs/investors/*` (ask discussion band €250k–€400k until jurisdiction/quotes). No verified revenue/customer metrics supplied. Not deployed; does not close mobile/security release checks. Tracker: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
 
-Presentation verification: production frontend build passed; portfolio/i18n/classification tests **3 passed**; Playwright investor presentation checks **6 passed** (five languages, filters, mobile width, research heroes and light theme). Screenshots: `tmp/investor-preview-2026-10-14/`.
+Presentation verification: portfolio/offer-chain vitest; Playwright investor checks (languages, filters, research heroes, budget/demo links); API smoke `tests/api/test_investor_paid_path_smoke.py` (credits ledger — no Stripe/broadcast). Screenshots: `tmp/investor-preview-2026-10-14/`.
 
 ANCAP is **largely built**, but it is **not fully release-complete end-to-end**.
 
