@@ -5,6 +5,7 @@ All tests share the same loop → no "Event loop is closed" or skips.
 """
 import json
 import os
+import secrets
 import subprocess
 import uuid
 from typing import Any
@@ -14,6 +15,11 @@ from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 from sqlalchemy import create_engine, text
 from starlette.testclient import TestClient
+
+# PyJWT rejects empty HMAC keys. Use a per-test-process throwaway secret;
+# never reuse production credentials or create an insecure application fallback.
+if not os.environ.get("SECRET_KEY"):
+    os.environ["SECRET_KEY"] = secrets.token_urlsafe(48)
 
 # Set before importing app (engine reads from env). Force async URL for app.
 _default_test_db_url = (
