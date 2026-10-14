@@ -1596,6 +1596,8 @@ async def _do_create_workflow_run_payment_intent(
     body: WorkflowRunPaymentIntentCreateRequest,
 ) -> WorkflowRunPaymentIntentCreateResponse:
     """Core logic for creating a payment intent for a workflow run. No idempotency handling."""
+    if await is_ledger_invariant_halted(session):
+        raise HTTPException(status_code=503, detail="Ledger invariant violated; operations temporarily blocked")
     row = await _get_owned_run(session, user_id, run_id)
     current_status = WorkflowRunStatus(row.status)
     existing = await _latest_payment_intent(
@@ -1648,6 +1650,8 @@ async def _do_create_workflow_run_payment_intent(
         )
 
     user_acc = await get_or_create_account(session, "user", UUID(str(row.owner_user_id)))
+    from app.db.models import Account
+    await session.execute(select(Account.id).where(Account.id == user_acc.id).with_for_update())
     balances = await balance_for_account(session, user_acc.id, row.payment_currency)
     available = balances.get(row.payment_currency) or Decimal(0)
     if available < amount_value:

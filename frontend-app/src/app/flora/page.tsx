@@ -123,9 +123,10 @@ export default function FloraAuctionPage() {
 
   const selected = lots.find((lot) => lot.id === selectedId) || catalog?.lots.find((lot) => lot.id === selectedId);
 
+  const selectedMinimum = selected?.min_next_acp;
   useEffect(() => {
-    if (selected) setAmount(selected.min_next_acp);
-  }, [selected?.id, selected?.min_next_acp]);
+    if (selectedMinimum !== undefined) setAmount(selectedMinimum);
+  }, [selectedId, selectedMinimum]);
 
   const placeBid = async (lot: Lot) => {
     setBusy(true);
@@ -353,7 +354,7 @@ export default function FloraAuctionPage() {
               </label>
               <label>
                 <span style={{ display: "block", fontSize: "0.8rem", marginBottom: 6 }}>{t("floraPage.sellQty")}</span>
-                <input className="input input-bordered" value={sellQty} onChange={(e) => setSellQty(e.target.value)} inputMode="numeric" placeholder="∞" />
+                <input className="input input-bordered" value={sellQty} onChange={(e) => setSellQty(e.target.value)} inputMode="numeric" placeholder="âˆž" />
               </label>
               <label>
                 <span style={{ display: "block", fontSize: "0.8rem", marginBottom: 6 }}>{t("floraPage.sellPrice")}</span>

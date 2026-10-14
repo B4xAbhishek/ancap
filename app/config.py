@@ -483,6 +483,7 @@ class Settings(BaseSettings):
 
     # LLM
     llm_provider: str = "teneta_claude"
+    workflow_operations_worker_enabled: bool = True
     llm_model: str = "claude-sonnet-4-6"
     anthropic_base_url: str = "https://api.tenetauniversity.com"
     anthropic_api_key: str = ""

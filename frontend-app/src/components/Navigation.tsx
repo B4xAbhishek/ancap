@@ -29,6 +29,7 @@ function navItemLabel(item: NavItem, t: (key: string) => string): string {
 
 const spotlightPublic: NavItem[] = [
   { label: "Workflows", href: "/ai/workflows", i18nKey: "positioning.workflows" },
+  { label: "Studio", href: "/ai/studio", i18nKey: "positioning.studio" },
   { label: "Solutions", href: "/projects", i18nKey: "positioning.solutions" },
   { label: "Creators", href: "/creators", i18nKey: "positioning.creators" },
   { label: "Developers", href: "/developers", i18nKey: "nav.developers" },

@@ -104,9 +104,10 @@ export default function FaunaAuctionPage() {
 
   const selected = lots.find((lot) => lot.id === selectedId) || catalog?.lots.find((lot) => lot.id === selectedId);
 
+  const selectedMinimum = selected?.min_next_acp;
   useEffect(() => {
-    if (selected) setAmount(selected.min_next_acp);
-  }, [selected?.id, selected?.min_next_acp]);
+    if (selectedMinimum !== undefined) setAmount(selectedMinimum);
+  }, [selectedId, selectedMinimum]);
 
   const placeBid = async (lot: Lot) => {
     setBusy(true);
