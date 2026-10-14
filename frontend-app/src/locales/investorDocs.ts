@@ -27,14 +27,18 @@ const en = {
   budgetEyebrow: "Investors · planning",
   budgetTitle: "12-month budget (assumptions)",
   budgetLead:
-    "Planning draft dated 2026-10-14. Figures are cost assumptions for fundraising discussion. They are not audited quotes, not a company valuation, and not a revenue forecast. Owner must confirm jurisdiction and replace bands with vendor quotes.",
+    "Planning draft dated 2026-10-14. Figures are cost assumptions for fundraising discussion. They are not audited quotes, not a company valuation, and not a revenue forecast. Planned structure: principal company in Cyprus plus an additional German GmbH — planning intent only until registration and roles are confirmed. Replace cost bands with vendor quotes; do not assume tax savings.",
+  budgetEntitiesHeading: "Planned entities",
+  budgetEntitiesBody:
+    "Cyprus (principal company) and Germany (GmbH). Not presented as completed registration, parent/subsidiary status, or a confirmed tax result. Formation, bookkeeping, filings and cross-border advice should be quoted separately for each entity.",
   budgetAskHeading: "Discussion ask band",
   budgetAskBodyBefore: "Unverified cost scenarios including a 15–20% reserve:",
   budgetAskBand: "lean €129,950–€247,920; standard €277,265–€539,760",
   budgetAskBodyAfter:
-    "These ranges follow the line items, not an approved funding ask. The lean plan includes one engineer; the standard plan includes two engineers plus ops and sales. Payroll on-costs and quotes remain open.",
+    "These ranges follow the line items, not an approved funding ask. The lean plan includes one engineer; the standard plan includes two engineers plus ops and sales. Payroll on-costs and quotes remain open. Totals are unchanged pending quoted formation and advice for both entities.",
   budgetBucketsHeading: "Cost buckets",
-  budgetBucket1: "One-time: company formation, accounting setup, legal refresh, independent security review.",
+  budgetBucket1:
+    "One-time: formation and registry for each planned entity, accounting setup, legal refresh, independent security review.",
   budgetBucket2: "Monthly: engineering, ops/IR, optional sales, hosting, LLM inference, SaaS tools.",
   budgetBucket3:
     "Pilot bag: cash travel / content experiments. Promotional ACP credits are non-cash and excluded from EUR totals.",
@@ -79,14 +83,18 @@ export const investorDocsByLang: Record<Language, Copy> = {
     budgetEyebrow: "Инвесторам · планирование",
     budgetTitle: "Бюджет на 12 месяцев (допущения)",
     budgetLead:
-      "Плановый черновик от 2026-10-14. Цифры — допущения по затратам для обсуждения привлечения. Это не аудированные котировки, не оценка компании и не прогноз выручки. Владелец должен подтвердить юрисдикцию и заменить диапазоны котировками подрядчиков.",
+      "Плановый черновик от 2026-10-14. Цифры — допущения по затратам для обсуждения привлечения. Это не аудированные котировки, не оценка компании и не прогноз выручки. Планируемая структура: основная компания на Кипре и дополнительная GmbH в Германии — только намерение до подтверждения регистрации и ролей. Заменить диапазоны котировками; налоговую экономию не предполагать.",
+    budgetEntitiesHeading: "Планируемые юрлица",
+    budgetEntitiesBody:
+      "Кипр (основная компания) и Германия (GmbH). Не представлено как завершённая регистрация, материнско-дочерние отношения или подтверждённый налоговый результат. Регистрацию, бухгалтерию, отчётность и трансграничные консультации котировать отдельно по каждому юрлицу.",
     budgetAskHeading: "Диапазон для обсуждения",
     budgetAskBodyBefore: "Непроверенные сценарии затрат с резервом 15–20%:",
     budgetAskBand: "lean €129,950–€247,920; standard €277,265–€539,760",
     budgetAskBodyAfter:
-      "Диапазоны следуют из строк бюджета, а не из утверждённой суммы запроса. Lean — один инженер; standard — два инженера плюс ops и продажи. Налоги на ФОТ и котировки остаются открытыми.",
+      "Диапазоны следуют из строк бюджета, а не из утверждённой суммы запроса. Lean — один инженер; standard — два инженера плюс ops и продажи. Налоги на ФОТ и котировки остаются открытыми. Итоги не менялись до получения котировок на оформление и консультации по обоим юрлицам.",
     budgetBucketsHeading: "Статьи затрат",
-    budgetBucket1: "Разовые: оформление компании, бухгалтерский старт, юридическое обновление, независимый security review.",
+    budgetBucket1:
+      "Разовые: регистрация каждого планируемого юрлица, бухгалтерский старт, юридическое обновление, независимый security review.",
     budgetBucket2: "Ежемесячные: инженерия, ops/IR, опциональные продажи, хостинг, LLM inference, SaaS.",
     budgetBucket3:
       "Пилотный фонд: поездки / контентные эксперименты. Промо-кредиты ACP — неденежные и исключены из EUR-итогов.",
@@ -126,14 +134,18 @@ export const investorDocsByLang: Record<Language, Copy> = {
     budgetEyebrow: "Інвесторам · планування",
     budgetTitle: "Бюджет на 12 місяців (припущення)",
     budgetLead:
-      "Плановий чернетковий документ від 2026-10-14. Цифри — припущення щодо витрат для обговорення залучення. Це не аудитовані котирування, не оцінка компанії і не прогноз виручки. Власник має підтвердити юрисдикцію та замінити діапазони котируваннями підрядників.",
+      "Плановий чернетковий документ від 2026-10-14. Цифри — припущення щодо витрат для обговорення залучення. Це не аудитовані котирування, не оцінка компанії і не прогноз виручки. Планована структура: основна компанія на Кіпрі та додаткова GmbH у Німеччині — лише намір до підтвердження реєстрації та ролей. Замінити діапазони котируваннями; податкову економію не припускати.",
+    budgetEntitiesHeading: "Плановані юрособи",
+    budgetEntitiesBody:
+      "Кіпр (основна компанія) і Німеччина (GmbH). Не подано як завершена реєстрація, материнсько-дочірні відносини чи підтверджений податковий результат. Реєстрацію, бухгалтерію, звітність і транскордонні консультації котирувати окремо для кожної юрособи.",
     budgetAskHeading: "Діапазон для обговорення",
     budgetAskBodyBefore: "Неперевірені сценарії витрат із резервом 15–20%:",
     budgetAskBand: "lean €129,950–€247,920; standard €277,265–€539,760",
     budgetAskBodyAfter:
-      "Діапазони випливають із рядків бюджету, а не із затвердженої суми запиту. Lean — один інженер; standard — два інженери плюс ops і продажі. Податки на ФОП і котирування залишаються відкритими.",
+      "Діапазони випливають із рядків бюджету, а не із затвердженої суми запиту. Lean — один інженер; standard — два інженери плюс ops і продажі. Податки на ФОП і котирування залишаються відкритими. Підсумки не змінювалися до отримання котирувань на оформлення та консультації для обох юросіб.",
     budgetBucketsHeading: "Статті витрат",
-    budgetBucket1: "Разові: оформлення компанії, бухгалтерський старт, юридичне оновлення, незалежний security review.",
+    budgetBucket1:
+      "Разові: реєстрація кожної планованої юрособи, бухгалтерський старт, юридичне оновлення, незалежний security review.",
     budgetBucket2: "Щомісячні: інженерія, ops/IR, опційні продажі, хостинг, LLM inference, SaaS.",
     budgetBucket3:
       "Пілотний фонд: поїздки / контентні експерименти. Промо-кредити ACP — негрошові й виключені з EUR-підсумків.",
@@ -173,14 +185,18 @@ export const investorDocsByLang: Record<Language, Copy> = {
     budgetEyebrow: "Investoren · Planung",
     budgetTitle: "12-Monats-Budget (Annahmen)",
     budgetLead:
-      "Planungsentwurf vom 2026-10-14. Zahlen sind Kostenannahmen für die Fundraising-Diskussion. Keine geprüften Angebote, keine Unternehmensbewertung und keine Umsatzprognose. Der Eigentümer muss die Jurisdiktion bestätigen und Spannen durch Anbieterangebote ersetzen.",
+      "Planungsentwurf vom 2026-10-14. Zahlen sind Kostenannahmen für die Fundraising-Diskussion. Keine geprüften Angebote, keine Unternehmensbewertung und keine Umsatzprognose. Geplante Struktur: Hauptgesellschaft auf Zypern plus zusätzliche deutsche GmbH — nur Planungsabsicht bis Registrierung und Rollen bestätigt sind. Spannen durch Angebote ersetzen; keine Steuerersparnis annehmen.",
+    budgetEntitiesHeading: "Geplante Gesellschaften",
+    budgetEntitiesBody:
+      "Zypern (Hauptgesellschaft) und Deutschland (GmbH). Nicht als abgeschlossene Registrierung, Mutter-/Tochterverhältnis oder bestätigtes Steuerergebnis dargestellt. Gründung, Buchhaltung, Meldungen und grenzüberschreitende Beratung getrennt je Gesellschaft anbieten lassen.",
     budgetAskHeading: "Diskussionsbandbreite",
     budgetAskBodyBefore: "Ungeprüfte Kostenszenarien inklusive 15–20 % Reserve:",
     budgetAskBand: "lean €129,950–€247,920; standard €277,265–€539,760",
     budgetAskBodyAfter:
-      "Die Spannen folgen den Budgetzeilen, nicht einer genehmigten Ask-Summe. Lean: ein Engineer; Standard: zwei Engineers plus Ops und Vertrieb. Lohnnebenkosten und Angebote bleiben offen.",
+      "Die Spannen folgen den Budgetzeilen, nicht einer genehmigten Ask-Summe. Lean: ein Engineer; Standard: zwei Engineers plus Ops und Vertrieb. Lohnnebenkosten und Angebote bleiben offen. Summen unverändert, bis Angebote für Gründung und Beratung beider Gesellschaften vorliegen.",
     budgetBucketsHeading: "Kostenblöcke",
-    budgetBucket1: "Einmalig: Firmengründung, Buchhaltungssetup, rechtliche Aktualisierung, unabhängiger Security-Review.",
+    budgetBucket1:
+      "Einmalig: Gründung und Register jeder geplanten Gesellschaft, Buchhaltungssetup, rechtliche Aktualisierung, unabhängiger Security-Review.",
     budgetBucket2: "Monatlich: Engineering, Ops/IR, optionaler Vertrieb, Hosting, LLM-Inference, SaaS.",
     budgetBucket3:
       "Pilotbeutel: Reisekosten / Content-Experimente. Werbe-ACP-Credits sind nicht zahlungswirksam und aus EUR-Summen ausgeschlossen.",
@@ -220,14 +236,17 @@ export const investorDocsByLang: Record<Language, Copy> = {
     budgetEyebrow: "投資者 · 規劃",
     budgetTitle: "十二個月預算（假設）",
     budgetLead:
-      "2026-10-14 規劃草稿。數字為募資討論用的成本假設，非經審計報價、非公司估值、非營收預測。負責人須確認管轄地，並以供應商報價取代區間。",
+      "2026-10-14 規劃草稿。數字為募資討論用的成本假設，非經審計報價、非公司估值、非營收預測。規劃結構：賽普勒斯主要公司，另設德國 GmbH——在註冊與角色確認前僅為意向。請以供應商報價取代區間，且不得假設稅務節省。",
+    budgetEntitiesHeading: "規劃中的法人",
+    budgetEntitiesBody:
+      "賽普勒斯（主要公司）與德國（GmbH）。不表示已完成註冊、母子公司關係或已確認的稅務結果。成立、會計、申報與跨境諮詢應對各法人分開報價。",
     budgetAskHeading: "討論用資金區間",
     budgetAskBodyBefore: "未驗證成本情境（含 15–20% 準備金）：",
     budgetAskBand: "精簡 €129,950–€247,920；標準 €277,265–€539,760",
     budgetAskBodyAfter:
-      "區間依預算明細計算，非已核准募資金額。精簡方案含一名工程師；標準方案含兩名工程師及營運與銷售。薪資附加成本與報價仍待確認。",
+      "區間依預算明細計算，非已核准募資金額。精簡方案含一名工程師；標準方案含兩名工程師及營運與銷售。薪資附加成本與報價仍待確認。在兩家法人之成立與諮詢報價到位前，合計金額維持不變。",
     budgetBucketsHeading: "成本類別",
-    budgetBucket1: "一次性：公司成立、會計建置、法律更新、獨立安全審查。",
+    budgetBucket1: "一次性：各規劃法人之成立與登記、會計建置、法律更新、獨立安全審查。",
     budgetBucket2: "每月：工程、營運／投資人關係、可選銷售、主機、LLM 推論、SaaS 工具。",
     budgetBucket3: "試點預算：差旅／內容實驗。促銷 ACP 點數屬非現金，已自 EUR 合計排除。",
     budgetBucket4: "準備金：15–20% 營運資金。",

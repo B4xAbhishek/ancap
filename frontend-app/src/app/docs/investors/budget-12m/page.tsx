@@ -17,6 +17,9 @@ export default function InvestorBudgetPage() {
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">{c.budgetTitle}</h1>
         <p className="mt-4 text-[var(--text-muted)]">{c.budgetLead}</p>
 
+        <h2 className="mt-10 text-xl font-semibold">{c.budgetEntitiesHeading}</h2>
+        <p className="mt-3 text-[var(--text-muted)]">{c.budgetEntitiesBody}</p>
+
         <h2 className="mt-10 text-xl font-semibold">{c.budgetAskHeading}</h2>
         <p className="mt-3 text-[var(--text-muted)]">
           {c.budgetAskBodyBefore}{" "}

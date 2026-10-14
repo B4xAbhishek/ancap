@@ -20,6 +20,7 @@ export function InvestorOverview() {
     <section className={s.section}><h2 className={s.heading}>{c.evidence}</h2><p className={s.lead}>{c.evidenceBody}</p>
       <div className={s.actions}><Link href="/proof-center" className={s.secondary}>{c.trust}</Link><Link href="/developers" className={s.secondary}>API / MCP</Link><a className={s.secondary} href="https://github.com/ancapcloud/ancap" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
       <div className={s.note}><strong>{c.stage}</strong><p>{c.stageBody}</p></div>
+      <div className={s.note}><strong>{c.entities}</strong><p>{c.entitiesBody}</p></div>
     </section>
     <section className={s.section}><h2 className={s.heading}>{c.funding}</h2><p className={s.lead}>{c.fundingBody}</p>
       <div className={s.grid}>{[[c.milestone1, c.milestone1Body], [c.milestone2, c.milestone2Body], [c.milestone3, c.milestone3Body]].map(([title, body]) => <article className={s.card} key={title}><h3>{title}</h3><p>{body}</p></article>)}</div>

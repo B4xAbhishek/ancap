@@ -108,3 +108,11 @@ Primary legal references checked on 2026-10-14:
 - German personal income-tax residence rule: https://www.gesetze-im-internet.de/estg/__1.html
 
 Personal immigration or residence-document details belong in private adviser intake, not the public investor package.
+
+## Quote request pack
+
+Separate RFQs (do not change EUR scenario totals until quotes return):
+
+- `docs/investors/quotes/CYPRUS_COMPANY_QUOTE_REQUEST.md` — Cyprus principal company: formation, bookkeeping, filings.
+- `docs/investors/quotes/GERMAN_GMBH_QUOTE_REQUEST.md` — German GmbH: formation, bookkeeping, filings.
+- `docs/investors/quotes/CROSS_BORDER_TAX_BRIEF.md` — joint brief for Cypriot adviser + German Steuerberater (management, PE, IP, contracts, investment vehicle, intercompany, VAT, payroll, ACP characterisation).

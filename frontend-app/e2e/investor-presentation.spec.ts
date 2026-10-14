@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { positioningByLang } from "../src/locales/positioning";
+import { investorDocsByLang } from "../src/locales/investorDocs";
 
 test("public presentation explains the workflow product in five languages", async ({ page, context }) => {
   const languages = [
@@ -98,4 +100,15 @@ test("project offers link directly to the correct workflow or bundle", async ({ 
   await expect(page.locator('aside a[href="/ai/bundles/launch-pack"]')).toBeVisible();
   await page.goto("/markets");
   await expect(page.locator('aside a[href="/ai/run/market-direction-brief"]')).toBeVisible();
+});
+
+test("planned entities disclaimer is localized on investor and budget pages", async ({ page, context }) => {
+  for (const lang of ["en", "ru", "uk", "de", "zh-Hant"] as const) {
+    await context.addCookies([{ name: "ancap-lang", value: lang, url: test.info().project.use.baseURL as string }]);
+    await page.addInitScript(value => localStorage.setItem("ancap-lang-v3", value), lang);
+    await page.goto("/investors");
+    await expect(page.locator("main").getByText(positioningByLang[lang].entitiesBody, { exact: true })).toBeVisible();
+    await page.goto("/docs/investors/budget-12m");
+    await expect(page.locator("article").getByText(investorDocsByLang[lang].budgetEntitiesBody, { exact: true })).toBeVisible();
+  }
 });
