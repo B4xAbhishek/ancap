@@ -5,7 +5,7 @@
 
 ## Current truth
 
-Workflow discovery release in validation (2026-10-14): task matching, local shortlist, comparison of three workflows, exact run-cost planning and JSON export; investor page links immutable local-demo evidence. Local frontend unit 46/46, browser 12/12 and mobile baseline unit 281/281 passed. Production build passed. Full audit and deployment are pending; see `docs/WORKFLOW_DISCOVERY_RELEASE_2026-10-14.md`.
+Workflow discovery release in validation (2026-10-14): task matching, local shortlist, comparison of three workflows, exact run-cost planning and JSON export; investor page links immutable local-demo evidence. Local frontend unit 46/46, browser 15/15 and mobile baseline unit 281/281 passed. Production build passed. Full audit and deployment are pending; see `docs/WORKFLOW_DISCOVERY_RELEASE_2026-10-14.md`.
 
 Investor corporate-plan update (2026-10-14, local): Cyprus principal company + additional German GmbH are described as proposed, with separate quote requests. Introductory investor memos RU/EN and outreach drafts are in `docs/investors/`; no correspondence sent. Verification of this update: production frontend build passed, Vitest 6 passed, Playwright 9 passed including planned-entity copy on both investor/budget pages in five languages. No production deployment in this update.
 
