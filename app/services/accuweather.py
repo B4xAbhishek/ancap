@@ -95,11 +95,53 @@ def _wmo_text(code: Any) -> str:
     return "Weather"
 
 
+def _wmo_to_aw_icon(code: Any, *, is_day: bool = True) -> int | None:
+    """Map Open-Meteo WMO weather_code → AccuWeather icon id (1–44) for awxcdn SVGs."""
+    try:
+        c = int(code)
+    except (TypeError, ValueError):
+        return None
+    if c == 0:
+        return 1 if is_day else 33
+    if c in (1, 2):
+        return 2 if is_day else 34
+    if c == 3:
+        return 7 if is_day else 38
+    if c in (45, 48):
+        return 11
+    if c in (51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82):
+        return 12
+    if c in (71, 73, 75, 77, 85, 86):
+        return 22
+    if c in (95, 96, 99):
+        return 15
+    return 7 if is_day else 38
+
+
+def _uv_text(uv: Any) -> str | None:
+    try:
+        v = float(uv)
+    except (TypeError, ValueError):
+        return None
+    if v < 3:
+        return "Low"
+    if v < 6:
+        return "Moderate"
+    if v < 8:
+        return "High"
+    if v < 11:
+        return "Very High"
+    return "Extreme"
+
+
 async def _aw_get(client: httpx.AsyncClient, path: str, *, params: dict | None = None) -> httpx.Response:
     key = _api_key()
     p = dict(params or {})
-    # Prefer Bearer for modern zpka_ keys; still pass apikey for compatibility.
-    headers = {"Authorization": f"Bearer {key}", "Accept": "application/json"}
+    headers = {"Accept": "application/json"}
+    # Classic AccuWeather keys expect apikey= only; Bearer on those often returns HTTP 403.
+    # Modern portal keys (zpka_…) prefer Authorization: Bearer.
+    if key.lower().startswith("zpka_"):
+        headers["Authorization"] = f"Bearer {key}"
     p.setdefault("apikey", key)
     return await client.get(f"{_BASE}{path}", params=p, headers=headers)
 
@@ -109,7 +151,14 @@ async def _open_meteo_fallback(lat: float, lon: float) -> dict:
     params = {
         "latitude": lat,
         "longitude": lon,
-        "current": "temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m",
+        "current": (
+            "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,"
+            "relative_humidity_2m,cloud_cover,surface_pressure,precipitation,uv_index,is_day"
+        ),
+        "hourly": "temperature_2m,weather_code,precipitation_probability",
+        "daily": "temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max",
+        "forecast_days": "1",
+        "forecast_hours": "2",
         "wind_speed_unit": "kmh",
         "timezone": "auto",
     }
@@ -118,7 +167,55 @@ async def _open_meteo_fallback(lat: float, lon: float) -> dict:
         res.raise_for_status()
         j = res.json()
     current = j.get("current") or {}
+    daily = j.get("daily") or {}
+    hourly = j.get("hourly") or {}
     code = current.get("weather_code")
+    is_day = bool(current.get("is_day", 1))
+    icon = _wmo_to_aw_icon(code, is_day=is_day)
+    uv = current.get("uv_index")
+
+    forecast_today = None
+    try:
+        mins = daily.get("temperature_2m_min") or []
+        maxs = daily.get("temperature_2m_max") or []
+        codes = daily.get("weather_code") or []
+        precip = daily.get("precipitation_probability_max") or []
+        dates = daily.get("time") or []
+        if mins or maxs:
+            day_code = codes[0] if codes else code
+            forecast_today = {
+                "date": str(dates[0]) if dates else None,
+                "min_c": float(mins[0]) if mins else None,
+                "max_c": float(maxs[0]) if maxs else None,
+                "day_text": _wmo_text(day_code),
+                "night_text": None,
+                "precip_probability_day": int(precip[0]) if precip and precip[0] is not None else None,
+                "link": None,
+            }
+    except (TypeError, ValueError, IndexError):
+        forecast_today = None
+
+    next_hour = None
+    try:
+        h_temp = hourly.get("temperature_2m") or []
+        h_code = hourly.get("weather_code") or []
+        h_precip = hourly.get("precipitation_probability") or []
+        h_time = hourly.get("time") or []
+        # Index 0 is often "now"; prefer the next slot when present.
+        idx = 1 if len(h_temp) > 1 else 0
+        if h_temp:
+            next_hour = {
+                "time": h_time[idx] if idx < len(h_time) else None,
+                "temperature_c": float(h_temp[idx]) if h_temp[idx] is not None else None,
+                "weather_text": _wmo_text(h_code[idx] if idx < len(h_code) else code),
+                "precip_probability": int(h_precip[idx]) if idx < len(h_precip) and h_precip[idx] is not None else None,
+                "icon": _wmo_to_aw_icon(h_code[idx] if idx < len(h_code) else code, is_day=is_day),
+            }
+    except (TypeError, ValueError, IndexError):
+        next_hour = None
+
+    humidity = current.get("relative_humidity_2m")
+    cloud = current.get("cloud_cover")
     return {
         "provider": "accuweather",
         "status": "fallback",
@@ -127,11 +224,19 @@ async def _open_meteo_fallback(lat: float, lon: float) -> dict:
         "longitude": lon,
         "timezone": j.get("timezone"),
         "temperature_c": current.get("temperature_2m"),
+        "realfeel_c": current.get("apparent_temperature"),
         "weather_text": _wmo_text(code),
-        "weather_icon": None,
-        "weather_icon_url": None,
+        "weather_icon": icon,
+        "weather_icon_url": _icon_url(icon),
+        "is_day_time": is_day,
         "wind_kmh": current.get("wind_speed_10m"),
-        "relative_humidity": current.get("relative_humidity_2m"),
+        "wind_gust_kmh": current.get("wind_gusts_10m"),
+        "relative_humidity": int(humidity) if isinstance(humidity, (int, float)) else None,
+        "cloud_cover": int(cloud) if isinstance(cloud, (int, float)) else None,
+        "pressure_mb": current.get("surface_pressure"),
+        "uv_index": float(uv) if isinstance(uv, (int, float)) else None,
+        "uv_text": _uv_text(uv),
+        "precip_1h_mm": current.get("precipitation"),
         "observed_at": datetime.now(timezone.utc),
         "accuweather_url": (
             f"https://www.accuweather.com/en/search-locations?query={lat:.4f},{lon:.4f}"
@@ -141,8 +246,8 @@ async def _open_meteo_fallback(lat: float, lon: float) -> dict:
             "ACCUWEATHER_API_KEY not configured — interim numeric feed with AccuWeather deep-link.",
         ],
         "fallback_provider": "open-meteo",
-        "forecast_today": None,
-        "next_hour": None,
+        "forecast_today": forecast_today,
+        "next_hour": next_hour,
     }
 
 

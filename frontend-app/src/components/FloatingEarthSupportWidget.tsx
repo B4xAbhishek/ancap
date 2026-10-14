@@ -9,8 +9,8 @@ import {
   type FloatingWidgetEventDetail,
 } from "@/lib/floatingWidgets";
 
-const GEO_CACHE_KEY = "ancap_earth_geo_v3";
-const WEATHER_CACHE_KEY = "ancap_earth_weather_accu_v3";
+const GEO_CACHE_KEY = "ancap_earth_geo_v4";
+const WEATHER_CACHE_KEY = "ancap_earth_weather_accu_v4";
 const OPEN_KEY = "ancap_earth_widget_open_v1";
 const CACHE_TTL_MS = 12 * 60 * 1000;
 
@@ -85,24 +85,94 @@ function fmtTemp(v: number | null | undefined): string {
   return `${n > 0 ? "+" : ""}${n}°`;
 }
 
+function parseLatLon(raw: unknown): { lat: number; lon: number } | null {
+  if (typeof raw === "string" && raw.includes(",")) {
+    const [a, b] = raw.split(",");
+    const lat = Number(a);
+    const lon = Number(b);
+    if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
+  }
+  return null;
+}
+
+/** geojs.io is often blocked in-browser; try CORS-friendly providers next. */
 async function fetchGeo(): Promise<GeoInfo> {
   const cached = readCache<GeoInfo>(GEO_CACHE_KEY);
   if (cached) return cached;
-  const res = await fetch("https://get.geojs.io/v1/ip/geo.json", { signal: AbortSignal.timeout(8000) });
-  if (!res.ok) throw new Error("geo failed");
-  const j = (await res.json()) as Record<string, unknown>;
-  const lat = Number(j.latitude);
-  const lon = Number(j.longitude);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error("geo coords");
-  const data: GeoInfo = {
-    lat,
-    lon,
-    city: String(j.city || j.region || "—"),
-    country: String(j.country || j.country_code || ""),
-    timezone: String(j.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"),
+
+  const tzFallback = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const attempts: Array<() => Promise<GeoInfo>> = [
+    async () => {
+      const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error("ipwho failed");
+      const j = (await res.json()) as Record<string, unknown>;
+      if (j.success === false) throw new Error("ipwho denied");
+      const lat = Number(j.latitude);
+      const lon = Number(j.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error("ipwho coords");
+      return {
+        lat,
+        lon,
+        city: String(j.city || j.region || "—"),
+        country: String(j.country || j.country_code || ""),
+        timezone: String(j.timezone || tzFallback),
+      };
+    },
+    async () => {
+      const res = await fetch("https://ipinfo.io/json", { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error("ipinfo failed");
+      const j = (await res.json()) as Record<string, unknown>;
+      const coords = parseLatLon(j.loc);
+      if (!coords) throw new Error("ipinfo coords");
+      return {
+        lat: coords.lat,
+        lon: coords.lon,
+        city: String(j.city || j.region || "—"),
+        country: String(j.country || ""),
+        timezone: String(j.timezone || tzFallback),
+      };
+    },
+    async () => {
+      const res = await fetch("https://get.geojs.io/v1/ip/geo.json", { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error("geojs failed");
+      const j = (await res.json()) as Record<string, unknown>;
+      const lat = Number(j.latitude);
+      const lon = Number(j.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error("geojs coords");
+      return {
+        lat,
+        lon,
+        city: String(j.city || j.region || "—"),
+        country: String(j.country || j.country_code || ""),
+        timezone: String(j.timezone || tzFallback),
+      };
+    },
+  ];
+
+  let lastErr: unknown;
+  for (const attempt of attempts) {
+    try {
+      const data = await attempt();
+      writeCache(GEO_CACHE_KEY, data);
+      return data;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  // Last resort: keep clock/weather usable near a stable EU desk pin (Bucharest).
+  const fallback: GeoInfo = {
+    lat: 44.4268,
+    lon: 26.1025,
+    city: "Local",
+    country: "",
+    timezone: tzFallback,
   };
-  writeCache(GEO_CACHE_KEY, data);
-  return data;
+  writeCache(GEO_CACHE_KEY, fallback);
+  if (lastErr) {
+    console.warn("earth-widget geo providers failed; using timezone fallback", lastErr);
+  }
+  return fallback;
 }
 
 async function fetchWeather(lat: number, lon: number): Promise<WeatherInfo> {
@@ -223,15 +293,23 @@ export function FloatingEarthSupportWidget() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      let g: GeoInfo | null = null;
       try {
-        const g = await fetchGeo();
+        g = await fetchGeo();
         if (cancelled) return;
         setGeo(g);
-        const w = await fetchWeather(g.lat, g.lon);
+      } catch {
+        if (!cancelled) setError("гео временно недоступен");
+      }
+      try {
+        const lat = g?.lat ?? 44.4268;
+        const lon = g?.lon ?? 26.1025;
+        const w = await fetchWeather(lat, lon);
         if (cancelled) return;
         setWeather(w);
+        setError("");
       } catch {
-        if (!cancelled) setError("гео/погода временно недоступны");
+        if (!cancelled) setError((prev) => prev || "погода временно недоступна");
       }
     })();
     return () => {
