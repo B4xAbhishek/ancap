@@ -6,6 +6,12 @@ import app.api.routers.mobile_acp as mobile_acp
 from app.services import rate_limit as rl_module
 
 
+
+def recovered_receipt_completion_is_not_implied(execution):
+    """Full route tx-ref coverage is only observed evidence, not final settlement."""
+    return execution["status"] == "pending_reconciliation" and execution["recoverable"] is True
+
+
 def test_smart_pay_capabilities(client, monkeypatch):
     monkeypatch.setenv("MOBILE_SMART_PAY_ENABLED", "true")
     monkeypatch.setenv("MOBILE_SMART_PAY_AI_FALLBACK_ENABLED", "false")
@@ -235,6 +241,7 @@ def test_smart_pay_execute_receipt_and_recover(client):
     assert receipt["recipientAddress"] == addr
     assert receipt["routeSummary"] == ["1. transfer ACP -> ACP on acp"]
     assert receipt["txRefs"] == []
+    assert receipt["completedAt"] is None
 
     recover_res = client.post(
         f"/v1/mobile/smart-pay/payments/{execution_id}/recover?sessionToken={session_token}",
@@ -245,8 +252,8 @@ def test_smart_pay_execute_receipt_and_recover(client):
     recover_payload = recover_res.json()
     recovered = recover_payload["execution"]
     assert recover_payload["sessionToken"] == session_token
-    assert recovered["status"] == "completed"
-    assert recovered["recoverable"] is False
+    assert recovered["status"] == "pending_reconciliation"
+    assert recovered["recoverable"] is True
     assert recovered["nextAction"] is None
     assert recovered["progress"] == {
         "totalRouteSteps": 1,
@@ -254,6 +261,8 @@ def test_smart_pay_execute_receipt_and_recover(client):
         "remainingRouteSteps": 0,
         "pendingRoles": [],
     }
+    # Client-provided hashes do not prove that a transaction was broadcast or confirmed.
+    assert recovered_receipt_completion_is_not_implied(recovered)
     assert recovered["txRefs"][0]["role"] == "payment"
     assert recovered["txRefs"][0]["network"] == "acp"
     assert recovered["txRefs"][0]["txid"] == "fixture-tx-alpha"
@@ -266,6 +275,7 @@ def test_smart_pay_execute_receipt_and_recover(client):
     assert recovered_receipt_res.status_code == 200
     recovered_receipt = recovered_receipt_res.json()
     assert recovered_receipt["txRefs"][0]["txid"] == "fixture-tx-alpha"
+    assert recovered_receipt["completedAt"] is None
     assert recovered_receipt["txRefs"][0]["explorerUrl"] == "https://ancap.cloud/explorer/tx/fixture-tx-alpha"
 
 
@@ -338,8 +348,8 @@ def test_smart_pay_recover_multi_step_route_stays_pending_until_all_route_txs_ar
     )
     assert final_recover.status_code == 200, final_recover.text
     final = final_recover.json()["execution"]
-    assert final["status"] == "completed"
-    assert final["recoverable"] is False
+    assert final["status"] == "pending_reconciliation"
+    assert final["recoverable"] is True
     assert final["nextAction"] is None
     assert final["progress"] == {
         "totalRouteSteps": 3,
@@ -411,7 +421,7 @@ def test_smart_pay_recover_preserves_explorer_link_metadata_from_structured_clie
     )
     assert recover_res.status_code == 200, recover_res.text
     recovered = recover_res.json()["execution"]
-    assert recovered["status"] == "completed"
+    assert recovered["status"] == "pending_reconciliation"
     assert recovered["progress"] == {
         "totalRouteSteps": 3,
         "observedTxCount": 3,
@@ -668,7 +678,7 @@ def test_smart_pay_recover_deduplicates_known_txs_case_insensitively(client):
     )
     assert duplicate_recover.status_code == 200, duplicate_recover.text
     duplicate_execution = duplicate_recover.json()["execution"]
-    assert duplicate_execution["status"] == "completed"
+    assert duplicate_execution["status"] == "pending_reconciliation"
     assert duplicate_execution["progress"] == {
         "totalRouteSteps": 1,
         "observedTxCount": 1,
@@ -826,7 +836,7 @@ def test_smart_pay_recover_accepts_explorer_links_inside_client_known_txs(client
     )
     assert recover_res.status_code == 200, recover_res.text
     recovered = recover_res.json()["execution"]
-    assert recovered["status"] == "completed"
+    assert recovered["status"] == "pending_reconciliation"
     assert recovered["txRefs"] == [
         {
             "role": "payment",
@@ -1085,8 +1095,8 @@ def test_smart_pay_payment_history_lists_latest_executions_with_receipts(client)
     assert [item["execution"]["id"] for item in payments[:2]] == [second_execution_id, first_execution_id]
 
     completed_entry = next(item for item in payments if item["execution"]["id"] == first_execution_id)
-    assert completed_entry["execution"]["status"] == "completed"
-    assert completed_entry["execution"]["recoverable"] is False
+    assert completed_entry["execution"]["status"] == "pending_reconciliation"
+    assert completed_entry["execution"]["recoverable"] is True
     assert completed_entry["receipt"]["txRefs"][0]["txid"] == "fixture-first-hop"
     assert completed_entry["receipt"]["recipientAddress"] == first_addr
 
@@ -1261,7 +1271,7 @@ def test_smart_pay_owner_auth_can_refresh_receipt_and_recover_without_original_s
     assert owner_recover.status_code == 200, owner_recover.text
     owner_recover_payload = owner_recover.json()
     assert owner_recover_payload["sessionToken"] == session_token
-    assert owner_recover_payload["execution"]["status"] == "completed"
+    assert owner_recover_payload["execution"]["status"] == "pending_reconciliation"
     assert owner_recover_payload["execution"]["progress"] == {
         "totalRouteSteps": 3,
         "observedTxCount": 3,
