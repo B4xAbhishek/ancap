@@ -5,15 +5,15 @@ Status: **planning draft for fundraising discussion**. Not a committed spend pla
 
 ## Purpose
 
-Derive a funding ask from **costs and measurable milestones**, without inventing revenue, customers, partners, or company valuation. Owner still must confirm jurisdiction, headcount, and quotes.
+Derive a funding ask from **costs and measurable milestones**, without inventing revenue, customers, partners, or company valuation. Owner plans the principal company in Cyprus and an additional German GmbH. Ownership, entity roles, effective management, headcount and quotes remain to be confirmed.
 
 ## Currency and jurisdiction
 
 | Item | Value | Source |
 | --- | --- | --- |
 | Planning currency | **EUR** | Assumption for cross-border discussion |
-| Company seat | **Not chosen** (owner open) | Owner input required |
-| Tax / VAT treatment | Unknown | Counsel after jurisdiction choice |
+| Planned entities | **Principal company in Cyprus + additional German GmbH** | Owner instruction, 2026-10-14; registration status and ownership not verified |
+| Tax / VAT treatment | Unconfirmed | Joint German/Cypriot tax review of actual management, operations and intercompany relationships |
 
 All EUR figures below are **assumptions** unless marked as a public list price. Local counsel / accountant quotes will replace them.
 
@@ -32,7 +32,7 @@ Final ask = selected, confirmed cash budget + a separately justified reserve. Th
 
 | Line | Lean (EUR) | Standard (EUR) | Assumption / check |
 | --- | --- | --- | --- |
-| Company formation + registry | 1,500–4,000 | 2,500–8,000 | EU micro-entity / Estonian e-Residency / PL/CZ ranges vary; **get counsel quote** |
+| Company formation + registry | 1,500–4,000 | 2,500–8,000 | Two planned entities: Cyprus company and German GmbH. Existing range is a placeholder, not a quotation for both; obtain separate formation quotes |
 | Accounting setup + year-1 bookkeeping retainer (prepaid) | 1,200–3,000 | 2,400–6,000 | Local accountant |
 | Legal: terms/privacy refresh + commercial review | 3,000–8,000 | 6,000–15,000 | Counsel quote |
 | Independent security review (app + wallet surface) | 8,000–15,000 | 15,000–35,000 | Scope in `docs/DEVELOPER_HANDOFF_RU.md`; **quote required** |
@@ -90,7 +90,21 @@ ACP promotional credits are excluded from EUR cash totals. Do not count them aga
 
 ## Owner checklist before sending to an investor
 
-1. Choose company country and entity type.
+1. Confirm the Cyprus company legal form, registration status and German GmbH ownership/role; obtain a cross-border management and tax review.
 2. Replace assumption bands with quotes (formation, counsel, auditor, payroll).
 3. Confirm headcount and contractor vs employee mix.
 4. Set the final ask = confirmed budget + reserve; attach this file + demo script + proof of paid-path smoke.
+
+## Owner jurisdiction update — 2026-10-14
+
+Planned principal company: Cyprus. Additional German entity: GmbH. Neither a completed registration nor a parent/subsidiary relationship is established by this instruction. The investor presentation should describe this as a proposed corporate structure pending professional confirmation.
+
+Budget separately for formation, bookkeeping, filings and advice for each entity; intercompany contracts, actual Cyprus operations/management and any additional payroll obligations need quotes. Do not increase or reduce the funding ask by an assumed tax saving. Formation capital and operating costs must be identified separately in the cash plan.
+
+Questions for German and Cypriot advisers: effective management and tax residence; permanent establishments; which entity owns the IP, receives investment and contracts with customers; arm's-length intercompany pricing; VAT and payroll; applicable requirements for the actual ACP/workflow business. The investor package must not assert tax savings before this review.
+
+Primary legal references checked on 2026-10-14:
+- German company residence / management: https://www.gesetze-im-internet.de/kstg_1977/__1.html
+- German personal income-tax residence rule: https://www.gesetze-im-internet.de/estg/__1.html
+
+Personal immigration or residence-document details belong in private adviser intake, not the public investor package.

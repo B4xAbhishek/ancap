@@ -57,7 +57,7 @@
 4. Проверенная демонстрация реального исполнения на согласованном staging (не только sample report).
 5. Независимая проверка финансовых и криптографических компонентов.
 
-Владелец обозначил цель: финансирование для найма сотрудников и открытия фирмы. Сумма и юрисдикция пока не определены. Бюджетный memo задаёт рамку, не готовый term sheet.
+Владелец обозначил цель: финансирование для найма сотрудников и открытия фирмы. Основная компания планируется на Кипре, дополнительная — GmbH в Германии; роли, владение и налоговая структура ещё требуют проверки. Сумма привлечения не утверждена. Бюджетный memo задаёт рамку, не готовый term sheet.
 
 ## Вставка (исходное задание)
 
@@ -95,4 +95,8 @@ SHA базы для демо-доказательств: `ddb8785fb5c2de6ca854ac
 | Live LLM demo | `scripts/investors/live_llm_paid_path_demo.py` → `tmp/investor-live-llm-20261014/` |
 | Live proof | `fallback_used=false`, provider=`ollama`, model=`qwen2.5:3b`, fee=1.4 ACP (10%), credits 50→36 |
 
-Owner still must supply jurisdiction, quotes, and real revenue metrics before investor send. Live demo used **local Ollama staging**, not Teneta/Anthropic production keys.
+Owner has specified Cyprus plus an additional German GmbH; entity roles, tax treatment, quotes and real revenue metrics remain to be confirmed. Live demo used **local Ollama staging**, not Teneta/Anthropic production keys.
+
+## Вставка для Cursor: юрисдикция
+
+Основная компания планируется на Кипре; дополнительная — GmbH в Германии. Обнови публичную подачу на пяти языках как планируемую структуру, не как зарегистрированную группу. Не выдумывай ownership, дочерние отношения или налоговую экономию. Подготовь перечень котировок отдельно для двух компаний и бриф для немецкого Steuerberater и кипрского консультанта: фактическое управление, постоянное представительство, IP, договоры с клиентами, инвестиции, межфирменные цены, VAT, зарплаты и ACP-модель. Личные данные о ВНЖ не добавлять в публичные материалы. Суммы бюджета менять только после подтверждённых котировок.
