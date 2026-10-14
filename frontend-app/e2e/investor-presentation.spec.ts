@@ -55,7 +55,7 @@ test("mobile presentation keeps content within the viewport", async ({ page, con
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     expect(overflow, route).toBe(false);
-    const brand = await page.locator('header a[href="/"]').boundingBox();
+    const brand = await page.locator('header').first().locator('a[href="/"]').first().boundingBox();
     const languages = await page.getByRole("radiogroup", { name: "Language" }).boundingBox();
     expect(brand && languages && brand.x + brand.width <= languages.x, "brand and language controls should not overlap").toBe(true);
   }

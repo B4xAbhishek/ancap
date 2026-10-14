@@ -11,7 +11,7 @@ test.describe("ANCAP Frontend - UI smoke", () => {
     const header = page.locator("header").first();
     await expect(header.getByRole("link", { name: /^login$/i }).first()).toBeVisible();
     await expect(header.getByRole("link", { name: /^register$/i }).first()).toBeVisible();
-    await expect(header.locator('a[href="/whitepaper/acp"]').first()).toBeVisible();
+    await expect(header.locator('a[href="/investors"]').first()).toBeVisible();
   });
 
   test("public routes return success", async ({ page }) => {
