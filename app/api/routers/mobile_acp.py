@@ -194,15 +194,30 @@ async def _hydrate_quote(session, quote_id: str) -> SmartPayQuoteItem | None:
     return quote
 
 
+def _mask_legacy_unverified_completion(execution: SmartPayExecutionItem) -> SmartPayExecutionItem:
+    """Old recover results could claim completion from client-submitted tx hashes alone.
+
+    No trusted chain-confirmation path currently sets Smart Pay completion. Normalize
+    legacy cache/DB snapshots on reads without rewriting their original evidence.
+    """
+    if execution.status != "completed":
+        return execution
+    return execution.model_copy(
+        update={"status": "pending_reconciliation", "recoverable": True, "next_action": None}
+    )
+
+
 async def _hydrate_execution(session, execution_id: str) -> SmartPayExecutionItem | None:
     execution_id = (execution_id or "").strip()
     cached = _SMART_PAY_EXECUTIONS.get(execution_id)
     if cached is not None:
-        return cached
+        normalized = _mask_legacy_unverified_completion(cached)
+        _SMART_PAY_EXECUTIONS[execution_id] = normalized
+        return normalized
     record = await session.get(MobileSmartPayRecord, execution_id)
     if record is None or record.kind != "execution":
         return None
-    execution = SmartPayExecutionItem.model_validate(record.payload)
+    execution = _mask_legacy_unverified_completion(SmartPayExecutionItem.model_validate(record.payload))
     _SMART_PAY_EXECUTIONS[execution.id] = execution
     _SMART_PAY_EXECUTION_OWNERS[execution.id] = str(record.owner_user_id) if record.owner_user_id else None
     if record.session_token:
@@ -212,13 +227,18 @@ async def _hydrate_execution(session, execution_id: str) -> SmartPayExecutionIte
 
 async def _hydrate_receipt(session, execution_id: str) -> SmartPayReceiptItem | None:
     execution_id = (execution_id or "").strip()
+    execution = await _hydrate_execution(session, execution_id)
     cached = _SMART_PAY_RECEIPTS.get(execution_id)
     if cached is not None:
-        return cached
-    record = await session.get(MobileSmartPayRecord, f"spr_{execution_id}")
-    if record is None or record.kind != "receipt":
-        return None
-    receipt = SmartPayReceiptItem.model_validate(record.payload)
+        receipt = cached
+    else:
+        record = await session.get(MobileSmartPayRecord, f"spr_{execution_id}")
+        if record is None or record.kind != "receipt":
+            return None
+        receipt = SmartPayReceiptItem.model_validate(record.payload)
+    # Historical receipts stored completedAt even for unsigned/in-flight payments.
+    if execution is None or execution.status != "completed":
+        receipt = receipt.model_copy(update={"completed_at": None})
     _SMART_PAY_RECEIPTS[execution_id] = receipt
     return receipt
 
@@ -1240,13 +1260,16 @@ def _execution_lifecycle_state(
     if not tx_refs:
         next_action = "sign_direct_send_tx" if quote.mode == "direct_send" else "sign_swap_tx"
         return "awaiting_local_signature", True, next_action, progress
-    if progress.remaining_route_steps > 0:
-        return "pending_reconciliation", True, None, progress
-    return "completed", False, None, progress
+    # Client-provided tx hashes/explorer links are observations, not settlement proof.
+    # Full route reference coverage must NOT imply chain-confirmed execution.
+    # A trusted network verification path must be added before returning "completed".
+    return "pending_reconciliation", True, None, progress
 
 
 def _build_receipt(intent: PaymentIntentResponseItem, quote: SmartPayQuoteItem, execution: SmartPayExecutionItem) -> SmartPayReceiptItem:
-    completed_at = execution.updated_at or execution.created_at or _utc_now_iso()
+    completed_at = (
+        execution.updated_at or execution.created_at or _utc_now_iso()
+    ) if execution.status == "completed" else None
     merchant_label = intent.merchant.label if intent.merchant and intent.merchant.label else None
     return SmartPayReceiptItem(
         id=f"spr_{execution.id}",
