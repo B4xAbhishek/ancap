@@ -33,7 +33,7 @@ ledger halt. Actual ACP quote checks occur at enqueue and before every model ste
 no assumed ACP/EUR exchange rate. Request idempotency and PostgreSQL transaction
 locks protect restart recovery and concurrent accounting.
 
-Validation is recorded after final CI and deployment. Connector/provider tests use
+Validation: 907 backend tests, 50 frontend tests, 281 mobile SDK tests and 27 browser scenarios passed in full CI. Migration upgrade/downgrade/upgrade passed on a disposable database. Deployed build `e53f949` passed readiness, queue heartbeat, five-language and mobile checks. [Immutable release evidence](investors/evidence/2026-10-15-workflow-operations/README.md) records scope and remaining dependency findings. Connector/provider tests use
 synthetic credentials and mocks; paid API tests use disposable databases and test
 credits. Production verification is read-only. Wallet/consensus/bridge/SACP WIP in
 the original checkout is excluded.

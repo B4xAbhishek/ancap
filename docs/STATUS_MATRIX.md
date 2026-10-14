@@ -2,7 +2,7 @@
 
 ## Workflow Studio release — 2026-10-15
 
-Implementation and limits: [workflow operations](WORKFLOW_OPERATIONS_RELEASE_2026-10-15.md). Durable schedules, review, delivery, context, versions, bounded trials/batches, API examples and BYOK are implemented. Final CI/deployment results belong in the release record. External account credentials and private infrastructure are customer supplied; wallet/bridge/consensus/SACP WIP is excluded.
+Implementation and limits: [workflow operations](WORKFLOW_OPERATIONS_RELEASE_2026-10-15.md). Durable schedules, review, delivery, context, versions, bounded trials/batches, API examples and BYOK are implemented. Full CI passed; build `e53f949` is deployed and verified. Release evidence records test counts and remaining dependency findings. External account credentials and private infrastructure are customer supplied; wallet/bridge/consensus/SACP WIP is excluded.
 
 > Status: active summary | Updated: 2026-10-02
 > Primary source of truth: `MASTER_ROADMAP.md`

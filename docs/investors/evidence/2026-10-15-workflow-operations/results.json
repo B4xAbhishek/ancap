@@ -1,0 +1,154 @@
+{
+  "verified_at_utc": "2026-10-14T22:47:00.449676+00:00",
+  "pull_request": "https://github.com/ancapcloud/ancap/pull/89",
+  "merge_sha": "e53f949c0d0681c0a854f387410cf03eae1d2fcc",
+  "feature_sha": "4d42ffba2a3a2aff3c4aeeb98f7e513544f8ee76",
+  "deploy_run": "https://github.com/ancapcloud/ancap/actions/runs/38648982401",
+  "deploy_status": "success",
+  "live_build": {
+    "NEXT_PUBLIC_APP_BUILD_ID": "e53f949",
+    "build_id_source": "next-build-id-file",
+    "next_public_app_build_id_env": "e53f949",
+    "next_build_id_file": "e53f949"
+  },
+  "ready": {
+    "status": "ready",
+    "checks": {
+      "database": true,
+      "redis": true
+    }
+  },
+  "capabilities": {
+    "workflow_slugs": [
+      "agent-api-readiness-pack",
+      "ai-iso-governance-readiness-pack",
+      "airdrop-bounty-builder",
+      "commodity-price-outlook",
+      "crypto-campaign-builder",
+      "exchange-listing-submission-pack",
+      "kol-telegram-campaign-builder",
+      "market-direction-brief",
+      "telegram-growth-kit",
+      "token-launch-audit-pack",
+      "token-listing-pack",
+      "token-risk-report",
+      "token-risk-report-pro"
+    ],
+    "steps_limit": 5,
+    "batch_rows_limit": 20,
+    "schedule_min_minutes": 60,
+    "trial": {
+      "per_account": 1,
+      "platform_daily_limit": 20,
+      "transferable": false
+    },
+    "connectors": [
+      "webhook",
+      "telegram",
+      "google_sheets",
+      "hubspot",
+      "anthropic"
+    ],
+    "private_execution": "Self-hosted deployment profile; hosting is supplied by the customer",
+    "quality_scope": "Structure and declared tests; not independent fact verification",
+    "worker": {
+      "enabled": true,
+      "last_tick": "2026-10-14T22:46:49.680680+00:00",
+      "last_error_type": null
+    }
+  },
+  "http_checks": [
+    {
+      "path": "/ai/studio",
+      "status": 200
+    },
+    {
+      "path": "/docs/workflow-operations",
+      "status": 200
+    },
+    {
+      "path": "/investors",
+      "status": 200
+    },
+    {
+      "path": "/workflow-integrations/ancap-workflow-example.py",
+      "status": 200
+    },
+    {
+      "path": "/workflow-integrations/ancap-workflow-n8n.json",
+      "status": 200
+    },
+    {
+      "path": "/v1/workflow-ops",
+      "status": 401,
+      "meaning": "Unauthenticated access denied"
+    },
+    {
+      "path": "/v1/workflow-ops/admin/economics",
+      "status": 401,
+      "meaning": "Unauthenticated access denied"
+    },
+    {
+      "path": "/v1/workflow-ops/private-profile",
+      "status": 401,
+      "meaning": "Unauthenticated access denied"
+    }
+  ],
+  "browser": {
+    "surface": "Codex in-app browser, production",
+    "languages": [
+      "en",
+      "ru",
+      "uk",
+      "de",
+      "zh-Hant"
+    ],
+    "javascript_errors": 0,
+    "mobile_width": 390,
+    "mobile_scroll_width": 375,
+    "horizontal_overflow": false
+  },
+  "validation": {
+    "backend": {
+      "passed": 907,
+      "skipped": 34,
+      "source": "https://github.com/ancapcloud/ancap/actions/runs/38648155226"
+    },
+    "frontend_unit": 50,
+    "mobile_sdk_unit": 281,
+    "browser_e2e": {
+      "passed": 27,
+      "skipped": 1,
+      "source": "https://github.com/ancapcloud/ancap/actions/runs/38648155184"
+    },
+    "targeted_backend": 33,
+    "migration_roundtrip": "passed",
+    "secret_hygiene": "passed",
+    "codeql": "passed; one lifecycle-yield informational note"
+  },
+  "limitations": [
+    "Connector/provider execution tests use synthetic credentials and mocks; no real external delivery was sent.",
+    "Private hosting is not provisioned; customer infrastructure and credentials are required.",
+    "Platform credits are not confirmed EUR revenue; supplier invoice costs and cash margin remain unverified.",
+    "Windows full suite was interrupted after the complete Linux suite passed; Linux CI is the full-suite evidence.",
+    "Original wallet/consensus/bridge/SACP WIP is excluded."
+  ],
+  "dependency_audit": {
+    "frontend_runtime": {
+      "total": 0,
+      "source": "npm audit --omit=dev"
+    },
+    "frontend_build_tools": {
+      "high": 7,
+      "critical": 0,
+      "root_advisory": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+    },
+    "repository_dependabot_last_report": {
+      "high": 51,
+      "moderate": 30,
+      "low": 12,
+      "critical": 0,
+      "total": 93
+    }
+  }
+}
