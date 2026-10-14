@@ -7,6 +7,7 @@ import { positioningByLang } from "@/locales/positioning";
 import { Navigation } from "@/components/Navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { WorkflowBundle, WorkflowTemplate } from "@/lib/workflowStore";
+import { WorkflowChoiceButtons, WorkflowDiscoveryPanel, useWorkflowShortlist } from "@/components/workflow/WorkflowDiscoveryPanel";
 
 const PREMIUM_SLUGS = [
   "token-launch-audit-pack",
@@ -27,6 +28,7 @@ export function WorkflowsCatalog({
   isFallback?: boolean;
 }) {
   const { t, lang } = useLanguage();
+  const shortlist = useWorkflowShortlist(workflows);
   const c = positioningByLang[lang];
   const p = portfolioByLang[lang];
   const [query, setQuery] = useState("");
@@ -84,6 +86,7 @@ export function WorkflowsCatalog({
           </div>
         </section>
 
+        <WorkflowDiscoveryPanel workflows={workflows} shortlist={shortlist} isFallback={isFallback} />
         <section className="mb-10 grid gap-4 md:grid-cols-4">
           {steps.map(([title, text]) => (
             <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -267,6 +270,7 @@ export function WorkflowsCatalog({
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold tracking-[-0.02em]">{workflow.title}</h3>
+                <WorkflowChoiceButtons workflow={workflow} shortlist={shortlist} />
                 <p className="mt-3 flex-1 text-sm leading-6 text-white/68">{workflow.description}</p>
                 <div className="mt-4 text-sm text-white/50">
                   {t("workflowsPage.estimatedTime").replace("{minutes}", String(workflow.estimated_time_minutes))}

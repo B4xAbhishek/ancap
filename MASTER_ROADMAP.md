@@ -29,6 +29,8 @@ Completed in the `2026-07-01` hardening deploy:
 
 ## Consolidated project goals
 
+Workflow discovery release (2026-10-14): user task matching, browser shortlist, comparison/cost planning and JSON export implemented; investor local-demo evidence exposed with test-credit labels. Validation and deployment in progress; `docs/WORKFLOW_DISCOVERY_RELEASE_2026-10-14.md` records scope and evidence.
+
 Investor outreach preparation (2026-10-14): proposed Cyprus + German GmbH structure localized; separate formation/accounting quote requests and cross-border adviser brief prepared. RU/EN introductions and first-contact drafts: `docs/investors/INVESTOR_INTRO_RU.md`, `INVESTOR_INTRO_EN.md`, `OUTREACH_DRAFTS.md`. Documents are drafts; correspondence has not been sent. Final ask still requires quotes and entity-role confirmation.
 
 Investor demonstration evidence (2026-10-14): local Ollama `qwen2.5:3b` run recorded `succeeded`, `fallback_used=false`, test-ledger payment 14 ACP and reported fee 1.4 ACP. Durable archive: `docs/investors/evidence/2026-10-14-local-ollama/`. This demonstrates local model execution with test credits, not production-provider acceptance or customer revenue. Localized offer and budget/demo copy is in the investor presentation source.
