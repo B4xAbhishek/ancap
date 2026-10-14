@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError
 
 from app.config import get_settings
 
@@ -25,14 +26,23 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 def create_access_token(subject: str) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    if not isinstance(subject, str) or not subject:
+        raise ValueError("JWT subject must be a non-empty string")
+    # Keep the existing sub/exp claims and configured HS256 signing key.
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
     to_encode = {"sub": subject, "exp": expire}
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
 def decode_token(token: str) -> str | None:
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        return payload.get("sub")
-    except JWTError:
+        payload = jwt.decode(
+            token,
+            settings.secret_key,
+            algorithms=[settings.algorithm],
+            options={"require": ["exp", "sub"], "verify_exp": True, "verify_sub": True},
+        )
+    except InvalidTokenError:
         return None
+    subject = payload.get("sub")
+    return subject if isinstance(subject, str) and subject else None
