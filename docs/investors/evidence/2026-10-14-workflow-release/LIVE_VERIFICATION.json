@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-10-14T18:45:33.006Z",
+  "base": "https://ancap.cloud",
+  "expected_build": "426bc5cb39912a0c10a1c1f58a7f1f98ace38b53",
+  "http": [
+    {
+      "path": "/internal/frontend-build",
+      "status": 200,
+      "body": {
+        "NEXT_PUBLIC_APP_BUILD_ID": "426bc5c",
+        "build_id_source": "next-build-id-file",
+        "next_public_app_build_id_env": "426bc5c",
+        "next_build_id_file": "426bc5c"
+      }
+    },
+    {
+      "path": "/api/v1/system/health",
+      "status": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    {
+      "path": "/api/v1/system/ready",
+      "status": 200,
+      "body": {
+        "status": "ready",
+        "checks": {
+          "database": true,
+          "redis": true
+        }
+      }
+    },
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/projects",
+      "status": 200
+    },
+    {
+      "path": "/investors",
+      "status": 200
+    },
+    {
+      "path": "/ai/workflows",
+      "status": 200
+    }
+  ],
+  "page_errors": [],
+  "features": {
+    "task_matching": true,
+    "save_reload": true,
+    "comparison_export": true,
+    "catalog_source": "live",
+    "investor_evidence": true,
+    "mobile_layout": true
+  }
+}

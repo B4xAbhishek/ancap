@@ -18,9 +18,9 @@ The investor overview exposes the recorded local Ollama demonstration and links 
 
 Release implementation is isolated from uncommitted mobile/consensus/bridge/SACP work in a separate Git worktree. No payment, signing, token issuance or database schema changes are included in this release.
 
-Initial local checks: frontend 46 unit tests and 12 browser checks passed; production frontend build passed. Mobile workspace type checks and 281 unit tests passed for the committed release baseline. Full backend and Rust/contract verification are recorded separately as they complete.
+Initial local checks: frontend 46 unit tests and 15 browser checks passed; production frontend build passed. Mobile workspace type checks and 281 unit tests passed for the committed release baseline. Full backend and Rust/contract verification are recorded separately as they complete.
 
-Deployment now requires fetched master to equal the requested GitHub deployment commit and does not ignore reset failure. Production deployment and public checks must be confirmed before marking this release shipped.
+Deployment now requires fetched master to equal the requested GitHub deployment commit and does not ignore reset failure. Production deployment and public checks are confirmed in the published-release record below.
 
 ## Security and regression follow-up
 
@@ -29,4 +29,10 @@ Deployment now requires fetched master to equal the requested GitHub deployment 
 - Updated Rust lockfile quinn-proto to 0.11.18 and rustls to 0.23.46 after the CI audit reported nine vulnerabilities. No consensus, bridge or wallet implementation WIP was imported.
 - Local final checks: 46 frontend unit tests, 15 public browser scenarios, frontend production build, 281 mobile unit tests and workspace type checks passed; Rust crypto/node/mobile FFI tests passed. Authentication/dependency regressions: 16 passed. Registration/login/user/security scenarios with an isolated test signing key: 24 passed.
 - Residual npm advisories remain: frontend 7 high reports trace to unpatched braces in build/lint glob tooling; mobile 63 high and 10 moderate reports require a separately tested Expo/tooling upgrade. Both active npm locks report zero critical findings. Rust unmaintained-crate warnings remain a migration task. These counts are the 14 October snapshot, not a security certification.
-- CI frontend E2E and Rust audit passed after dependency patches. Backend CI exposed its empty test signing key; the fixture now generates an isolated key before importing the app. Final backend/CI results and deployment are pending at this commit.
+- CI frontend E2E and Rust audit passed after dependency patches. Backend CI exposed its empty test signing key; the fixture now generates an isolated key before importing the app. Final backend/CI results and deployment are confirmed in the published-release record below.
+
+## Published release
+
+Deployed `426bc5c` to https://ancap.cloud on 14 October 2026. [PR #80](https://github.com/ancapcloud/ancap/pull/80) and [deploy run](https://github.com/ancapcloud/ancap/actions/runs/38616142302) completed successfully. Full Linux backend: 883 passed / 34 skipped. Browser CI: 25 passed / 1 skipped. Rust/contract CI, CodeQL, secret hygiene and Docker build passed. Live API health/readiness and build provenance passed; live catalog discovery, shortlist reload, comparison export, investor evidence and mobile layout worked with no browser runtime errors.
+
+Evidence and explicit remaining limits: `docs/investors/evidence/2026-10-14-workflow-release/`. This documentation-only follow-up does not change or redeploy the verified application build.
