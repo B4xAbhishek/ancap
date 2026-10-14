@@ -1,0 +1,121 @@
+{
+  "name": "ANCAP budgeted workflow \u2014 configure owner, cap and bearer credential",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start",
+      "name": "Manual start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\"automation_id\": \"REPLACE_WITH_YOUR_AUTOMATION_UUID\", \"max_cost_acp\": \"REPLACE_WITH_EXPLICIT_MAXIMUM\", \"idempotency_key\": \"REPLACE_WITH_A_UNIQUE_UUID\", \"api_url\": \"https://api.ancap.cloud/v1\"}"
+      },
+      "id": "setup",
+      "name": "Set owner and budget",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.api_url + \"/workflow-ops/automations/\" + $json.automation_id + \"/runs\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({idempotency_key:$json.idempotency_key,max_cost_acp:$json.max_cost_acp,kind:\"manual\",inputs:{}}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "enqueue",
+      "name": "Queue budgeted workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_YOUR_CREDENTIAL_ID",
+          "name": "ANCAP Authorization Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $(\"Set owner and budget\").item.json.api_url + \"/workflow-ops/runs/\" + $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "status",
+      "name": "Read queued status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CONFIGURE_YOUR_CREDENTIAL_ID",
+          "name": "ANCAP Authorization Bearer"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual start": {
+      "main": [
+        [
+          {
+            "node": "Set owner and budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set owner and budget": {
+      "main": [
+        [
+          {
+            "node": "Queue budgeted workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue budgeted workflow": {
+      "main": [
+        [
+          {
+            "node": "Read queued status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

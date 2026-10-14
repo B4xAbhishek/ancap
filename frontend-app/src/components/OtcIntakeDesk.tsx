@@ -104,6 +104,7 @@ export function OtcIntakeDesk({ defaultPayoutAddress = "" }: Props) {
     }
   }, [defaultPayoutAddress]);
 
+  const loadFailedMessage = t("otcIntake.loadFailed");
   useEffect(() => {
     void (async () => {
       try {
@@ -115,10 +116,10 @@ export function OtcIntakeDesk({ defaultPayoutAddress = "" }: Props) {
         setOrders(Array.isArray(list) ? list : []);
         if (list?.[0]?.id) setSelectedId(list[0].id);
       } catch (err) {
-        setError(err instanceof Error ? err.message : t("otcIntake.loadFailed"));
+        setError(err instanceof Error ? err.message : loadFailedMessage);
       }
     })();
-  }, []);
+  }, [loadFailedMessage]);
 
   const selected = orders.find((o) => o.id === selectedId) || orders[0] || null;
 

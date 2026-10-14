@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import { WorkflowFooter, presentationStyles as s } from "@/components/WorkflowPresentation";
 import { positioningByLang } from "@/locales/positioning";
+import { workflowOpsCopy } from "@/locales/workflowOps";
 import { DemoEvidencePanel } from "@/components/workflow/DemoEvidencePanel";
 
 export function InvestorOverview() {
@@ -19,6 +20,7 @@ export function InvestorOverview() {
       <div className={s.actions}><Link href="/pricing" className={s.secondary}>{c.workflows}</Link><Link href="/dashboard/seller" className={s.secondary}>{c.creators}</Link><Link href="/projects" className={s.secondary}>{c.solutions}</Link></div>
     </section>
     <section className={s.section}><h2 className={s.heading}>{c.evidence}</h2><p className={s.lead}>{c.evidenceBody}</p>
+      <section className={s.section}><h2 className={s.heading}>{workflowOpsCopy[lang].title}</h2><p className={s.lead}>{workflowOpsCopy[lang].lead}</p><div className={s.actions}><Link href="/ai/studio" className={s.primary}>{workflowOpsCopy[lang].trial}</Link><Link href="/docs/workflow-operations" className={s.secondary}>API / n8n</Link></div></section>
       <DemoEvidencePanel />
       <div className={s.actions}><Link href="/proof-center" className={s.secondary}>{c.trust}</Link><Link href="/developers" className={s.secondary}>API / MCP</Link><a className={s.secondary} href="https://github.com/ancapcloud/ancap" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
       <div className={s.note}><strong>{c.stage}</strong><p>{c.stageBody}</p></div>

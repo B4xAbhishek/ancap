@@ -68,6 +68,7 @@ export function WorkflowsCatalog({
             {t("workflowsPage.lead")}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/ai/studio" className="rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950">{t("positioning.studio")}</Link>
             <Link href="/dashboard" className="rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:opacity-90">
               {t("workflowsPage.openDashboard")}
             </Link>

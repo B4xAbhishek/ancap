@@ -1,7 +1,7 @@
 import type { Language } from "./translations";
 
 const en = {
-  workflows: "Workflows", solutions: "Solutions", creators: "For creators", investors: "For investors", platform: "Platform", trust: "Trust & evidence", workspace: "Workspace",
+  studio: "Studio", workflows: "Workflows", solutions: "Solutions", creators: "For creators", investors: "For investors", platform: "Platform", trust: "Trust & evidence", workspace: "Workspace",
   kicker: "AI workflow commerce", title: "Turn expertise into paid AI workflows.", lead: "ANCAP brings execution, ACP payment and proof receipts into one platform. Customers buy a defined output. Creators build workflows and earn from paid runs.",
   browse: "Explore workflows", sample: "See a sample result", how: "From a task to a deliverable", howLead: "A workflow turns a repeatable customer task into a structured AI-assisted process.",
   step1: "01 / Define the task", step1Body: "Choose a workflow and provide the requested inputs.", step2: "02 / Review the offer", step2Body: "Check the deliverables, ACP price and execution conditions.", step3: "03 / Run the workflow", step3Body: "Track execution and retrieve the generated artifact.", step4: "04 / Verify the receipt", step4Body: "Inspect the run record and payment evidence. A receipt records execution; it does not certify the output's accuracy.",
@@ -23,7 +23,7 @@ type Copy = Record<keyof typeof en, string>;
 export const positioningByLang: Record<Language, Copy> = {
   en,
   ru: {
-    workflows: "Workflows", solutions: "Направления", creators: "Авторам", investors: "Инвесторам", platform: "Платформа", trust: "Доверие и доказательства", workspace: "Рабочий кабинет",
+    studio: "Студия", workflows: "Workflows", solutions: "Направления", creators: "Авторам", investors: "Инвесторам", platform: "Платформа", trust: "Доверие и доказательства", workspace: "Рабочий кабинет",
     kicker: "Продажа AI-workflow", title: "Превращайте экспертизу в платные AI-workflow.", lead: "ANCAP объединяет выполнение задач, оплату в ACP и квитанции исполнения. Клиент покупает конкретный результат. Автор создаёт workflow и зарабатывает на оплаченных запусках.", browse: "Выбрать workflow", sample: "Посмотреть пример результата", how: "От задачи до готового материала", howLead: "Workflow превращает повторяемую задачу клиента в последовательный процесс с помощью ИИ.",
     step1: "01 / Определить задачу", step1Body: "Выберите workflow и предоставьте необходимые данные.", step2: "02 / Проверить предложение", step2Body: "Изучите состав результата, цену в ACP и условия выполнения.", step3: "03 / Запустить workflow", step3Body: "Следите за выполнением и получите созданный материал.", step4: "04 / Проверить квитанцию", step4Body: "Изучите запись запуска и оплаты. Квитанция фиксирует исполнение, но не подтверждает точность результата.",
     examples: "Начните с конкретной задачи", examplesLead: "Примеры существующих workflow. Актуальные цены и доступность указаны в каталоге.", risk: "Отчёт о рисках токена", riskBody: "Вход: адрес токена. Результат: структурированный отчёт о рисках и данные для проверки.", launch: "Пакет для листинга", launchBody: "Вход: сведения о проекте. Результат: описания и ответы для заявок на листинг.", growth: "План кампании", growthBody: "Вход: аудитория и цели запуска. Результат: сообщения, план каналов и список действий.",
@@ -38,7 +38,7 @@ export const positioningByLang: Record<Language, Copy> = {
     budgetLink: "Бюджет на 12 месяцев (допущения)", demoLink: "Сценарий демо на 5 минут",
   },
   uk: {
-    workflows: "Workflows", solutions: "Напрями", creators: "Авторам", investors: "Інвесторам", platform: "Платформа", trust: "Довіра та докази", workspace: "Робочий кабінет",
+    studio: "Студія", workflows: "Workflows", solutions: "Напрями", creators: "Авторам", investors: "Інвесторам", platform: "Платформа", trust: "Довіра та докази", workspace: "Робочий кабінет",
     kicker: "Продаж AI-workflow", title: "Перетворюйте експертизу на платні AI-workflow.", lead: "ANCAP поєднує виконання завдань, оплату в ACP та квитанції виконання. Клієнт купує визначений результат. Автор створює workflow і заробляє на оплачених запусках.", browse: "Обрати workflow", sample: "Приклад результату", how: "Від завдання до матеріалу", howLead: "Workflow перетворює повторюване завдання клієнта на послідовний процес за допомогою ШІ.",
     step1: "01 / Визначити завдання", step1Body: "Оберіть workflow та надайте потрібні дані.", step2: "02 / Перевірити пропозицію", step2Body: "Перегляньте результат, ціну в ACP та умови виконання.", step3: "03 / Запустити workflow", step3Body: "Стежте за виконанням та отримайте матеріал.", step4: "04 / Перевірити квитанцію", step4Body: "Перегляньте запис запуску та оплати. Квитанція фіксує виконання, але не засвідчує точність результату.",
     examples: "Почніть із конкретного завдання", examplesLead: "Приклади наявних workflow. Актуальні ціни та доступність зазначено в каталозі.", risk: "Звіт про ризики токена", riskBody: "Вхід: адреса токена. Результат: структурований звіт і дані для перевірки.", launch: "Пакет для лістингу", launchBody: "Вхід: дані проєкту. Результат: описи та відповіді для заявок.", growth: "План кампанії", growthBody: "Вхід: аудиторія та цілі. Результат: повідомлення, план каналів і перелік дій.",
@@ -51,7 +51,7 @@ export const positioningByLang: Record<Language, Copy> = {
     budgetLink: "Бюджет на 12 місяців (припущення)", demoLink: "Сценарій демо на 5 хвилин",
   },
   de: {
-    workflows: "Workflows", solutions: "Anwendungen", creators: "Für Anbieter", investors: "Für Investoren", platform: "Plattform", trust: "Vertrauen & Nachweise", workspace: "Arbeitsbereich",
+    studio: "Studio", workflows: "Workflows", solutions: "Anwendungen", creators: "Für Anbieter", investors: "Für Investoren", platform: "Plattform", trust: "Vertrauen & Nachweise", workspace: "Arbeitsbereich",
     kicker: "Handel mit KI-Workflows", title: "Expertise in bezahlte KI-Workflows verwandeln.", lead: "ANCAP verbindet Ausführung, ACP-Zahlungen und Ausführungsbelege. Kunden kaufen ein definiertes Ergebnis. Anbieter erstellen Workflows und verdienen an bezahlten Ausführungen.", browse: "Workflows entdecken", sample: "Beispiel ansehen", how: "Von der Aufgabe zum Ergebnis", howLead: "Ein Workflow macht aus einer wiederkehrenden Kundenaufgabe einen strukturierten KI-gestützten Prozess.",
     step1: "01 / Aufgabe definieren", step1Body: "Workflow auswählen und benötigte Eingaben bereitstellen.", step2: "02 / Angebot prüfen", step2Body: "Ergebnisse, ACP-Preis und Ausführungsbedingungen prüfen.", step3: "03 / Workflow ausführen", step3Body: "Ausführung verfolgen und erzeugtes Dokument abrufen.", step4: "04 / Beleg prüfen", step4Body: "Ausführungs- und Zahlungsnachweise ansehen. Ein Beleg dokumentiert die Ausführung, nicht die Richtigkeit des Ergebnisses.",
     examples: "Mit einer konkreten Aufgabe beginnen", examplesLead: "Beispiele bestehender Workflows. Aktuelle Preise und Verfügbarkeit stehen im Katalog.", risk: "Token-Risikobericht", riskBody: "Eingabe: Token-Adresse. Ergebnis: strukturierter Bericht mit überprüfbaren Daten.", launch: "Listing-Unterlagen", launchBody: "Eingabe: Projektdaten. Ergebnis: Beschreibungen und Antworten für Listing-Anträge.", growth: "Kampagnenplan", growthBody: "Eingabe: Zielgruppe und Ziele. Ergebnis: Botschaften, Kanalplan und Checkliste.",
@@ -64,7 +64,7 @@ export const positioningByLang: Record<Language, Copy> = {
     budgetLink: "12-Monats-Budget (Annahmen)", demoLink: "5-Minuten-Demoablauf",
   },
   "zh-Hant": {
-    workflows: "工作流程", solutions: "應用領域", creators: "創作者", investors: "投資者", platform: "平台", trust: "信任與證據", workspace: "工作區",
+    studio: "工作室", workflows: "工作流程", solutions: "應用領域", creators: "創作者", investors: "投資者", platform: "平台", trust: "信任與證據", workspace: "工作區",
     kicker: "AI 工作流程交易", title: "將專業知識轉化為付費 AI 工作流程。", lead: "ANCAP 整合任務執行、ACP 支付及執行憑證。客戶購買明確的成果，創作者建立工作流程並從付費執行獲得收益。", browse: "探索工作流程", sample: "查看成果範例", how: "從任務到交付成果", howLead: "工作流程將重複的客戶任務轉化為有結構的 AI 輔助程序。",
     step1: "01 / 定義任務", step1Body: "選擇工作流程並提供所需輸入。", step2: "02 / 查看方案", step2Body: "確認交付成果、ACP 價格及執行條件。", step3: "03 / 執行流程", step3Body: "追蹤執行並取得生成的資料。", step4: "04 / 驗證憑證", step4Body: "查看執行及付款紀錄。憑證記錄執行，不保證成果的準確性。",
     examples: "從具體任務開始", examplesLead: "現有工作流程的範例。最新價格與供應情況請查看目錄。", risk: "代幣風險報告", riskBody: "輸入：代幣地址。成果：結構化風險報告及待驗證資料。", launch: "上架申請資料", launchBody: "輸入：專案資料。成果：描述文案及申請回答。", growth: "行銷活動計畫", growthBody: "輸入：受眾與目標。成果：訊息、通路計畫及執行清單。",

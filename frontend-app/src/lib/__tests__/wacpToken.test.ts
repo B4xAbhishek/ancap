@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { buildWacpWatchAssetParams, getWacpLogoUrl, WACP_BSC_CONTRACT } from "@/lib/wacpToken";
 
 describe("wacpToken", () => {
