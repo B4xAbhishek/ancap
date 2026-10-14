@@ -1,6 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import hashlib
+from contextvars import ContextVar
 import json
 import time
 from decimal import Decimal
@@ -14,6 +15,9 @@ from app.config import get_settings
 from app.db.models import LlmUsageEvent
 from app.schemas import WorkflowTemplatePublic
 from app.services.workflow_execution import execute_workflow_template
+
+# Credentials and limits are request-local; shared Settings are never overwritten.
+workflow_provider_credentials: ContextVar[dict | None] = ContextVar("workflow_provider_credentials", default=None)
 
 
 # Sensitive medical / adult-hospitality SKUs: always use vetted template deliverables
@@ -169,20 +173,21 @@ def _workflow_prompt(template: WorkflowTemplatePublic, inputs: dict[str, Any]) -
 
 async def _call_teneta_claude(prompt: str, timeout: int = 45) -> tuple[str, dict[str, Any]]:
     settings = get_settings()
-    if not settings.anthropic_api_key:
+    overrides = workflow_provider_credentials.get() or {}
+    if not (overrides.get("api_key") or settings.anthropic_api_key):
         raise RuntimeError("ANTHROPIC_API_KEY is not configured")
-    base_url = settings.anthropic_base_url.rstrip("/")
+    base_url = ("https://api.anthropic.com" if overrides.get("api_key") else settings.anthropic_base_url).rstrip("/")
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
             f"{base_url}/v1/messages",
             headers={
-                "x-api-key": settings.anthropic_api_key,
+                "x-api-key": overrides.get("api_key") or settings.anthropic_api_key,
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json",
             },
             json={
-                "model": settings.llm_model,
-                "max_tokens": settings.llm_max_tokens,
+                "model": overrides.get("model") or settings.llm_model,
+                "max_tokens": min(settings.llm_max_tokens, overrides.get("max_tokens", settings.llm_max_tokens)),
                 "messages": [{"role": "user", "content": prompt}],
             },
         )
@@ -216,7 +221,7 @@ async def _call_ollama(prompt: str, timeout: int = 45) -> tuple[str, dict[str, A
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
             f"{settings.ollama_base_url.rstrip('/')}/api/generate",
-            json={"model": settings.llm_model, "prompt": prompt, "stream": False},
+            json={"model": settings.llm_model, "prompt": prompt, "stream": False, "options": {"num_predict": min(settings.llm_max_tokens, (workflow_provider_credentials.get() or {}).get("max_tokens", settings.llm_max_tokens))}},
         )
         response.raise_for_status()
         payload = response.json()
@@ -305,8 +310,9 @@ async def execute_paid_workflow_with_llm(
     workflow_run_id: str | UUID | None,
 ) -> LlmExecutionResult:
     settings = get_settings()
-    provider = (settings.llm_provider or "teneta_claude").strip().lower()
-    model = settings.llm_model
+    overrides = workflow_provider_credentials.get() or {}
+    provider = (overrides.get("provider") or settings.llm_provider or "teneta_claude").strip().lower()
+    model = overrides.get("model") or settings.llm_model
     prompt = _workflow_prompt(template, inputs or {})
     started = time.perf_counter()
     metadata: dict[str, Any] = {"workflow_slug": template.slug, "provider_configured": provider}

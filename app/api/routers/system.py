@@ -493,6 +493,8 @@ async def _run_all_jobs(session: DbSession) -> dict:
     growth_referrals = await referral_rewards_tick(session, max_items=500)
     growth_notifications = await notifications_fanout_tick(session, max_events=500)
     subscriptions_summary = await subscriptions_tick(session, max_items=500)
+    from app.services.workflow_ops import workflow_ops_tick
+    workflow_operations = await workflow_ops_tick(max_items=2)
     growth_leaderboards = await leaderboard_recompute_tick(session)
     growth_feed = await activity_feed_materialize_tick(session, limit=200)
     growth_metrics = await growth_metrics_rollup_tick(session)
@@ -547,6 +549,7 @@ async def _run_all_jobs(session: DbSession) -> dict:
         "growth_referrals": growth_referrals,
         "growth_notifications": growth_notifications,
         "subscriptions": subscriptions_summary,
+        "workflow_operations": workflow_operations,
         "growth_leaderboards": growth_leaderboards,
         "growth_feed": growth_feed,
         "growth_metrics": growth_metrics,

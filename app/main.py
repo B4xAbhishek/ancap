@@ -58,6 +58,7 @@ from app.api.routers import (
     notifications,
     tasks,
     workflow_store,
+    workflow_ops,
     paid_api,
     leaderboards,
     growth_dashboard,
@@ -123,6 +124,22 @@ logger = get_logger("api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import asyncio
+    from contextlib import suppress
+    from app.services.workflow_ops import workflow_ops_tick, WORKER_HEALTH
+
+    async def workflow_worker():
+        while True:
+            try:
+                summary = await workflow_ops_tick(max_items=2)
+                delay = 1 if summary["processed"] else 15
+            except Exception as exc:
+                WORKER_HEALTH["last_error_type"] = type(exc).__name__
+                logger.warning("workflow_operations_retry", error_type=type(exc).__name__)
+                delay = 15
+            await asyncio.sleep(delay)
+
+    workflow_task = asyncio.create_task(workflow_worker()) if get_settings().workflow_operations_worker_enabled else None
     try:
         from app.api.routers.wallet_acp import _schedule_chain_scan_warm
 
@@ -135,8 +152,13 @@ async def lifespan(app: FastAPI):
         schedule_utxo_index_catchup()
     except Exception:
         logger.exception("Failed to schedule ACP UTXO index catch-up on startup")
-    yield
-    # shutdown if needed
+    try:
+        yield
+    finally:
+        if workflow_task:
+            workflow_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await workflow_task
 
 
 app = FastAPI(
@@ -248,6 +270,7 @@ ALL_ROUTERS = [
     notifications.router,
     tasks.router,
     workflow_store.router,
+    workflow_ops.router,
     paid_api.router,
     leaderboards.router,
     growth_dashboard.router,

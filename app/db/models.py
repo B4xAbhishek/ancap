@@ -3469,3 +3469,61 @@ class AcpExplorerAddressEvent(Base):
     __table_args__ = (
         Index("ix_acp_explorer_addr_events_addr_height", "address", "height"),
     )
+
+# --- Workflow operations: durable context, revisions, scheduling and execution ---
+class WorkflowProject(Base):
+    __tablename__ = "workflow_projects"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    owner_user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(120), nullable=False)
+    context_json = Column(JSONB, nullable=False, default=dict)
+    members_json = Column(JSONB, nullable=False, default=dict)
+    retention_days = Column(Integer, nullable=False, default=30)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+
+
+class WorkflowConnection(Base):
+    __tablename__ = "workflow_connections"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    owner_user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(120), nullable=False)
+    kind = Column(String(24), nullable=False)
+    config_json = Column(JSONB, nullable=False, default=dict)
+    secret_box = Column(Text, nullable=False, default="")
+    allow_delivery = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+
+
+class WorkflowAutomation(Base):
+    __tablename__ = "workflow_automations"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    owner_user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id = Column(UUID(as_uuid=False), ForeignKey("workflow_projects.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String(120), nullable=False)
+    versions_json = Column(JSONB, nullable=False, default=list)
+    published_version = Column(Integer, nullable=True)
+    enabled = Column(Boolean, nullable=False, default=False)
+    interval_minutes = Column(Integer, nullable=False, default=1440)
+    monthly_budget_acp = Column(Numeric(36,18), nullable=False, default=0)
+    spent_acp = Column(Numeric(36,18), nullable=False, default=0)
+    budget_month = Column(String(7), nullable=True)
+    next_run_at = Column(DateTime(timezone=True), nullable=True, index=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+
+
+class WorkflowOperationRun(Base):
+    __tablename__ = "workflow_operation_runs"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    owner_user_id = Column(UUID(as_uuid=False), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    automation_id = Column(UUID(as_uuid=False), ForeignKey("workflow_automations.id", ondelete="SET NULL"), nullable=True)
+    request_key = Column(String(100), nullable=False)
+    request_hash = Column(String(64), nullable=False)
+    kind = Column(String(16), nullable=False, default="manual")
+    state = Column(String(24), nullable=False, default="queued", index=True)
+    snapshot_json = Column(JSONB, nullable=False, default=dict)
+    progress_json = Column(JSONB, nullable=False, default=dict)
+    cost_acp = Column(Numeric(36,18), nullable=False, default=0)
+    max_cost_acp = Column(Numeric(36,18), nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    __table_args__ = (Index("uq_workflow_ops_owner_request", "owner_user_id", "request_key", unique=True),)
