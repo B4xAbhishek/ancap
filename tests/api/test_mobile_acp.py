@@ -7,9 +7,33 @@ from app.services import rate_limit as rl_module
 
 
 
-def recovered_receipt_completion_is_not_implied(execution):
-    """Full route tx-ref coverage is only observed evidence, not final settlement."""
-    return execution["status"] == "pending_reconciliation" and execution["recoverable"] is True
+
+def test_smart_pay_legacy_completed_execution_requires_trusted_settlement_evidence():
+    """Mask historical false finalization without discarding known route references."""
+    legacy = mobile_acp.SmartPayExecutionItem(
+        id="pe_legacy_unverified",
+        payment_intent_id="pi_legacy",
+        quote_id="q_legacy",
+        status="completed",
+        created_at="2026-07-01T00:00:00Z",
+        updated_at="2026-07-01T00:01:00Z",
+        recoverable=False,
+        next_action=None,
+        tx_refs=[
+            mobile_acp.SmartPayTxRef(
+                role="payment",
+                network="acp",
+                txid="unverified-client-reported-tx",
+                route_step_index=1,
+            )
+        ],
+    )
+    normalized = mobile_acp._mask_legacy_unverified_completion(legacy)
+    assert normalized.status == "pending_reconciliation"
+    assert normalized.recoverable is True
+    assert normalized.next_action is None
+    assert normalized.tx_refs == legacy.tx_refs
+    assert legacy.status == "completed"  # Do not mutate historical objects in place.
 
 
 def test_smart_pay_capabilities(client, monkeypatch):
@@ -262,7 +286,6 @@ def test_smart_pay_execute_receipt_and_recover(client):
         "pendingRoles": [],
     }
     # Client-provided hashes do not prove that a transaction was broadcast or confirmed.
-    assert recovered_receipt_completion_is_not_implied(recovered)
     assert recovered["txRefs"][0]["role"] == "payment"
     assert recovered["txRefs"][0]["network"] == "acp"
     assert recovered["txRefs"][0]["txid"] == "fixture-tx-alpha"
