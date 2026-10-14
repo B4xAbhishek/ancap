@@ -390,7 +390,7 @@ function normalizeSmartPayReceipt(receipt: SmartPayReceipt | null | undefined): 
     id: normalizeRequiredString(receipt.id),
     paymentExecutionId: normalizeRequiredString(receipt.paymentExecutionId),
     paymentIntentId: normalizeRequiredString(receipt.paymentIntentId),
-    completedAt: normalizeRequiredString(receipt.completedAt),
+    completedAt: normalizeOptionalString(receipt.completedAt),
     sourceAssetSpent: normalizeRequiredString(receipt.sourceAssetSpent),
     sourceAmountSpent: normalizeRequiredString(receipt.sourceAmountSpent),
     targetAssetPaid: normalizeRequiredString(receipt.targetAssetPaid),
