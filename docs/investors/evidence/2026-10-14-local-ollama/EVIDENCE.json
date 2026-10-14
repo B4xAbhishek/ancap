@@ -1,0 +1,88 @@
+{
+  "started_at": "20261014T170453Z",
+  "git_sha": "ddb8785fb5c2de6ca854ac083bd024e703efc097",
+  "environment": "disposable_test_db",
+  "database": "ancap_investor_demo_20261014",
+  "llm_provider": "ollama",
+  "llm_model": "qwen2.5:3b",
+  "llm_fallback_to_template": false,
+  "workflow_platform_fee_percent": "10",
+  "funds": "test_ledger_credits_only",
+  "stripe": false,
+  "chain_broadcast": false,
+  "run_id": "71c9f1e8-ef25-4c82-b0e9-4d4eb0725c81",
+  "price_acp": "14.000000000000000000",
+  "balance_before_deposit": "0",
+  "balance_after_deposit": "50.000000000000000000",
+  "balance_after_pay": "36.000000000000000000",
+  "credits_moved": "14.000000000000000000",
+  "payment_intent_status": "captured",
+  "payment_intent_id": "494f089d-0bee-409f-8484-37b048f999f3",
+  "platform_fee": {
+    "amount": "1.40000000",
+    "percent": "10",
+    "currency": "ACP",
+    "operator_share": "12.60000000"
+  },
+  "platform_fee_amount": "1.40000000",
+  "llm_usage": {
+    "model": "qwen2.5:3b",
+    "status": "succeeded",
+    "event_id": "ef9b64a3-ac9c-498d-8a28-44bb7ef7a3d3",
+    "provider": "ollama",
+    "fallback_used": false
+  },
+  "execution_summary": {
+    "mode": "llm_generated",
+    "llm_model": "qwen2.5:3b",
+    "llm_provider": "ollama"
+  },
+  "fallback_used": false,
+  "artifact_keys": [
+    "delivery",
+    "execution_summary",
+    "llm_usage",
+    "status",
+    "template_title",
+    "workflow_slug"
+  ],
+  "artifact_preview": {
+    "status": "completed",
+    "workflow_slug": "token-risk-report",
+    "deliverable_type": "NoneType",
+    "summary_mode": "llm_generated"
+  },
+  "receipt_proof_keys": [
+    "accepted_currencies",
+    "artifact_kind",
+    "billing_mode",
+    "executed_at",
+    "execution_mode",
+    "last_status_change",
+    "llm_usage",
+    "margin_snapshot",
+    "oracle_wacp_usd",
+    "payment_confirmation",
+    "payment_intent_id",
+    "payment_intent_status",
+    "payment_intents",
+    "platform_fee",
+    "pricing_basis",
+    "provider_cost_estimate",
+    "referral_rewards",
+    "sections_generated",
+    "settlement_status",
+    "status_timeline",
+    "template_slug",
+    "template_title",
+    "usd_sticker"
+  ],
+  "ok": true,
+  "checks": {
+    "fallback_used_false": true,
+    "artifact_present": true,
+    "receipt_captured": true,
+    "platform_fee_positive": true,
+    "credits_decreased": true
+  }
+}

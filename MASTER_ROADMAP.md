@@ -29,6 +29,8 @@ Completed in the `2026-07-01` hardening deploy:
 
 ## Consolidated project goals
 
+Investor demonstration evidence (2026-10-14): local Ollama `qwen2.5:3b` run recorded `succeeded`, `fallback_used=false`, test-ledger payment 14 ACP and reported fee 1.4 ACP. Durable archive: `docs/investors/evidence/2026-10-14-local-ollama/`. This demonstrates local model execution with test credits, not production-provider acceptance or customer revenue. Localized offer and budget/demo copy is in the investor presentation source.
+
 Investor presentation (2026-10-14): local homepage and public navigation focus on paid AI workflow outputs; `/projects` groups six areas; `/investors` explains model/evidence/milestones without invented traction. Portfolio routes carry an honest buyer→receipt offer chain; research heroes stay AI briefs/concepts. Demo script + 12‑month cost budget (assumptions; cash scenarios derived from line items; final ask pending quotes) and test-env paid-path smoke (credits) are in-repo. Owner still must confirm jurisdiction, quotes, and any traction metrics. Handoff: [`docs/CURSOR_INVESTOR_FINISH_RU.md`](docs/CURSOR_INVESTOR_FINISH_RU.md).
 
 Execution / contractor handoff (2026-10-14): [`docs/DEVELOPER_HANDOFF_RU.md`](docs/DEVELOPER_HANDOFF_RU.md) defines mobile release acceptance and independent audit scope. Local backend import restored by syncing `.venv` cryptography to the pinned `50.0.1`; mobile public-docs / roadmap-sync / error-sanitization checks: **20 passed**. Physical-device and store-release items remain open.

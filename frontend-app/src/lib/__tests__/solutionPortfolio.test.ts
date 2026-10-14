@@ -5,6 +5,7 @@ import { portfolioByLang, solutionPortfolio, workflowArea } from "../solutionPor
 import { offerForRoute, projectOffers } from "../projectOffers";
 import { positioningByLang } from "@/locales/positioning";
 import { t } from "@/locales/translations";
+import { offerCopyByLang } from "../projectOffersCopy";
 
 describe("public workflow presentation", () => {
   it("keeps every portfolio entry reachable at an existing page", () => {
@@ -46,6 +47,30 @@ describe("public workflow presentation", () => {
       if (offer!.offerKind === "concept") {
         // Concept pages may still list related brief slugs for literacy, but must not claim physical delivery.
         expect(offer!.constraints.toLowerCase()).toMatch(/not |n\/a|pilot|concept|literacy|none/);
+      }
+    }
+  });
+  it("localizes offer chains for every supported language", () => {
+    const href = "/markets";
+    const en = offerForRoute(href, "en");
+    expect(en).toBeTruthy();
+    for (const lang of ["ru", "uk", "de", "zh-Hant"] as const) {
+      const localized = offerForRoute(href, lang);
+      expect(localized, lang).toBeTruthy();
+      expect(localized!.buyer).not.toBe(en!.buyer);
+      expect(localized!.task.trim()).not.toBe("");
+      expect(localized!.receipt.trim()).not.toBe("");
+    }
+  });
+  it("has complete localized copy for all 32 offers without English fallback", () => {
+    const routes = projectOffers.map(offer => offer.href).sort();
+    expect(routes).toHaveLength(32);
+    for (const lang of ["en", "ru", "uk", "de", "zh-Hant"] as const) {
+      expect(Object.keys(offerCopyByLang[lang]).sort(), lang).toEqual(routes);
+      for (const href of routes) {
+        for (const field of ["buyer", "task", "inputs", "aiResult", "constraints", "payment", "receipt"] as const) {
+          expect(offerCopyByLang[lang][href][field].trim(), `${lang} ${href} ${field}`).not.toBe("");
+        }
       }
     }
   });

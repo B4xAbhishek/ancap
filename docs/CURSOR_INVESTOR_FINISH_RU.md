@@ -1,7 +1,11 @@
 # ANCAP — задание для Cursor: завершение подготовки к инвестору
 
+Повторная проверка локализованной версии: production frontend build успешен, Vitest 6/6, Playwright 8/8, защита демо-БД 6/6. Сохранённый receipt проверен; live-демо и API smoke в этой проверке повторно не запускались. Поиск provider credentials, закончившийся ошибкой, не подтверждает отсутствие ключа — production-конфигурацию проверять отдельно без вывода секретов.
+
+Проверка последней волны (2026-10-14): локализованные данные присутствуют для всех 32 офферов на пяти языках (Vitest 6/6). Сохранённые доказательства подтверждают локальное Ollama-исполнение без fallback и списание 14 тестовых ACP; архив с контрольными суммами: `docs/investors/evidence/2026-10-14-local-ollama/`. Базовый SHA демо относится к незакоммиченному рабочему дереву; новая версия скрипта фиксирует хеши исполняемых исходников, строго ограничивает локальную одноразовую БД и сохраняет каждый запуск в отдельную папку. Проверки защиты БД 6/6 выполняются без доступа к БД. Готовность production-провайдера и наличие клиентских продаж этим демо не подтверждены.
+
 Дата: 2026-10-14.  
-Обновление прогресса: 2026-10-14 (после `2da45fc`).
+Обновление прогресса: 2026-10-14 (после `ddb8785`; локализация offers/budget/demo + live LLM demo).
 
 ## Что уже изменено в локальном проекте
 
@@ -13,7 +17,7 @@
 - Каталог по умолчанию показывает начальный коммерческий фокус; остальные направления доступны через фильтр. Fallback backend-каталога отмечается явно.
 - Первые экраны AETERNA, Cryo, Saliva Rx, Galaxy, Lunar и Stardust переосмыслены как AI-брифы; на всех страницах портфеля баннер показывает цепочку покупатель → задача → входы → AI-результат → ограничения → оплата → квитанция (`projectOffers.ts`).
 - Новости и погода ограничены соответствующими страницами, анимация фона отключена на главной, портфеле и странице инвестора.
-- Основная подача переведена на EN/RU/UK/DE/繁中; новые тексты projectOffers и страницы бюджета/демо пока английские и требуют локализации.
+- Основная подача переведена на EN/RU/UK/DE/繁中; `projectOffers` + `/docs/investors/budget-12m` + `/docs/investors/demo-5min` локализованы (EN/RU/UK/DE/zh-Hant).
 - Демо на 5 минут: `docs/investors/DEMO_SCRIPT_5MIN.md` + `/docs/investors/demo-5min`.
 - Бюджет 12 месяцев (допущения): `docs/investors/BUDGET_12M_ASSUMPTIONS.md` + `/docs/investors/budget-12m`. Сценарии затрат с резервом 15–20%: lean **€129,950–€247,920**, standard **€277,265–€539,760**. Это непроверенные допущения, не окончательная сумма привлечения.
 - Smoke платного пути (тестовый ledger, без Stripe/broadcast): `tests/api/test_investor_paid_path_smoke.py`.
@@ -25,7 +29,7 @@
 | 1 | Главная / projects / investors / workflows, 5 языков | [x] презентационная проверка; повторный Playwright после изменений |
 | 2 | Цепочка buyer→receipt на страницах портфеля | [x] `projectOffers` + баннер `ProjectWorkflowContext` |
 | 3 | Сверка slug с backend-каталогом | [x] тест `test_portfolio_offer_slugs_exist_in_workflow_catalog` |
-| 4 | Полный платный путь на тестовой среде + smoke | [x] credits path; зависимости: test client + ledger deposit (не production) |
+| 4 | Полный платный путь на тестовой среде + smoke | [x] credits smoke + **live LLM** (`fallback_used=false`, ollama staging) на одноразовой БД |
 | 5 | Демо 5 минут | [x] |
 | 6 | Инвесторский пакет по фактам | [~] `/investors` + бюджет; выручка/клиенты **не предоставлены владельцем** |
 | 7 | Бюджет 12 месяцев → сумма привлечения | [x] допущения EUR; владелец должен подтвердить юрисдикцию и котировки |
@@ -77,3 +81,18 @@ bridge и SACP. Не откатывай и не включай чужие изм
 - Smoke-тест допускает `llm_usage.fallback_used=true` и нулевую комиссию; его успех не доказывает живой LLM, фактический доход или продажу клиенту.
 - Перед demo зафиксировать SHA, сеть/среду и источник тестовых средств; сохранить фактический artifact и receipt, проверить provider/model/status, отсутствие fallback, движение средств и комиссию.
 - Подтверждение реальной выручки, юрисдикция и котировки остаются открытыми. Мультиязычную готовность новых offer-цепочек не считать закрытой по одним переводам подписей полей.
+
+## Дополнение после ddb8785 (локализация + live LLM)
+
+SHA базы для демо-доказательств: `ddb8785fb5c2de6ca854ac083bd024e703efc097` (рабочее дерево поверх SHA содержит локализацию и demo-скрипт до коммита).
+
+| Артефакт | Путь / результат |
+| --- | --- |
+| Offer copy EN/RU/UK/DE/zh-Hant | `frontend-app/src/lib/projectOffersCopy.ts` + `offerForRoute(path, lang)` |
+| Budget / demo pages i18n | `frontend-app/src/locales/investorDocs.ts` |
+| Disposable DB | `ancap_investor_demo_20261014` (только тест; не production) |
+| API smoke | `pytest tests/api/test_investor_paid_path_smoke.py -q` → **2 passed** на disposable DB |
+| Live LLM demo | `scripts/investors/live_llm_paid_path_demo.py` → `tmp/investor-live-llm-20261014/` |
+| Live proof | `fallback_used=false`, provider=`ollama`, model=`qwen2.5:3b`, fee=1.4 ACP (10%), credits 50→36 |
+
+Owner still must supply jurisdiction, quotes, and real revenue metrics before investor send. Live demo used **local Ollama staging**, not Teneta/Anthropic production keys.

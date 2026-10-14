@@ -7,9 +7,11 @@
 
 **Investor presentation (local, 2026-10-14):** homepage/navigation regrouped around AI workflow commerce, six-area project portfolio, and `/investors` overview. Portfolio pages expose buyer→task→inputs→AI result→limits→pay→receipt chains (`projectOffers`). Demo script + 12‑month budget assumptions published under `/docs/investors/*` (unverified cost scenarios; final ask pending jurisdiction/quotes). No verified revenue/customer metrics supplied. Not deployed; does not close mobile/security release checks. Tracker: `docs/CURSOR_INVESTOR_FINISH_RU.md`.
 
-Presentation verification: portfolio/offer-chain vitest; Playwright investor checks (languages, filters, research heroes, budget/demo links); API smoke `tests/api/test_investor_paid_path_smoke.py` (credits ledger — no Stripe/broadcast). Screenshots: `tmp/investor-preview-2026-10-14/`.
+Presentation verification: portfolio/offer-chain vitest (incl. localized offers); Playwright investor checks (languages, filters, research heroes, budget/demo links); API smoke on disposable DB `ancap_investor_demo_20261014` (2 passed); live LLM staging demo `tmp/investor-live-llm-20261014/` (`fallback_used=false`, ollama/qwen2.5:3b, fee+credits — no Stripe/broadcast). Screenshots: `tmp/investor-preview-2026-10-14/`. Offer + budget/demo copy: EN/RU/UK/DE/zh-Hant.
 
 ANCAP is **largely built**, but it is **not fully release-complete end-to-end**.
+
+Latest investor verification: production frontend build passed, portfolio/localization Vitest **6 passed**, Playwright **8 passed**, demo database guard checks **6 passed** without DB access. Stored local Ollama evidence reviewed and archived at `docs/investors/evidence/2026-10-14-local-ollama/`; this review did not rerun the live demo or API smoke. Production provider configuration remains unverified.
 
 **Work-stop blockers: none.**
 

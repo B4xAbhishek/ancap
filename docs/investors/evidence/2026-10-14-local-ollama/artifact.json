@@ -1,0 +1,68 @@
+{
+  "status": "completed",
+  "delivery": [
+    {
+      "item": "Risk snapshot",
+      "details": {
+        "chain": "Base",
+        "project_name": "Investor Live LLM Token",
+        "token_symbol": "ILLM",
+        "risk_assessment": {
+          "risk_level": "Medium",
+          "risk_description": "Investor Live LLM Token has moderate risk associated with it, including potential liquidity issues and regulatory compliance concerns. Further investigation is recommended."
+        }
+      }
+    },
+    {
+      "item": "Trust signals",
+      "details": {
+        "chain": "Base",
+        "project_name": "Investor Live LLM Token",
+        "token_symbol": "ILLM",
+        "trust_signals": {
+          "tokenomics": "Stable",
+          "user_engagement": "Moderate",
+          "regulatory_status": "Unclear",
+          "community_activity": "Low"
+        }
+      }
+    },
+    {
+      "item": "Operational flags",
+      "details": {
+        "chain": "Base",
+        "project_name": "Investor Live LLM Token",
+        "token_symbol": "ILLM",
+        "operational_flags": {
+          "legal_issues": "Possible",
+          "development_team": "Unknown",
+          "community_support": "Low",
+          "liquidity_problems": "High"
+        }
+      }
+    },
+    {
+      "item": "Receipt",
+      "details": {
+        "signature": "abc123",
+        "timestamp": "2023-10-05T12:00:00Z",
+        "workflow_id": "WRK-00001"
+      }
+    }
+  ],
+  "llm_usage": {
+    "model": "qwen2.5:3b",
+    "status": "succeeded",
+    "event_id": "ef9b64a3-ac9c-498d-8a28-44bb7ef7a3d3",
+    "provider": "ollama",
+    "retry_count": 0,
+    "provider_status": "ok"
+  },
+  "workflow_slug": "token-risk-report",
+  "template_title": "Token Risk Report",
+  "execution_summary": {
+    "mode": "llm_generated",
+    "llm_model": "qwen2.5:3b",
+    "llm_provider": "ollama"
+  }
+}

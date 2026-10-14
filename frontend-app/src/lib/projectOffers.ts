@@ -1,3 +1,6 @@
+import type { Language } from "@/locales/translations";
+import { offerCopyByLang, offerKindLabelByLang, type OfferCopyFields } from "./projectOffersCopy";
+
 /**
  * Honest commercial chain for each public portfolio route.
  * offerKind:
@@ -9,431 +12,72 @@
 
 export type OfferKind = "executable" | "brief" | "concept" | "desk";
 
-export type ProjectOffer = {
+export type ProjectOffer = OfferCopyFields & {
   href: string;
-  buyer: string;
-  task: string;
-  inputs: string;
-  aiResult: string;
-  constraints: string;
   offerKind: OfferKind;
   /** Backend workflow-store slugs when an executable or brief SKU exists. Empty ⇒ concept page. */
   workflowSlugs: string[];
-  payment: string;
-  receipt: string;
 };
 
-export const projectOffers: ProjectOffer[] = [
-  // crypto — initial commercial focus
-  {
-    href: "/markets",
-    buyer: "Token / crypto team preparing market or commodity analysis",
-    task: "Obtain a structured market or momentum brief for planning",
-    inputs: "Asset or commodity focus, horizon, risk tolerance notes",
-    aiResult: "Market-direction or momentum brief (document)",
-    constraints: "Not investment advice; not a live trading bot; public listing widgets on the page are separate from paid briefs",
-    offerKind: "executable",
-    workflowSlugs: ["market-direction-brief", "commodity-price-outlook", "crypto-quote-momentum-scan", "markets-ai-radar-pro"],
-    payment: "ACP / wACP via workflow-store checkout",
-    receipt: "Run receipt with price snapshot, input hash, status timeline",
-  },
-  {
-    href: "/business",
-    buyer: "Founder packaging a commercial AI workflow offer",
-    task: "Prepare a business / offer brief before selling execution",
-    inputs: "Offer description, audience, pricing intent",
-    aiResult: "Business framing and requirements memo",
-    constraints: "Page is navigation into commercial tools; confirm SKU in /ai/workflows before paying",
-    offerKind: "brief",
-    workflowSlugs: ["agent-api-readiness-pack", "ai-iso-governance-readiness-pack"],
-    payment: "ACP when a catalog SKU is selected",
-    receipt: "Proof receipt on completed run",
-  },
-  {
-    href: "/growth",
-    buyer: "Crypto growth / community lead",
-    task: "Build a campaign or Telegram operating plan",
-    inputs: "Audience, channels, launch window, constraints",
-    aiResult: "Campaign plan, post ideas, ops checklist",
-    constraints: "Does not purchase ads or guarantee follower growth",
-    offerKind: "executable",
-    workflowSlugs: ["crypto-campaign-builder", "telegram-growth-kit", "kol-telegram-campaign-builder", "growth-pack", "growth-pro-pack"],
-    payment: "ACP / wACP",
-    receipt: "Workflow run receipt",
-  },
-  {
-    href: "/agency",
-    buyer: "Team wanting agency-style launch materials",
-    task: "Assemble listing + risk + campaign materials in one pack",
-    inputs: "Project facts, token references, channel goals",
-    aiResult: "Bundled launch / growth documents",
-    constraints: "Agency page routes to catalog packs; delivery is documents, not managed services",
-    offerKind: "executable",
-    workflowSlugs: ["launch-pack", "pro-launch-pack", "concierge-pack"],
-    payment: "ACP / wACP on pack checkout",
-    receipt: "Bundle run receipt",
-  },
-  // business / professional
-  {
-    href: "/startups",
-    buyer: "Startup preparing a token or product launch",
-    task: "Generate listing copy and launch readiness materials",
-    inputs: "Project name, narrative, chain, checklist answers",
-    aiResult: "Listing pack / launch audit documents",
-    constraints: "Not an exchange listing guarantee",
-    offerKind: "executable",
-    workflowSlugs: ["token-listing-pack", "token-launch-audit-pack", "exchange-listing-submission-pack"],
-    payment: "ACP / wACP",
-    receipt: "Proof receipt",
-  },
-  {
-    href: "/counsel",
-    buyer: "Founder preparing counsel / jurisdiction intake",
-    task: "Produce a structured intake for a qualified adviser",
-    inputs: "Jurisdiction intent, entity facts, document notes",
-    aiResult: "Counsel matching / entity / contract intake brief",
-    constraints: "Not legal advice; licensed counsel required",
-    offerKind: "brief",
-    workflowSlugs: ["counsel-jurisdiction-match", "counsel-entity-setup", "counsel-contract-review", "counsel-crypto-assets"],
-    payment: "ACP for brief generation",
-    receipt: "Run receipt; adviser engagement is separate",
-  },
-  {
-    href: "/insurance",
-    buyer: "Operator exploring insurance-desk literacy",
-    task: "Understand insurance-related desk/product framing",
-    inputs: "Risk theme and coverage questions",
-    aiResult: "Planning notes / desk handoff (when SKU listed)",
-    constraints: "Not an insurance policy; not a broker licence claim",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "No fake checkout on this page — use catalog if a SKU appears",
-    receipt: "N/A until an executable SKU is selected",
-  },
-  {
-    href: "/compliance",
-    buyer: "Team preparing governance / compliance readiness docs",
-    task: "Build an AI/ISO-style readiness or compliance pack",
-    inputs: "Process description, controls, evidence inventory",
-    aiResult: "Governance / compliance readiness documents",
-    constraints: "Readiness support only — not a certification",
-    offerKind: "executable",
-    workflowSlugs: ["ai-iso-governance-readiness-pack", "compliance-pack"],
-    payment: "ACP / wACP",
-    receipt: "Proof receipt with governance scope metadata",
-  },
-  {
-    href: "/careers",
-    buyer: "Candidate or hiring lead",
-    task: "Review open roles and application path",
-    inputs: "Application materials (off-platform or form)",
-    aiResult: "None — careers listing, not a paid AI deliverable",
-    constraints: "Not a workflow SKU; no ACP purchase of employment",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None",
-    receipt: "N/A",
-  },
-  // commerce
-  {
-    href: "/flora",
-    buyer: "Buyer/seller exploring flower auction literacy",
-    task: "Use FLORA auction / catalog surfaces",
-    inputs: "Lot or request details when desk is open",
-    aiResult: "Auction/desk artifacts when enabled — not a botanical guarantee",
-    constraints: "Partner / auction rail; confirm live SKU before paying",
-    offerKind: "desk",
-    workflowSlugs: [],
-    payment: "Desk/auction settlement when offered",
-    receipt: "Auction or desk receipt if issued",
-  },
-  {
-    href: "/literary",
-    buyer: "Author or collector using literary auction desk",
-    task: "List or bid via literary auction surfaces",
-    inputs: "Work metadata / bid intent",
-    aiResult: "Desk artifacts; not a publishing contract by default",
-    constraints: "Auction desk — not automatic book distribution",
-    offerKind: "desk",
-    workflowSlugs: [],
-    payment: "Auction/desk when offered",
-    receipt: "Desk receipt if issued",
-  },
-  {
-    href: "/marketplace",
-    buyer: "Buyer of marketplace listings",
-    task: "Browse and purchase listed offers",
-    inputs: "Listing selection and payment method",
-    aiResult: "Depends on listing — may be non-AI goods/services",
-    constraints: "Marketplace orders are distinct from workflow-store SKUs",
-    offerKind: "desk",
-    workflowSlugs: [],
-    payment: "Per listing terms",
-    receipt: "Order receipt when issued",
-  },
-  {
-    href: "/field-services",
-    buyer: "Customer requesting field IT / CCTV / solar install prep",
-    task: "Generate an install/service intake for a technician partner",
-    inputs: "Site details, service type, constraints",
-    aiResult: "Install / service intake brief",
-    constraints: "Partner performs physical work; ANCAP sells the intake document",
-    offerKind: "brief",
-    workflowSlugs: [
-      "it-pc-setup",
-      "it-device-repair",
-      "it-network-home",
-      "cam-cctv-install",
-      "solar-balcony-install",
-    ],
-    payment: "ACP for intake SKU",
-    receipt: "Run receipt; field visit is partner-side",
-  },
-  {
-    href: "/starlink-install",
-    buyer: "Customer planning Starlink install",
-    task: "Prepare install intake / SKU brief for a partner installer",
-    inputs: "Site type, mounting notes, service tier",
-    aiResult: "Starlink install intake documents",
-    constraints: "Not Starlink hardware sold by ANCAP; not SpaceX partnership claim",
-    offerKind: "brief",
-    workflowSlugs: ["starlink-install-intake", "starlink-standard", "starlink-business"],
-    payment: "ACP for listed install SKUs",
-    receipt: "Run / order receipt",
-  },
-  {
-    href: "/antique-fire-restore",
-    buyer: "Owner exploring conservation literacy after fire damage",
-    task: "Obtain a conservation planning brief (artifact analogy)",
-    inputs: "Artifact description, damage notes",
-    aiResult: "Conservation / reverse-combustion literacy brief",
-    constraints: "Not medical burn care; not a guaranteed restore outcome",
-    offerKind: "brief",
-    workflowSlugs: ["antique-fire-restore"],
-    payment: "ACP when SKU purchased",
-    receipt: "Proof receipt",
-  },
-  {
-    href: "/humanitarian",
-    buyer: "Donor or organizer seeking humanitarian desk handoff",
-    task: "Select an ACP-priced humanitarian brief / channel handoff",
-    inputs: "Aid theme and jurisdiction notes",
-    aiResult: "Desk brief and Red Cross / partner listing handoff",
-    constraints: "Not a 135-FZ charity; not ICRC/IFRC partnership; not tax-deductible by default",
-    offerKind: "desk",
-    workflowSlugs: [],
-    payment: "ACP desk amounts when offered on /humanitarian",
-    receipt: "Desk receipt if issued — not a charity donation receipt",
-  },
-  // life sciences research
-  {
-    href: "/aeterna",
-    buyer: "Individual preparing longevity / genomic partner consult",
-    task: "Buy an educational / consult-prep brief from vault or panel inputs",
-    inputs: "Consented vault metadata, lifestyle notes, intent kind",
-    aiResult: "Partner-ready consult brief (document)",
-    constraints: "Not a diagnosis, treatment, wet-lab protocol, or physical medical service",
-    offerKind: "brief",
-    workflowSlugs: ["aeterna-dna-wellness-report", "aeterna-longevity-panel-brief", "aeterna-molecular-aging-profile"],
-    payment: "High ACP prices on catalog SKUs — confirm before checkout",
-    receipt: "Proof receipt; clinical care remains with licensed partners",
-  },
-  {
-    href: "/dna-bank",
-    buyer: "User exploring DNA/RNA vault literacy",
-    task: "Understand vault storage / hash workflow",
-    inputs: "Consent and vault metadata when enabled",
-    aiResult: "Vault / bank literacy materials; optional AETERNA briefs",
-    constraints: "Encryption vault tooling ≠ clinical lab service",
-    offerKind: "brief",
-    workflowSlugs: ["aeterna-dna-wellness-report"],
-    payment: "ACP for linked briefs when selected",
-    receipt: "Vault/run receipt as applicable",
-  },
-  {
-    href: "/cryo",
-    buyer: "Person exploring cryopreservation partner desk",
-    task: "Review services and request partner intake",
-    inputs: "Service selection, jurisdiction",
-    aiResult: "Desk catalog + partner handoff materials",
-    constraints: "Licensed cryo partners only; ANCAP does not operate freezers",
-    offerKind: "desk",
-    workflowSlugs: [],
-    payment: "Partner / desk pricing when offered",
-    receipt: "Desk receipt if issued",
-  },
-  {
-    href: "/saliva-rx",
-    buyer: "Research reader exploring saliva diagnostics literacy",
-    task: "Read research brief framing",
-    inputs: "None for page literacy; catalog SKU if later listed",
-    aiResult: "Research brief framing only on this page",
-    constraints: "Not a pharmacy or prescription service",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None on page",
-    receipt: "N/A",
-  },
-  {
-    href: "/fauna",
-    buyer: "Reader exploring veterinary / fauna research framing",
-    task: "Review research / partner literacy",
-    inputs: "Optional AETERNA vet brief inputs via catalog",
-    aiResult: "Research framing; vet briefs via AETERNA SKUs if selected",
-    constraints: "Concept / research framing — not a veterinary procedure; licensed veterinarian only for clinical acts",
-    offerKind: "concept",
-    workflowSlugs: ["aeterna-vet-cat-cryo-restore", "aeterna-vet-regen-pod"],
-    payment: "ACP only if an AETERNA vet brief SKU is purchased",
-    receipt: "Brief receipt — not a veterinary procedure",
-  },
-  // infrastructure / frontier
-  {
-    href: "/tech",
-    buyer: "Operator exploring tech / weather-desk literacy",
-    task: "Review tech desk concepts and auction floors",
-    inputs: "Auction or brief inputs when SKU selected",
-    aiResult: "Desk / auction planning documents",
-    constraints: "Does not control weather or deploy physical infrastructure",
-    offerKind: "concept",
-    workflowSlugs: ["stardust-extreme-weather-monitor", "stardust-disaster-early-warning"],
-    payment: "Auction or SKU when offered — not a weather outcome",
-    receipt: "Auction/run receipt if issued",
-  },
-  {
-    href: "/perimeter",
-    buyer: "Security planner exploring perimeter concepts",
-    task: "Read perimeter / security literacy",
-    inputs: "None unless a catalog SKU is added",
-    aiResult: "Concept framing",
-    constraints: "Not a deployed security operations center",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None on page",
-    receipt: "N/A",
-  },
-  {
-    href: "/galaxy",
-    buyer: "Researcher exploring space-AI architecture literacy",
-    task: "Obtain a space / orbit concept brief",
-    inputs: "Mission theme, constraints",
-    aiResult: "Orbit / architecture literacy brief",
-    constraints: "Concept brief only — not satellite ownership or flight ops",
-    offerKind: "brief",
-    workflowSlugs: ["space-ai-orbit-intake", "space-ai-beyond-orbit", "space-ai-superintel-architecture"],
-    payment: "ACP for listed space-AI briefs",
-    receipt: "Proof receipt for the document run",
-  },
-  {
-    href: "/lunar",
-    buyer: "Researcher exploring lunar land registry literacy",
-    task: "Review parcel / interest desk framing",
-    inputs: "Parcel interest notes when desk enabled",
-    aiResult: "Registry / interest desk documents when offered",
-    constraints: "Science-tagged registry literacy — not title to lunar territory",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "Desk amounts only if explicitly offered",
-    receipt: "N/A unless desk issues one",
-  },
-  {
-    href: "/stardust",
-    buyer: "Researcher exploring weather-monitoring concept briefs",
-    task: "Study weather-monitor / early-warning concept SKUs",
-    inputs: "Region and monitoring intent",
-    aiResult: "Monitoring / warning concept documents",
-    constraints: "Does not control weather; auction floors are not outcome guarantees",
-    offerKind: "brief",
-    workflowSlugs: [
-      "stardust-extreme-weather-monitor",
-      "stardust-disaster-early-warning",
-      "stardust-weather-control-global",
-      "stardust-weather-control-subscription",
-    ],
-    payment: "ACP / auction when offered",
-    receipt: "Document/auction receipt — not a weather-control certificate",
-  },
-  {
-    href: "/quantum-sim",
-    buyer: "Developer exploring quantum-SIM concepts",
-    task: "Read quantum-SIM literacy",
-    inputs: "None unless SKU added",
-    aiResult: "Concept framing",
-    constraints: "Simulation literacy — not a carrier SIM product claim",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None on page",
-    receipt: "N/A",
-  },
-  // community pilots
-  {
-    href: "/nexus",
-    buyer: "Community operator",
-    task: "Pilot social / nexus features",
-    inputs: "Profile and post content",
-    aiResult: "Pilot app artifacts — not a guaranteed audience",
-    constraints: "Pilot surface",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None unless a catalog SKU is linked",
-    receipt: "N/A",
-  },
-  {
-    href: "/dating",
-    buyer: "Pilot user",
-    task: "Try dating pilot surfaces",
-    inputs: "Profile data",
-    aiResult: "Pilot matching UI — not a matchmaking guarantee",
-    constraints: "Pilot",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None by default",
-    receipt: "N/A",
-  },
-  {
-    href: "/entertainment",
-    buyer: "Event planner exploring entertainment literacy",
-    task: "Review entertainment SKU / party brief if listed",
-    inputs: "Event notes when purchasing a SKU",
-    aiResult: "Entertainment planning brief when SKU exists",
-    constraints: "Pilot / specialty SKU — confirm catalog",
-    offerKind: "brief",
-    workflowSlugs: ["entertainment-tesla-coil-party"],
-    payment: "ACP if SKU purchased",
-    receipt: "Run receipt",
-  },
-  {
-    href: "/arena",
-    buyer: "Pilot participant",
-    task: "Use arena pilot surfaces",
-    inputs: "Participation data",
-    aiResult: "Pilot artifacts",
-    constraints: "Pilot",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None by default",
-    receipt: "N/A",
-  },
-  {
-    href: "/feed",
-    buyer: "Pilot reader/creator",
-    task: "Use feed pilot",
-    inputs: "Posts",
-    aiResult: "Feed content — not a paid workflow by default",
-    constraints: "Pilot",
-    offerKind: "concept",
-    workflowSlugs: [],
-    payment: "None by default",
-    receipt: "N/A",
-  },
+type OfferDef = {
+  href: string;
+  offerKind: OfferKind;
+  workflowSlugs: string[];
+};
+
+/** Structural catalog — localized copy lives in projectOffersCopy.ts */
+export const projectOfferDefs: OfferDef[] = [
+  { href: "/markets", offerKind: "executable", workflowSlugs: ["market-direction-brief", "commodity-price-outlook", "crypto-quote-momentum-scan", "markets-ai-radar-pro"] },
+  { href: "/business", offerKind: "brief", workflowSlugs: ["agent-api-readiness-pack", "ai-iso-governance-readiness-pack"] },
+  { href: "/growth", offerKind: "executable", workflowSlugs: ["crypto-campaign-builder", "telegram-growth-kit", "kol-telegram-campaign-builder", "growth-pack", "growth-pro-pack"] },
+  { href: "/agency", offerKind: "executable", workflowSlugs: ["launch-pack", "pro-launch-pack", "concierge-pack"] },
+  { href: "/startups", offerKind: "executable", workflowSlugs: ["token-listing-pack", "token-launch-audit-pack", "exchange-listing-submission-pack"] },
+  { href: "/counsel", offerKind: "brief", workflowSlugs: ["counsel-jurisdiction-match", "counsel-entity-setup", "counsel-contract-review", "counsel-crypto-assets"] },
+  { href: "/insurance", offerKind: "concept", workflowSlugs: [] },
+  { href: "/compliance", offerKind: "executable", workflowSlugs: ["ai-iso-governance-readiness-pack", "compliance-pack"] },
+  { href: "/careers", offerKind: "concept", workflowSlugs: [] },
+  { href: "/flora", offerKind: "desk", workflowSlugs: [] },
+  { href: "/literary", offerKind: "desk", workflowSlugs: [] },
+  { href: "/marketplace", offerKind: "desk", workflowSlugs: [] },
+  { href: "/field-services", offerKind: "brief", workflowSlugs: ["it-pc-setup", "it-device-repair", "it-network-home", "cam-cctv-install", "solar-balcony-install"] },
+  { href: "/starlink-install", offerKind: "brief", workflowSlugs: ["starlink-install-intake", "starlink-standard", "starlink-business"] },
+  { href: "/antique-fire-restore", offerKind: "brief", workflowSlugs: ["antique-fire-restore"] },
+  { href: "/humanitarian", offerKind: "desk", workflowSlugs: [] },
+  { href: "/aeterna", offerKind: "brief", workflowSlugs: ["aeterna-dna-wellness-report", "aeterna-longevity-panel-brief", "aeterna-molecular-aging-profile"] },
+  { href: "/dna-bank", offerKind: "brief", workflowSlugs: ["aeterna-dna-wellness-report"] },
+  { href: "/cryo", offerKind: "desk", workflowSlugs: [] },
+  { href: "/saliva-rx", offerKind: "concept", workflowSlugs: [] },
+  { href: "/fauna", offerKind: "concept", workflowSlugs: ["aeterna-vet-cat-cryo-restore", "aeterna-vet-regen-pod"] },
+  { href: "/tech", offerKind: "concept", workflowSlugs: ["stardust-extreme-weather-monitor", "stardust-disaster-early-warning"] },
+  { href: "/perimeter", offerKind: "concept", workflowSlugs: [] },
+  { href: "/galaxy", offerKind: "brief", workflowSlugs: ["space-ai-orbit-intake", "space-ai-beyond-orbit", "space-ai-superintel-architecture"] },
+  { href: "/lunar", offerKind: "concept", workflowSlugs: [] },
+  { href: "/stardust", offerKind: "brief", workflowSlugs: ["stardust-extreme-weather-monitor", "stardust-disaster-early-warning", "stardust-weather-control-global", "stardust-weather-control-subscription"] },
+  { href: "/quantum-sim", offerKind: "concept", workflowSlugs: [] },
+  { href: "/nexus", offerKind: "concept", workflowSlugs: [] },
+  { href: "/dating", offerKind: "concept", workflowSlugs: [] },
+  { href: "/entertainment", offerKind: "brief", workflowSlugs: ["entertainment-tesla-coil-party"] },
+  { href: "/arena", offerKind: "concept", workflowSlugs: [] },
+  { href: "/feed", offerKind: "concept", workflowSlugs: [] },
 ];
 
-export function offerForRoute(pathname: string): ProjectOffer | null {
-  return projectOffers.find((item) => item.href === pathname) ?? null;
+/** @deprecated Prefer offerForRoute(pathname, lang). English snapshot for tests/slug sync. */
+export const projectOffers: ProjectOffer[] = projectOfferDefs.map((def) => ({
+  ...def,
+  ...offerCopyByLang.en[def.href],
+}));
+
+export function offerForRoute(pathname: string, lang: Language = "en"): ProjectOffer | null {
+  const def = projectOfferDefs.find((item) => item.href === pathname);
+  if (!def) return null;
+  const copy = offerCopyByLang[lang]?.[def.href] ?? offerCopyByLang.en[def.href];
+  if (!copy) return null;
+  return { ...def, ...copy };
 }
 
-export const OFFER_KIND_LABEL: Record<OfferKind, string> = {
-  executable: "Executable workflow",
-  brief: "AI / partner brief",
-  concept: "Concept / literacy page",
-  desk: "Desk / partner handoff",
-};
+export function offerKindLabel(kind: OfferKind, lang: Language = "en"): string {
+  return offerKindLabelByLang[lang]?.[kind] ?? offerKindLabelByLang.en[kind];
+}
+
+/** @deprecated use offerKindLabel(kind, lang) */
+export const OFFER_KIND_LABEL: Record<OfferKind, string> = offerKindLabelByLang.en;

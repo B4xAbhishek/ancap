@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { solutionPortfolio, portfolioByLang } from "@/lib/solutionPortfolio";
-import { offerForRoute, OFFER_KIND_LABEL } from "@/lib/projectOffers";
+import { offerForRoute, offerKindLabel } from "@/lib/projectOffers";
 import { positioningByLang } from "@/locales/positioning";
 import { fallbackWorkflowBundles } from "@/lib/workflowStore";
 
@@ -16,7 +16,7 @@ export function ProjectWorkflowContext() {
   const area = solutionPortfolio[index];
   const p = portfolioByLang[lang];
   const c = positioningByLang[lang];
-  const offer = offerForRoute(pathname);
+  const offer = offerForRoute(pathname, lang);
   const primarySlug = offer?.workflowSlugs[0];
   const primaryHref = primarySlug
     ? `${fallbackWorkflowBundles.some(bundle => bundle.slug === primarySlug) ? "/ai/bundles" : "/ai/run"}/${encodeURIComponent(primarySlug)}`
@@ -35,7 +35,7 @@ export function ProjectWorkflowContext() {
           <span className="ml-3 text-xs text-[var(--text-muted)]">{p.kinds[area.kind]}</span>
           {offer ? (
             <span className="ml-3 text-xs uppercase tracking-wide text-[var(--text-muted)]">
-              {OFFER_KIND_LABEL[offer.offerKind]}
+              {offerKindLabel(offer.offerKind, lang)}
             </span>
           ) : null}
         </div>
