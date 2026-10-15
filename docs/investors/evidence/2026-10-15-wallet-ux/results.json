@@ -1,0 +1,86 @@
+{
+  "verified_at_utc": "2026-10-15T04:53:28.456146+00:00",
+  "pull_request": "https://github.com/ancapcloud/ancap/pull/90",
+  "merge_sha": "f4588a7b473131a26de1fda987376aaf36cc1611",
+  "feature_sha": "bc47af5d9cb13d4086255c3a2f132f8e62c7266c",
+  "deployment": "https://github.com/ancapcloud/ancap/actions/runs/38683245215",
+  "deploy_conclusion": "success",
+  "build_http_status": 200,
+  "build": {
+    "NEXT_PUBLIC_APP_BUILD_ID": "f4588a7",
+    "build_id_source": "next-build-id-file",
+    "next_public_app_build_id_env": "f4588a7",
+    "next_build_id_file": "f4588a7"
+  },
+  "readiness_http_status": 200,
+  "readiness": {
+    "status": "ready",
+    "checks": {
+      "database": true,
+      "redis": true
+    }
+  },
+  "wallet_http_status": 200,
+  "robots": "noindex, nofollow",
+  "unauthenticated_balance_http_status": 401,
+  "ci": {
+    "backend": {
+      "passed": 907,
+      "skipped": 34,
+      "url": "https://github.com/ancapcloud/ancap/actions/runs/38682514625"
+    },
+    "public_trust_regression": {
+      "passed": 60,
+      "skipped": 5
+    },
+    "frontend": {
+      "passed": 54,
+      "url": "https://github.com/ancapcloud/ancap/actions/runs/38682514442"
+    },
+    "browser": {
+      "passed": 38,
+      "skipped": 1,
+      "wallet_fixtures": 10
+    },
+    "codeql": "https://github.com/ancapcloud/ancap/actions/runs/38682514351"
+  },
+  "browser_read_only": {
+    "guest_stays_on_wallet_route": true,
+    "headings": {
+      "EN": [
+        "ACP Wallet",
+        "Sign in to your wallet"
+      ],
+      "RU": [
+        "Кошелёк ACP",
+        "Войти в кошелёк"
+      ],
+      "UK": [
+        "Гаманець ACP",
+        "Увійти в гаманець"
+      ],
+      "DE": [
+        "ACP-Wallet",
+        "Beim Wallet anmelden"
+      ],
+      "zh-Hant": [
+        "ACP 錢包",
+        "登入錢包"
+      ]
+    },
+    "mobile": {
+      "viewport_width": 390,
+      "document_width": 375,
+      "horizontal_overflow": false
+    },
+    "console_errors": [],
+    "language_restored": "RU",
+    "viewport_reset": true
+  },
+  "limitations": [
+    "Signed-in browser tests use synthetic fixtures; no production account credentials were used.",
+    "No real transfer, broadcast, password change or wallet creation was performed.",
+    "Existing mobile/consensus/bridge/SACP WIP was excluded.",
+    "Documentation-only follow-up does not change the deployed application SHA."
+  ]
+}

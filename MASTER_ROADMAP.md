@@ -2,7 +2,7 @@
 
 ## ACP wallet usability — 2026-10-15
 
-Web wallet hierarchy, balance clarity, reviewed transfers and on-demand services are implemented. [Scope and verification](docs/WALLET_UX_RELEASE_2026-10-15.md). Existing native/consensus/bridge/SACP work is not included.
+Web wallet hierarchy, balance clarity, reviewed transfers and on-demand services are implemented. Full CI passed; build `f4588a7` is deployed and verified, including five-language/mobile guest checks. [Scope and verification](docs/WALLET_UX_RELEASE_2026-10-15.md). Existing native/consensus/bridge/SACP work is not included.
 
 ## Workflow Studio release — 2026-10-15
 

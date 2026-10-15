@@ -41,5 +41,25 @@ balances, explicit transfer review, queued-job failures, backup display, expired
 sessions, history failures and mobile widths. All credentials, addresses and balances
 in those fixtures are synthetic. No real transfer or password rotation is performed.
 
-Full CI and production deployment are recorded after verification. Production checks
-are read-only. Screenshots of the signed-in layout use a clearly identified test user.
+Full CI passed: 907 backend tests (34 skipped), 60 public-trust regression tests
+(5 skipped), 54 frontend tests and 38 browser scenarios (1 skipped), including
+10 wallet fixture scenarios. Frontend production build, mobile SDK checks, secret
+hygiene and CodeQL passed. Production checks are read-only. Screenshots of the
+signed-in layout use a clearly identified test user.
+
+## Deployment
+
+[PR #90](https://github.com/ancapcloud/ancap/pull/90) merged as
+`f4588a7b473131a26de1fda987376aaf36cc1611`.
+[Production deployment](https://github.com/ancapcloud/ancap/actions/runs/38683245215)
+succeeded; `/internal/frontend-build` reports `f4588a7`. On 15 October 2026,
+readiness confirmed database/Redis, `/wallet/acp` returned HTTP 200 with
+`noindex, nofollow`, and an unauthenticated balance request returned HTTP 401.
+The live guest page stayed on the wallet route, rendered all five languages and
+fit a 390-pixel viewport without horizontal overflow or captured JavaScript errors.
+
+[Release evidence](investors/evidence/2026-10-15-wallet-ux/README.md) records CI and
+read-only production results. No production account login, real transfer, broadcast,
+password change or wallet creation was performed. Existing backend/native wallet
+limitations remain; the web API still has no complete Dilithium keystore export.
+The documentation-only follow-up does not change the deployed application SHA.
