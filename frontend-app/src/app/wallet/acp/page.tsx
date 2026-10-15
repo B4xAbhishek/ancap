@@ -1,1204 +1,1345 @@
-﻿"use client";
-
+"use client";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Navigation } from "@/components/Navigation";
-import { WacpPublicActions } from "@/components/WacpPublicActions";
-import { OtcIntakeDesk } from "@/components/OtcIntakeDesk";
-import { AssayGcDesk } from "@/components/AssayGcDesk";
-import { OwnershipProofDesk } from "@/components/OwnershipProofDesk";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
-import { walletAcp } from "@/lib/api";
+import { ApiError, walletAcp } from "@/lib/api";
 import {
   formatAcpDisplay,
   selectHeroAcp,
   selectOnChainAtDeposit,
   selectPlatformLedger,
-  selectWithdrawableNow,
 } from "@/lib/acpBalanceDisplay";
+import {
+  DEFAULT_ACP_FEE,
+  maximumSend,
+  transferCheck,
+  isAcpAddress,
+} from "@/lib/walletTransfer";
+import { walletUxCopy } from "@/locales/walletUx";
+import { WalletBulkTransfer } from "./WalletBulkTransfer";
+import type { WalletBalance, ChainTransaction } from "./types";
+import s from "./wallet.module.css";
 
-const CUSTODIAL_HOT_ADDRESS = "acp1qzfdkqxfgyw9ysk99qsd79yxdfe338yd85vrqnp9";
-
-type TokenomicsBucket = {
-  key: string;
-  label: string;
-  acp: string;
-  utxo_count: number;
-};
-
-type BalanceResponse = {
+const OtcDesk = dynamic(() =>
+  import("@/components/OtcIntakeDesk").then((m) => m.OtcIntakeDesk),
+);
+const AssayDesk = dynamic(() =>
+  import("@/components/AssayGcDesk").then((m) => m.AssayGcDesk),
+);
+const OwnershipDesk = dynamic(() =>
+  import("@/components/OwnershipProofDesk").then((m) => m.OwnershipProofDesk),
+);
+type Section =
+  | "overview"
+  | "receive"
+  | "send"
+  | "history"
+  | "security"
+  | "services";
+type TransferReview = {
   address: string;
-  units: string;
-  acp: string;
-  utxo_count?: number;
-  on_chain_acp?: string | null;
-  on_chain_at_deposit_acp?: string | null;
-  ledger_credits_acp?: string | null;
-  platform_ledger_acp?: string | null;
-  headline_acp?: string | null;
-  primary_acp?: string | null;
-  primary_kind?: "on_chain" | "platform_credits" | "operator_total" | "chain_supply" | null;
-  balance_status?: string | null;
-  probe_status?: "live" | "degraded" | "unavailable" | null;
-  in_work_acp?: string;
-  in_work_staked_acp?: string;
-  in_work_ledger_acp?: string;
-  staked_acp?: string | null;
-  reserved_total_acp?: string | null;
-  available_acp?: string;
-  withdrawable_now_acp?: string | null;
-  withdraw_source?: "personal_utxo" | "custodial_hot" | "none" | null;
-  platform_credits_acp?: string | null;
-  operator_hot_live_acp?: string | null;
-  operator_controlled_live_acp?: string | null;
-  chain_supply_acp?: string | null;
-  supply_cap_acp?: string | null;
-  supply_invariant_ok?: boolean | null;
-  tokenomics_buckets?: TokenomicsBucket[] | null;
-  view_mode?: "user" | "operator_hot" | null;
-  vested_unlocked_acp?: string;
-  vested_locked_acp?: string;
-  balance_note?: string;
-  chain_height?: number | null;
+  amount: string;
+  fee: string;
+  total: string;
 };
+type TransferResult = {
+  accepted?: boolean;
+  txid?: string | null;
+  status?: string;
+  job_id?: string;
+  reason?: string;
+};
+const HOT_ADDRESS = "acp1qzfdkqxfgyw9ysk99qsd79yxdfe338yd85vrqnp9";
 
-type SwapOrder = {
-  id: string;
-  status: "awaiting_deposit" | "pending_review" | "completed" | "cancelled" | "rejected";
-  usdt_trc20_amount: string;
-  rate_acp_per_usdt: string;
-  estimated_acp_amount: string;
-  payout_acp_address: string;
-  deposit_trc20_address: string;
-  deposit_reference: string;
-  tron_txid?: string | null;
-  payout_txid?: string | null;
-  note?: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-type AcpTransaction = {
-  txid: string;
-  block_height: number;
-  block_time: string;
-  confirmations: number;
-  direction: "in" | "out" | "self";
-  sent_units: string;
-  sent_acp: string;
-  received_units: string;
-  received_acp: string;
-  net_units: string;
-  net_acp: string;
-};
-
-type SwapFormErrors = {
-  usdt_trc20_amount?: string;
-  payout_acp_address?: string;
-};
+function WalletIcon({ name }: { name: string }) {
+  const paths: Record<string, ReactNode> = {
+    receive: (
+      <>
+        <path d="M12 3v12m-5-5 5 5 5-5" />
+        <path d="M4 16v4h16v-4" />
+      </>
+    ),
+    send: (
+      <>
+        <path d="M12 16V4m-5 5 5-5 5 5" />
+        <path d="M4 17v4h16v-4" />
+      </>
+    ),
+    history: (
+      <>
+        <path d="M4 5v5h5" />
+        <path d="M4 10a8 8 0 1 1 1 7m7-10v5l3 2" />
+      </>
+    ),
+    security: (
+      <>
+        <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z" />
+        <path d="m8 12 3 3 5-6" />
+      </>
+    ),
+    overview: (
+      <>
+        <rect x="3" y="5" width="18" height="15" rx="3" />
+        <path d="M3 9h18m-6 5h3" />
+      </>
+    ),
+    services: (
+      <>
+        <circle cx="6" cy="6" r="2" />
+        <circle cx="18" cy="6" r="2" />
+        <circle cx="6" cy="18" r="2" />
+        <circle cx="18" cy="18" r="2" />
+      </>
+    ),
+  };
+  return (
+    <svg
+      width="21"
+      height="21"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name] || paths.overview}
+    </svg>
+  );
+}
 
 export default function AcpWalletPage() {
-  const ACP_FIXED_MIN_FEE = "0.00000100";
-  const ACP_ADDRESS_RE = /^acp1[a-z0-9]{20,100}$/;
-  const PASSWORD_ROTATION_ID = "password-security";
-  const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, changePassword, logout } = useAuth();
-  const { t } = useLanguage();
-  const passwordSectionRef = useRef<HTMLDivElement | null>(null);
-
-  const [depositAddress, setDepositAddress] = useState<string>("");
-  const [depositNote, setDepositNote] = useState<string>("");
+  const {
+    isAuthenticated,
+    isLoading: authLoading,
+    user,
+    changePassword,
+    logout,
+  } = useAuth();
+  const { lang, t } = useLanguage();
+  const c = walletUxCopy[lang];
+  const [section, setSection] = useState<Section>("overview");
+  const [sessionOwner, setSessionOwner] = useState<string | null>(null);
+  const [wallet, setWallet] = useState<WalletBalance | null>(null);
+  const [address, setAddress] = useState("");
   const [needsPersonalize, setNeedsPersonalize] = useState(false);
-  const [personalizePassword, setPersonalizePassword] = useState("");
-  const [personalizeBusy, setPersonalizeBusy] = useState(false);
-  const [personalizeMnemonic, setPersonalizeMnemonic] = useState("");
-  const [privacyAddress, setPrivacyAddress] = useState<string>("");
-  const [privacyBusy, setPrivacyBusy] = useState(false);
-  const [privacyPassword, setPrivacyPassword] = useState("");
-  const [balance, setBalance] = useState<BalanceResponse | null>(null);
-  const [transactions, setTransactions] = useState<AcpTransaction[]>([]);
-  const [txAddressInput, setTxAddressInput] = useState("");
-  const [txAddressActive, setTxAddressActive] = useState("");
-  const [txAddressBalance, setTxAddressBalance] = useState<BalanceResponse | null>(null);
-  const [swapOrders, setSwapOrders] = useState<SwapOrder[]>([]);
-  const [selectedOrderId, setSelectedOrderId] = useState<string>("");
-
+  const [depositNote, setDepositNote] = useState("");
+  const [loading, setLoading] = useState(false),
+    [partial, setPartial] = useState(false);
+  const [updated, setUpdated] = useState<Date | null>(null);
+  const [error, setError] = useState(""),
+    [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
-  const [balanceBusy, setBalanceBusy] = useState(false);
-  const [historyBusy, setHistoryBusy] = useState(false);
-  const [historyLoaded, setHistoryLoaded] = useState(false);
-  const [error, setError] = useState("");
-  const [loadWarnings, setLoadWarnings] = useState<string[]>([]);
-
-  const [swapForm, setSwapForm] = useState({
-    usdt_trc20_amount: "100",
-    payout_acp_address: "",
-    note: "",
-    tron_txid: "",
+  const generation = useRef(0),
+    actionLock = useRef(false),
+    sendLock = useRef(false);
+  const [personalPassword, setPersonalPassword] = useState(""),
+    [backup, setBackup] = useState("");
+  const [privacyPassword, setPrivacyPassword] = useState(""),
+    [privacyAddress, setPrivacyAddress] = useState("");
+  const [recipient, setRecipient] = useState(""),
+    [amount, setAmount] = useState("");
+  const [customFee, setCustomFee] = useState(false),
+    [fee, setFee] = useState(DEFAULT_ACP_FEE);
+  const [review, setReview] = useState<TransferReview | null>(null),
+    [walletPassword, setWalletPassword] = useState("");
+  const [attempted, setAttempted] = useState(false),
+    [result, setResult] = useState<TransferResult | null>(null);
+  const [historyAddress, setHistoryAddress] = useState(""),
+    [activeAddress, setActiveAddress] = useState("");
+  const [transactions, setTransactions] = useState<ChainTransaction[]>([]);
+  const [historyState, setHistoryState] = useState<
+    "idle" | "loading" | "error" | "ready"
+  >("idle");
+  const historyGeneration = useRef(0);
+  const [passwords, setPasswords] = useState({
+    current: "",
+    next: "",
+    confirm: "",
   });
-  const [quote, setQuote] = useState<{ rate_acp_per_usdt: string; estimated_acp_amount: string } | null>(null);
-  const [swapFormErrors, setSwapFormErrors] = useState<SwapFormErrors>({});
-  const [swapInfo, setSwapInfo] = useState("");
-
-  const [withdrawForm, setWithdrawForm] = useState({
-    to_address: "",
-    amount_acp: "",
-    wallet_password: "",
-  });
-  const [withdrawFeeMode, setWithdrawFeeMode] = useState<"auto" | "manual">("auto");
-  const [withdrawFeeAcp, setWithdrawFeeAcp] = useState(ACP_FIXED_MIN_FEE);
-  const [withdrawResult, setWithdrawResult] = useState<any>(null);
-  const [distributionPlan, setDistributionPlan] = useState("");
-  const [distributionPassword, setDistributionPassword] = useState("");
-  const [distributionResult, setDistributionResult] = useState<any[]>([]);
-  const [passwordChangeForm, setPasswordChangeForm] = useState({
-    current_password: "",
-    new_password: "",
-    confirm_password: "",
-  });
-  const [passwordChangeBusy, setPasswordChangeBusy] = useState(false);
-  const [passwordChangeInfo, setPasswordChangeInfo] = useState("");
-  const [recoveryMode, setRecoveryMode] = useState(false);
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      const nextTarget = typeof window !== "undefined"
-        ? `/wallet/acp${window.location.hash || ""}`
-        : "/wallet/acp";
-      router.push(`/login?next=${encodeURIComponent(nextTarget)}`);
-    }
-  }, [authLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      refreshAll();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (!isAuthenticated || typeof window === "undefined") return;
-    const inRecoveryMode = window.location.hash === `#${PASSWORD_ROTATION_ID}`;
-    setRecoveryMode(inRecoveryMode);
-    if (!inRecoveryMode) return;
-    const node = passwordSectionRef.current;
-    if (!node) return;
-    const timer = window.setTimeout(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
-      node.focus();
-    }, 80);
-    return () => window.clearTimeout(timer);
-  }, [isAuthenticated]);
-
-  const selectedOrder = useMemo(
-    () => swapOrders.find((o) => o.id === selectedOrderId) || swapOrders[0] || null,
-    [swapOrders, selectedOrderId],
+  const [tool, setTool] = useState("");
+  const securityRef = useRef<HTMLElement | null>(null);
+  const operator =
+    wallet?.view_mode === "operator_hot" ||
+    wallet?.primary_kind === "operator_total" ||
+    wallet?.primary_kind === "chain_supply";
+  const available =
+    wallet?.probe_status === "unavailable"
+      ? null
+      : (wallet?.withdrawable_now_acp ?? wallet?.available_acp ?? null);
+  const validation = transferCheck(recipient, amount, fee, available);
+  const validationMessage = (code: string | null) =>
+    code === "address"
+      ? c.addressError
+      : code === "amount"
+        ? c.amountError
+        : code === "fee"
+          ? c.feeError
+          : code === "balance"
+            ? c.balanceError
+            : code === "rows"
+              ? c.rowsError
+              : c.unknown;
+  const money = (value: string | null | undefined) =>
+    value == null ? "—" : formatAcpDisplay(value);
+  const field = (label: string, control: ReactNode) => (
+    <label className={s.field}>
+      <span>{label}</span>
+      {control}
+    </label>
   );
 
-  useEffect(() => {
-    const resolved = (depositAddress || balance?.address || "").trim();
-    if (!resolved) return;
-    setTxAddressInput((prev) => (prev ? prev : resolved));
-  }, [depositAddress, balance?.address]);
-
-  async function refreshAll() {
-    setBusy(true);
-    setBalanceBusy(true);
-    setError("");
-    setLoadWarnings([]);
-    const warnings: string[] = [];
-    const statusOf = (res: PromiseSettledResult<unknown>) =>
-      res.status === "rejected" && typeof (res.reason as { status?: unknown })?.status === "number"
-        ? Number((res.reason as { status: number }).status)
-        : 0;
-
-    // Load deposit address first so the page is usable even if balance RPC stalls.
-    let resolvedDeposit = "";
-    try {
-      const addrRes = await Promise.allSettled([walletAcp.getDepositAddress()]);
-      const addr = addrRes[0];
-      if (addr.status === "fulfilled") {
-        const payload = (addr.value || null) as {
-          address?: string;
-          note?: string | null;
-          needs_personalize?: boolean;
-        } | null;
-        resolvedDeposit = String(payload?.address || "").trim();
-        setDepositAddress(resolvedDeposit);
-        setDepositNote(String(payload?.note || "").trim());
-        setNeedsPersonalize(Boolean(payload?.needs_personalize));
-      } else {
-        warnings.push(
-          t("walletAcpPage.depositAddressUnavailable").replace(
-            "{error}",
-            addr.reason?.message || t("walletAcpPage.unknownError"),
-          ),
-        );
-        if (statusOf(addr) === 401) {
-          logout();
-          const nextTarget =
-            typeof window !== "undefined" ? `/wallet/acp${window.location.hash || ""}` : "/wallet/acp";
-          router.push(`/login?next=${encodeURIComponent(nextTarget)}`);
-          return;
-        }
+  async function refreshWallet() {
+    if (!isAuthenticated) return;
+    const epoch = generation.current;
+    setLoading(true);
+    setPartial(false);
+    const addressJob = walletAcp.getDepositAddress().then((data) => {
+      if (epoch === generation.current) {
+        setAddress(String(data.address || ""));
+        setNeedsPersonalize(Boolean(data.needs_personalize));
+        setDepositNote(String(data.note || ""));
       }
-    } finally {
-      setBusy(false);
-    }
-
+      return data;
+    });
     try {
-      const [balRes, ordersRes] = await Promise.allSettled([
+      const [addr, balance] = await Promise.allSettled([
+        addressJob,
         walletAcp.getHotBalance(),
-        walletAcp.listSwapOrders(),
       ]);
-
-      if (balRes.status === "fulfilled") {
-        const bal = (balRes.value || null) as BalanceResponse | null;
-        if (bal && !String(bal.address || "").trim() && resolvedDeposit) {
-          bal.address = resolvedDeposit;
-        }
-        setBalance(bal);
-        setTxAddressBalance(bal);
-        const balAddr = String(bal?.address || "").trim();
-        if (balAddr && !resolvedDeposit) {
-          resolvedDeposit = balAddr;
-          setDepositAddress(balAddr);
-        }
-      } else {
-        // Fallback: plain balance endpoint still returns address when hot decorate fails.
-        try {
-          const fallback = (await walletAcp.getBalance()) as BalanceResponse;
-          if (fallback && !String(fallback.address || "").trim() && resolvedDeposit) {
-            fallback.address = resolvedDeposit;
-          }
-          setBalance(fallback || null);
-          setTxAddressBalance(fallback || null);
-          const balAddr = String(fallback?.address || "").trim();
-          if (balAddr && !resolvedDeposit) {
-            resolvedDeposit = balAddr;
-            setDepositAddress(balAddr);
-          }
-          warnings.push(t("walletAcpPage.hotBalanceDegraded").replace("{error}", balRes.reason?.message || "error"));
-        } catch (fallbackErr: any) {
-          warnings.push(
-            t("walletAcpPage.walletBalanceUnavailable").replace("{error}", balRes.reason?.message || fallbackErr?.message || t("walletAcpPage.unknownError")),
-          );
-        }
-      }
-
-      if (ordersRes.status === "fulfilled") {
-        const orders = Array.isArray(ordersRes.value) ? ordersRes.value : [];
-        setSwapOrders(orders);
-        if (!selectedOrderId && orders.length > 0) {
-          setSelectedOrderId(orders[0].id);
-        }
-      } else {
-        warnings.push(t("walletAcpPage.swapHistoryUnavailable").replace("{error}", ordersRes.reason?.message || t("walletAcpPage.unknownError")));
-      }
-
-      const any401 = [balRes, ordersRes].some((res) => statusOf(res) === 401);
-      if (any401) {
+      if (epoch !== generation.current) return;
+      if (
+        [addr, balance].some(
+          (result) =>
+            result.status === "rejected" &&
+            result.reason instanceof ApiError &&
+            result.reason.status === 401,
+        )
+      ) {
         logout();
-        const nextTarget =
-          typeof window !== "undefined" ? `/wallet/acp${window.location.hash || ""}` : "/wallet/acp";
-        router.push(`/login?next=${encodeURIComponent(nextTarget)}`);
         return;
       }
-
-      setLoadWarnings(warnings);
-
-      // Auto-load on-chain history for the deposit (and custodial hot when operator).
-      const historyTarget =
-        (resolvedDeposit || String((balRes.status === "fulfilled" ? (balRes.value as BalanceResponse)?.address : "") || "").trim() || "").trim();
-      if (historyTarget) {
-        setTxAddressInput((prev) => (prev ? prev : historyTarget));
-        void refreshTransactionsByAddress(historyTarget, { silent: true, skipBalance: true });
-        const bal = balRes.status === "fulfilled" ? ((balRes.value || null) as BalanceResponse | null) : null;
-        if (bal?.view_mode === "operator_hot") {
-          if (historyTarget !== CUSTODIAL_HOT_ADDRESS) {
-            void refreshTransactionsByAddress(CUSTODIAL_HOT_ADDRESS, { silent: true, skipBalance: true, merge: true });
-          }
+      let value: WalletBalance | null =
+        balance.status === "fulfilled" ? balance.value : null;
+      if (balance.status === "rejected") {
+        try {
+          value = await walletAcp.getBalance();
+        } catch {
+          /* Keep the last known balance, labelled as stale. */
         }
+        if (epoch !== generation.current) return;
       }
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.loadFailed"));
+      if (value) {
+        setWallet(value);
+        setUpdated(new Date());
+        if (
+          addr.status !== "fulfilled" &&
+          value.address &&
+          value.address !== HOT_ADDRESS
+        )
+          setAddress(value.address);
+      }
+      setPartial(
+        addr.status === "rejected" ||
+          balance.status === "rejected" ||
+          !value ||
+          value.probe_status === "unavailable" ||
+          value.probe_status === "degraded" ||
+          Boolean(value.balance_status && value.balance_status !== "live"),
+      );
     } finally {
-      setBalanceBusy(false);
+      if (epoch === generation.current) setLoading(false);
     }
   }
 
-  async function copy(text: string) {
-    const v = (text || "").trim();
-    if (!v) return;
+  useEffect(() => {
+    generation.current++;
+    historyGeneration.current++;
+    setSessionOwner(user?.id || null);
+    setWallet(null);
+    setAddress("");
+    setUpdated(null);
+    setTransactions([]);
+    setHistoryState("idle");
+    setHistoryAddress("");
+    setActiveAddress("");
+    setBackup("");
+    setPrivacyAddress("");
+    setWalletPassword("");
+    setPersonalPassword("");
+    setPrivacyPassword("");
+    setPasswords({ current: "", next: "", confirm: "" });
+    setResult(null);
+    setReview(null);
+    setAttempted(false);
+    setError("");
+    setNotice("");
+    setBusy(false);
+    if (isAuthenticated) void refreshWallet();
+    const walletGeneration = generation;
+    const transactionGeneration = historyGeneration;
+    return () => {
+      walletGeneration.current++;
+      transactionGeneration.current++;
+    };
+    // Network data belongs to the authenticated account; language changes do not refetch funds.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id]);
+
+  useEffect(() => {
+    const syncHash = () => {
+      const key = window.location.hash.slice(1);
+      if (key === "password-security") setSection("security");
+      else if (
+        [
+          "overview",
+          "receive",
+          "send",
+          "history",
+          "security",
+          "services",
+        ].includes(key)
+      )
+        setSection(key as Section);
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
+  useEffect(() => {
+    if (
+      section === "security" &&
+      isAuthenticated &&
+      window.location.hash === "#password-security"
+    )
+      securityRef.current?.focus();
+  }, [section, isAuthenticated]);
+  function navigate(next: Section) {
+    setSection(next);
+    setError("");
+    setNotice("");
+    setWalletPassword("");
+    setPrivacyPassword("");
+    setPersonalPassword("");
+    setPasswords({ current: "", next: "", confirm: "" });
+    window.history.replaceState(
+      null,
+      "",
+      `#${next === "security" ? "password-security" : next}`,
+    );
+  }
+  async function copy(value: string) {
     try {
-      await navigator.clipboard.writeText(v);
-      setSwapInfo(t("walletAcpPage.copied"));
+      await navigator.clipboard.writeText(value);
+      setNotice(t("walletAcpPage.copied"));
     } catch {
       setError(t("walletAcpPage.clipboardUnavailable"));
     }
   }
-
-  function validateSwapForm(input: typeof swapForm): { valid: boolean; errors: SwapFormErrors } {
-    const errors: SwapFormErrors = {};
-    const amountRaw = input.usdt_trc20_amount.trim();
-    const payoutAddress = input.payout_acp_address.trim();
-    const amountNum = Number(amountRaw);
-
-    if (!amountRaw) {
-      errors.usdt_trc20_amount = t("walletAcpPage.tetherAmountRequired");
-    } else if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      errors.usdt_trc20_amount = t("walletAcpPage.tetherAmountInvalid");
-    }
-
-    if (!payoutAddress) {
-      errors.payout_acp_address = t("walletAcpPage.payoutAddressRequired");
-    } else if (!ACP_ADDRESS_RE.test(payoutAddress)) {
-      errors.payout_acp_address = t("walletAcpPage.payoutAddressInvalid");
-    }
-
-    return { valid: Object.keys(errors).length === 0, errors };
-  }
-
-  function normalizeTxList(value: unknown): AcpTransaction[] {
-    if (Array.isArray(value)) return value as AcpTransaction[];
-    if (value && typeof value === "object") {
-      const items = (value as { items?: unknown }).items;
-      if (Array.isArray(items)) return items as AcpTransaction[];
-    }
-    return [];
-  }
-
-  function explorerBalanceForAddress(target: string, bal: BalanceResponse | null | undefined): BalanceResponse | null {
-    if (!bal) return null;
-    // Operator hero `acp`/`utxo_count` is an aggregate across role wallets. Never paste that
-    // onto the personal deposit address in the explorer panel.
-    if (
-      bal.view_mode === "operator_hot" &&
-      singleWalletAddress &&
-      target === singleWalletAddress &&
-      target !== CUSTODIAL_HOT_ADDRESS
-    ) {
-      const depositAcp = selectOnChainAtDeposit(bal) ?? "0";
-      return {
-        address: target,
-        acp: depositAcp,
-        units: String(Math.round(Number(depositAcp) * 1e8) || 0),
-        utxo_count: Number(depositAcp) > 0 ? bal.utxo_count : 0,
-        on_chain_at_deposit_acp: depositAcp,
-        on_chain_acp: depositAcp,
-        view_mode: "user",
-      };
-    }
-    return bal;
-  }
-
-  async function refreshTransactionsByAddress(address: string, options?: { silent?: boolean; skipBalance?: boolean; merge?: boolean }) {
-    const target = address.trim();
-    if (!target) return;
-    if (!options?.silent) {
-      setHistoryBusy(true);
-      setError("");
-    }
-    try {
-      const requests: Promise<any>[] = [walletAcp.listTransactions({ address: target, limit: 20, privacy: false })];
-      if (!options?.skipBalance) {
-        requests.push(walletAcp.getBalance({ address: target }));
-      }
-      const [txRes, balRes] = await Promise.allSettled(requests);
-      if (txRes.status === "fulfilled") {
-        const next = normalizeTxList(txRes.value);
-        if (options?.merge) {
-          setTransactions((prev) => {
-            const byId = new Map<string, AcpTransaction>();
-            for (const row of [...prev, ...next]) {
-              byId.set(`${row.txid}-${row.block_height}`, row);
-            }
-            return Array.from(byId.values()).sort((a, b) => b.block_height - a.block_height).slice(0, 40);
-          });
-        } else {
-          setTransactions(next);
-        }
-      } else {
-        const txErr = String(txRes.reason?.message || "");
-        if (!txErr.includes("API error 502") && !txErr.includes("API error 503") && !txErr.includes("API error 504")) {
-          throw txRes.reason;
-        }
-        if (!options?.merge) setTransactions([]);
-      }
-      if (!options?.skipBalance) {
-        if (balRes && balRes.status === "fulfilled") {
-          setTxAddressBalance(explorerBalanceForAddress(target, (balRes.value as BalanceResponse) || null));
-        } else {
-          const balErr = String((balRes as PromiseRejectedResult | undefined)?.reason?.message || "");
-          if (!balErr.includes("API error 502") && !balErr.includes("API error 503") && !balErr.includes("API error 504")) {
-            throw (balRes as PromiseRejectedResult | undefined)?.reason;
-          }
-          setTxAddressBalance({ address: target, units: "0", acp: "0", utxo_count: 0 });
-        }
-      } else if (singleWalletAddress && target === singleWalletAddress && balance) {
-        setTxAddressBalance(explorerBalanceForAddress(target, balance));
-      }
-      setTxAddressActive(target);
-      setHistoryLoaded(true);
-    } catch (e: any) {
-      const msg = String(e?.message || "");
-      if (msg.includes("API error 401") || (e && typeof e === "object" && "status" in e && Number((e as { status?: unknown }).status) === 401)) {
-        logout();
-        const nextTarget =
-          typeof window !== "undefined" ? `/wallet/acp${window.location.hash || ""}` : "/wallet/acp";
-        router.push(`/login?next=${encodeURIComponent(nextTarget)}`);
-        return;
-      }
-      if (!options?.silent) {
-        setError(msg || t("walletAcpPage.historyLoadFailed"));
-      }
-    } finally {
-      if (!options?.silent) {
-        setHistoryBusy(false);
-      }
-    }
-  }
-
-  async function refreshQuote() {
+  async function perform<T>(job: () => Promise<T>, done: (value: T) => void) {
+    if (actionLock.current) return;
+    actionLock.current = true;
+    const epoch = generation.current;
+    setBusy(true);
     setError("");
-    setSwapInfo("");
-    const checked = validateSwapForm(swapForm);
-    setSwapFormErrors(checked.errors);
-    if (!checked.valid) {
-      setQuote(null);
+    setNotice("");
+    try {
+      const value = await job();
+      if (epoch === generation.current) done(value);
+    } catch (e) {
+      if (epoch === generation.current)
+        setError(e instanceof Error ? e.message : c.unknown);
+    } finally {
+      actionLock.current = false;
+      if (epoch === generation.current) setBusy(false);
+    }
+  }
+  async function loadHistory(target: string) {
+    if (!isAcpAddress(target)) {
+      setError(c.addressError);
       return;
     }
+    const sequence = ++historyGeneration.current;
+    setHistoryState("loading");
+    setActiveAddress(target.trim());
+    setTransactions([]);
     try {
-      const q = await walletAcp.swapQuote({ usdt_trc20_amount: swapForm.usdt_trc20_amount.trim() });
-      setQuote(q);
-      setSwapInfo(t("walletAcpPage.quoteUpdated").replace("{amount}", q.estimated_acp_amount));
-    } catch (e: any) {
-      setQuote(null);
-      setError(e?.message || t("walletAcpPage.quoteFailed"));
-    }
-  }
-
-  async function createSwapOrder(e: React.FormEvent) {
-    e.preventDefault();
-    const checked = validateSwapForm(swapForm);
-    setSwapFormErrors(checked.errors);
-    if (!checked.valid) return;
-    setBusy(true);
-    setError("");
-    setSwapInfo("");
-    try {
-      const created = await walletAcp.createSwapOrder({
-        usdt_trc20_amount: swapForm.usdt_trc20_amount.trim(),
-        payout_acp_address: swapForm.payout_acp_address.trim(),
-        note: swapForm.note.trim() || undefined,
+      const data = await walletAcp.listTransactions({
+        address: target.trim(),
+        limit: 20,
+        privacy: false,
       });
-      await refreshAll();
-      setSelectedOrderId(created.id);
-      setSwapInfo(t("walletAcpPage.swapCreated").replace("{id}", created.id));
-      setSwapForm((prev) => ({ ...prev, tron_txid: "" }));
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.swapCreateFailed"));
-    } finally {
-      setBusy(false);
+      if (sequence !== historyGeneration.current) return;
+      const rows = Array.isArray(data) ? data : data?.items;
+      if (!Array.isArray(rows)) throw new Error("Invalid history response");
+      setTransactions(rows);
+      setHistoryState("ready");
+    } catch (e) {
+      if (
+        e instanceof ApiError &&
+        e.status === 401 &&
+        sequence === historyGeneration.current
+      ) {
+        logout();
+        return;
+      }
+      if (sequence === historyGeneration.current) setHistoryState("error");
     }
   }
-
-  async function confirmSelectedOrder() {
-    if (!selectedOrder) return;
-    setBusy(true);
-    setError("");
-    try {
-      await walletAcp.confirmSwapOrder(selectedOrder.id, {
-        tron_txid: swapForm.tron_txid.trim() || undefined,
-      });
-      await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.swapConfirmFailed"));
-    } finally {
-      setBusy(false);
+  useEffect(() => {
+    if (
+      section === "history" &&
+      isAuthenticated &&
+      address &&
+      historyState === "idle"
+    ) {
+      setHistoryAddress(address);
+      void loadHistory(address);
     }
-  }
+    // History loads on demand, once for the selected account/address.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section, address, isAuthenticated]);
 
-  async function cancelSelectedOrder() {
-    if (!selectedOrder) return;
-    setBusy(true);
-    setError("");
-    try {
-      await walletAcp.cancelSwapOrder(selectedOrder.id);
-      await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.swapCancelFailed"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function doWithdraw(e: React.FormEvent) {
+  async function submitTransfer(e: FormEvent) {
     e.preventDefault();
+    if (!review || !walletPassword || sendLock.current || attempted) return;
+    const checked = transferCheck(
+      review.address,
+      review.amount,
+      review.fee,
+      available,
+    );
+    if (checked.error) {
+      setError(validationMessage(checked.error));
+      return;
+    }
+    sendLock.current = true;
+    const epoch = generation.current;
     setBusy(true);
+    setAttempted(true);
     setError("");
-    setWithdrawResult(null);
+    const secret = walletPassword;
+    setWalletPassword("");
     try {
-      const feeAcp = (withdrawFeeMode === "auto" ? ACP_FIXED_MIN_FEE : withdrawFeeAcp).trim();
-      const res = await walletAcp.withdraw({
-        to_address: withdrawForm.to_address.trim(),
-        amount_acp: withdrawForm.amount_acp.trim(),
-        fee_acp: feeAcp,
-        wallet_password: withdrawForm.wallet_password,
-      });
-      setWithdrawResult(res);
-      await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.withdrawFailed"));
+      const response = await walletAcp.withdraw(
+        {
+          to_address: review.address,
+          amount_acp: review.amount,
+          fee_acp: review.fee,
+          wallet_password: secret,
+        },
+        (jobId) => {
+          if (epoch === generation.current)
+            setResult({ status: "pending", job_id: jobId });
+        },
+      );
+      if (epoch !== generation.current) return;
+      setResult(response || {});
+      void refreshWallet();
+      setHistoryState("idle");
+    } catch (e) {
+      if (epoch === generation.current) {
+        setResult((previous) => ({ ...previous, status: "unknown" }));
+        setError(e instanceof Error ? e.message : c.uncertainHint);
+      }
     } finally {
-      setBusy(false);
+      sendLock.current = false;
+      if (epoch === generation.current) setBusy(false);
     }
   }
 
-  async function runDistribution(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    setDistributionResult([]);
-    try {
-      const lines = distributionPlan
-        .split(/\r?\n/)
-        .map((x) => x.trim())
-        .filter(Boolean);
-      if (!lines.length) throw new Error(t("walletAcpPage.distributionNeedLine"));
-      const results: any[] = [];
-      for (const line of lines) {
-        const [to, amount] = line.split(/\s+/);
-        if (!to || !amount) throw new Error(t("walletAcpPage.distributionInvalidLine").replace("{line}", line));
-        const res = await walletAcp.withdraw({
-          to_address: to,
-          amount_acp: amount,
-          fee_acp: ACP_FIXED_MIN_FEE,
-          wallet_password: distributionPassword,
-        });
-        results.push({ to, amount, ...res });
-      }
-      setDistributionResult(results);
-      await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.distributionFailed"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function submitPasswordChange(e: React.FormEvent) {
-    e.preventDefault();
-    setPasswordChangeBusy(true);
-    setError("");
-    setPasswordChangeInfo("");
-    try {
-      if (passwordChangeForm.current_password.length < 8) {
-        throw new Error(t("walletAcpPage.currentPasswordRequired"));
-      }
-      if (passwordChangeForm.new_password.length < 8) {
-        throw new Error(t("walletAcpPage.newPasswordMin"));
-      }
-      if (passwordChangeForm.new_password !== passwordChangeForm.confirm_password) {
-        throw new Error(t("walletAcpPage.passwordsMismatch"));
-      }
-      await changePassword(passwordChangeForm.current_password, passwordChangeForm.new_password);
-      setPasswordChangeForm({ current_password: "", new_password: "", confirm_password: "" });
-      setPasswordChangeInfo(t("walletAcpPage.passwordUpdated"));
-    } catch (e: any) {
-      setError(e?.message || t("walletAcpPage.passwordChangeFailed"));
-    } finally {
-      setPasswordChangeBusy(false);
-    }
-  }
-
-  if (authLoading || !isAuthenticated) return null;
-
-  const singleWalletAddress = (depositAddress || balance?.address || "").trim();
-  const isSwapFormValid = validateSwapForm(swapForm).valid;
-  const withdrawAvailableNum = Number(
-    balance?.withdrawable_now_acp ?? balance?.available_acp ?? "0",
+  const summary = (
+    <div className={s.metrics}>
+      {[
+        [c.onChain, selectOnChainAtDeposit(wallet), c.network],
+        [c.credits, selectPlatformLedger(wallet), c.creditsHint],
+        [
+          c.reserved,
+          wallet?.reserved_total_acp ??
+            wallet?.in_work_acp ??
+            wallet?.staked_acp,
+          c.reservedHint,
+        ],
+      ].map(([label, value, hint]) => (
+        <div className={s.metric} key={label}>
+          <span>{label}</span>
+          <strong title={value || undefined}>
+            {money(value)} <small>ACP</small>
+          </strong>
+          <p>{hint}</p>
+        </div>
+      ))}
+    </div>
   );
-  const withdrawAmountNum = Number(withdrawForm.amount_acp);
-  const withdrawAmountValid =
-    withdrawForm.amount_acp.trim() !== "" &&
-    Number.isFinite(withdrawAmountNum) &&
-    withdrawAmountNum > 0;
-  const withdrawAddressValid = ACP_ADDRESS_RE.test(withdrawForm.to_address.trim());
-  const withdrawPasswordValid = withdrawForm.wallet_password.length > 0;
-  const withdrawExceedsBalance =
-    Number.isFinite(withdrawAvailableNum) &&
-    withdrawAmountValid &&
-    withdrawAmountNum > withdrawAvailableNum;
-  const isOperatorHotView = balance?.view_mode === "operator_hot";
-  const heroAcp = selectHeroAcp(balance);
-  const onChainAtDeposit = selectOnChainAtDeposit(balance);
-  const platformLedger = selectPlatformLedger(balance);
-  const stakedAcp = balance?.staked_acp ?? balance?.in_work_staked_acp ?? null;
-  const reservedTotal = balance?.reserved_total_acp ?? balance?.in_work_acp ?? null;
-  const withdrawableNow = selectWithdrawableNow(balance);
-  const withdrawDisabled =
-    busy ||
-    !withdrawAddressValid ||
-    !withdrawAmountValid ||
-    !withdrawPasswordValid ||
-    withdrawExceedsBalance;
+  const intro = (
+    <header className={s.header}>
+      <div>
+        <p className={s.eyebrow}>ANCAP / ACP</p>
+        <h1>{t("walletAcpPage.title")}</h1>
+        <p className={s.lead}>{c.subtitle}</p>
+      </div>
+      {isAuthenticated && (
+        <button
+          className={s.secondary}
+          disabled={loading || busy}
+          onClick={() => void refreshWallet()}
+        >
+          {loading ? t("walletAcpPage.loading") : c.refresh}
+        </button>
+      )}
+    </header>
+  );
 
   return (
-    <>
-      <div className="min-h-screen">
-        <Navigation />
-
-        <div className="container" style={{ padding: "48px 24px" }}>
-          <div style={{ display: "grid", gap: 16, marginBottom: 18 }}>
-            <div style={{ maxWidth: 760 }}>
-              <h1 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900, letterSpacing: "-0.03em", margin: 0, color: "var(--text)" }}>
-                {t("walletAcpPage.title")}
-              </h1>
-            </div>
+    <div className={s.shell}>
+      <Navigation />
+      <main className={s.page}>
+        {intro}
+        {authLoading || (isAuthenticated && sessionOwner !== user?.id) ? (
+          <div className={s.panel} role="status">
+            {t("walletAcpPage.loading")}
           </div>
-
-          {error && (
-            <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", fontSize: "0.9rem", marginBottom: "18px" }}>
-              {error}
+        ) : !isAuthenticated ? (
+          <section className={s.welcome}>
+            <WalletIcon name="overview" />
+            <h2>{c.login}</h2>
+            <p>{c.loginHint}</p>
+            <div className={s.actions}>
+              <Link
+                className={s.primary}
+                href={`/login?next=${encodeURIComponent("/wallet/acp" + (section === "security" ? "#password-security" : ""))}`}
+              >
+                {c.login}
+              </Link>
+              <Link className={s.secondary} href="/register">
+                {c.register}
+              </Link>
             </div>
-          )}
-          {swapInfo && (
-            <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.1)", color: "#10b981", fontSize: "0.9rem", marginBottom: "18px" }}>
-              {swapInfo}
+            <div className={s.features}>
+              {["receive", "send", "history"].map((key) => (
+                <div key={key}>
+                  <WalletIcon name={key} />
+                  <strong>{c[key as "receive" | "send" | "history"]}</strong>
+                </div>
+              ))}
             </div>
-          )}
-          {passwordChangeInfo && (
-            <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.1)", color: "#10b981", fontSize: "0.9rem", marginBottom: "18px" }}>
-              {passwordChangeInfo}
+          </section>
+        ) : (
+          <>
+            <nav className={s.tabs} aria-label={c.sections}>
+              {(
+                [
+                  "overview",
+                  "receive",
+                  "send",
+                  "history",
+                  "security",
+                  "services",
+                ] as Section[]
+              ).map((key) => (
+                <button
+                  key={key}
+                  aria-current={section === key ? "page" : undefined}
+                  onClick={() => navigate(key)}
+                  disabled={busy}
+                >
+                  <WalletIcon name={key} />
+                  {c[key]}
+                </button>
+              ))}
+            </nav>
+            <div aria-live="polite">
+              {notice && (
+                <p className={s.success} role="status">
+                  {notice}
+                </p>
+              )}
             </div>
-          )}
-
-          <div style={{ display: "grid", gap: 16 }}>
-            {loadWarnings.length > 0 && (
-              <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b", fontSize: "0.9rem", marginBottom: "2px", display: "grid", gap: 6 }}>
-                {loadWarnings.map((w) => (
-                  <div key={w}>{w}</div>
-                ))}
+            {error && (
+              <p className={s.error} role="alert">
+                {error}
+              </p>
+            )}
+            {partial && (
+              <p className={s.warning} role="status">
+                {c.partial}
+              </p>
+            )}
+            {backup && section !== "receive" && (
+              <button className={s.warning} onClick={() => navigate("receive")}>
+                {c.backup} →
+              </button>
+            )}
+            {section === "overview" && (
+              <div className={s.stack}>
+                {operator && (
+                  <aside className={s.warning}>
+                    <strong>{c.operator}</strong>
+                    <p>{c.operatorHint}</p>
+                  </aside>
+                )}
+                <section className={s.hero} aria-label={c.available}>
+                  <div>
+                    <span className={s.eyebrow}>{c.available}</span>
+                    <div className={s.balance}>
+                      {loading && !wallet ? "…" : money(available)}{" "}
+                      <span>ACP</span>
+                    </div>
+                    <p>{c.availableHint}</p>
+                    <div className={s.updated}>
+                      {updated
+                        ? `${c.updated}: ${updated.toLocaleTimeString(lang)}`
+                        : c.unknown}
+                    </div>
+                  </div>
+                  <div className={s.quick}>
+                    {(["receive", "send", "history"] as Section[]).map(
+                      (key) => (
+                        <button
+                          key={key}
+                          className={
+                            key === "receive" ? s.primary : s.secondary
+                          }
+                          onClick={() => navigate(key)}
+                        >
+                          <WalletIcon name={key} />
+                          {c[key]}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </section>
+                {summary}
+                <section className={s.panel}>
+                  <div className={s.sectionHeader}>
+                    <div>
+                      <h2>{c.address}</h2>
+                      <p>{c.network}</p>
+                    </div>
+                    <button
+                      className={s.secondary}
+                      onClick={() => navigate("receive")}
+                    >
+                      {c.receive} →
+                    </button>
+                  </div>
+                  <code className={s.address}>
+                    {!needsPersonalize && address
+                      ? address
+                      : t("walletAcpPage.personalizeWallet")}
+                  </code>
+                  <p className={s.muted}>{c.receiveHint}</p>
+                </section>
+                <div className={s.linkGrid}>
+                  <Link href="/wallet/credits">
+                    <strong>{c.credits}</strong>
+                    <span>{c.creditsHint}</span>
+                  </Link>
+                  <Link href="/buy-acp">
+                    <strong>{c.buy} →</strong>
+                    <span>{c.network} / wACP</span>
+                  </Link>
+                </div>
+                <details className={s.panel}>
+                  <summary>{c.technical}</summary>
+                  <dl className={s.facts}>
+                    <div>
+                      <dt>{t("walletAcpPage.walletBalance")}</dt>
+                      <dd>{money(selectHeroAcp(wallet))} ACP</dd>
+                    </div>
+                    <div>
+                      <dt>
+                        {wallet?.primary_kind === "chain_supply"
+                          ? t("walletAcpPage.primaryKindSupply")
+                          : wallet?.primary_kind === "operator_total"
+                            ? t("walletAcpPage.primaryKindOperator")
+                            : wallet?.primary_kind === "platform_credits"
+                              ? t("walletAcpPage.primaryKindCredits")
+                              : t("walletAcpPage.primaryKindOnChain")}
+                      </dt>
+                      <dd>{wallet?.balance_status || c.unknown}</dd>
+                    </div>
+                    <div>
+                      <dt>
+                        {t("walletAcpPage.chainHeight").replace("{n}", "")}
+                      </dt>
+                      <dd>{wallet?.chain_height ?? "—"}</dd>
+                    </div>
+                  </dl>
+                  {operator && (
+                    <>
+                      <p className={s.muted}>
+                        {t("walletAcpPage.operatorBucketsLiveNote")}
+                      </p>
+                      {wallet?.tokenomics_buckets?.map((bucket) => (
+                        <p className={s.metricLine} key={bucket.key}>
+                          <span>{bucket.label}</span>
+                          <strong>{money(bucket.acp)} ACP</strong>
+                        </p>
+                      ))}
+                    </>
+                  )}
+                </details>
               </div>
             )}
-
-            <div className="responsive-grid responsive-grid-3">
-              <div className="card">
-                <div className="card-header">
-                  <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.depositAddress")}</h3>
-                  <span className="badge badge-info">ACP</span>
-                </div>
-                <div style={{ marginTop: 10, color: "var(--text-muted)", fontSize: "0.9rem" }}>{t("walletAcpPage.sendAcpTo")}</div>
-                <div style={{ marginTop: 10, padding: 12, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                  {busy && !singleWalletAddress ? t("walletAcpPage.loading") : (singleWalletAddress || t("walletAcpPage.dash"))}
-                </div>
-                {depositNote ? (
-                  <div style={{ marginTop: 8, color: "#f59e0b", fontSize: "0.85rem", lineHeight: 1.45 }}>{depositNote}</div>
-                ) : null}
-                {needsPersonalize ? (
-                  <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-                    <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.85rem", lineHeight: 1.45 }}>
-                      {t("walletAcpPage.personalizeLead")}
-                    </p>
-                    <input
-                      type="password"
-                      placeholder={t("walletAcpPage.walletPassword")}
-                      value={personalizePassword}
-                      onChange={(e) => setPersonalizePassword(e.target.value)}
-                      style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)" }}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      disabled={personalizeBusy || personalizePassword.length < 8}
-                      onClick={() => {
-                        void (async () => {
-                          setPersonalizeBusy(true);
-                          setError("");
-                          try {
-                            const res = (await walletAcp.personalizeWallet({
-                              wallet_password: personalizePassword,
-                            })) as { address?: string; wallet_backup_mnemonic?: string };
-                            const next = String(res?.address || "").trim();
-                            const mnemonic = String(res?.wallet_backup_mnemonic || "").trim();
-                            if (next) {
-                              setDepositAddress(next);
+            {section === "receive" && (
+              <section className={s.narrow}>
+                <div className={s.panel}>
+                  <span className={s.eyebrow}>{c.network}</span>
+                  <h2>{c.receive}</h2>
+                  <p className={s.muted}>{c.receiveHint}</p>
+                  {needsPersonalize ? (
+                    <div className={s.stack}>
+                      <p>{t("walletAcpPage.personalizeLead")}</p>
+                      {field(
+                        t("walletAcpPage.walletPassword"),
+                        <input
+                          type="password"
+                          value={personalPassword}
+                          onChange={(e) => setPersonalPassword(e.target.value)}
+                          autoComplete="current-password"
+                        />,
+                      )}
+                      <button
+                        className={s.primary}
+                        disabled={busy || personalPassword.length < 8}
+                        onClick={() => {
+                          const secret = personalPassword;
+                          setPersonalPassword("");
+                          void perform(
+                            () =>
+                              walletAcp.personalizeWallet({
+                                wallet_password: secret,
+                              }),
+                            (value) => {
+                              setAddress(value.address || "");
                               setNeedsPersonalize(false);
-                              setDepositNote("");
-                              setPersonalizePassword("");
-                              setPersonalizeMnemonic(mnemonic);
-                              setSwapInfo(t("walletAcpPage.personalizeSuccess"));
-                              await refreshAll();
-                            }
-                          } catch (e: any) {
-                            setError(e?.message || t("walletAcpPage.personalizeFailed"));
-                          } finally {
-                            setPersonalizeBusy(false);
-                          }
-                        })();
-                      }}
-                    >
-                      {personalizeBusy ? t("walletAcpPage.generating") : t("walletAcpPage.personalizeWallet")}
-                    </button>
-                    {personalizeMnemonic ? (
-                      <div style={{ marginTop: 4, padding: 12, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)" }}>
-                        <div style={{ color: "#f59e0b", fontSize: "0.85rem", marginBottom: 8 }}>{t("walletAcpPage.personalizeMnemonicLead")}</div>
-                        <div style={{ overflowWrap: "anywhere", fontFamily: "ui-monospace, monospace", fontSize: "0.85rem" }}>{personalizeMnemonic}</div>
-                        <button type="button" className="btn btn-ghost" style={{ marginTop: 8 }} onClick={() => copy(personalizeMnemonic)}>{t("walletAcpPage.copy")}</button>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-                <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
-                  <button type="button" className="btn btn-ghost" onClick={() => copy(singleWalletAddress)} disabled={!singleWalletAddress || needsPersonalize}>{t("walletAcpPage.copy")}</button>
-                </div>
-                <div style={{ marginTop: 16, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-                  <h4 style={{ margin: "0 0 8px", fontWeight: 800 }}>{t("walletAcpPage.privacyReceive")}</h4>
-                  <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.85rem", lineHeight: 1.5 }}>
-                    {t("walletAcpPage.privacyReceiveLead")}
-                  </p>
-                  <input
-                    type="password"
-                    placeholder={t("walletAcpPage.walletPasswordOnce")}
-                    value={privacyPassword}
-                    onChange={(e) => setPrivacyPassword(e.target.value)}
-                    style={{ marginTop: 10, width: "100%", padding: 10, borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)" }}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    style={{ marginTop: 10 }}
-                    disabled={privacyBusy}
-                    onClick={() => {
-                      void (async () => {
-                        setPrivacyBusy(true);
-                        setError("");
-                        try {
-                          const res = (await walletAcp.privacyReceiveAddress({
-                            wallet_password: privacyPassword || undefined,
-                            label: "web-wallet",
-                          })) as { address?: string };
-                          setPrivacyAddress(res.address || "");
-                          setPrivacyPassword("");
-                        } catch (err) {
-                          setError(err instanceof Error ? err.message : t("walletAcpPage.privacyAddressFailed"));
-                        } finally {
-                          setPrivacyBusy(false);
-                        }
-                      })();
-                    }}
-                  >
-                    {privacyBusy ? t("walletAcpPage.generating") : t("walletAcpPage.newPrivacyAddress")}
-                  </button>
-                  {privacyAddress ? (
-                    <div style={{ marginTop: 10, padding: 12, borderRadius: 10, border: "1px solid var(--border)", overflowWrap: "anywhere" }}>
-                      {privacyAddress}
-                      <div style={{ marginTop: 8 }}>
-                        <button type="button" className="btn btn-ghost" onClick={() => copy(privacyAddress)}>{t("walletAcpPage.copy")}</button>
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-header">
-                  <h3 style={{ fontWeight: 800, margin: 0 }}>{isOperatorHotView ? t("walletAcpPage.operatorHotWallet") : t("walletAcpPage.walletBalance")}</h3>
-                  <span className="badge badge-active">
-                    {balance?.probe_status === "unavailable"
-                      ? t("walletAcpPage.probeUnavailable")
-                      : balance?.probe_status === "degraded" || (balance?.balance_status && balance.balance_status !== "live")
-                        ? t("walletAcpPage.probeDegraded")
-                        : t("walletAcpPage.live")}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    marginTop: 12,
-                    fontSize: "clamp(1.25rem, 4vw, 2rem)",
-                    fontWeight: 900,
-                    color: "var(--text)",
-                    overflowWrap: "anywhere",
-                    wordBreak: "break-word",
-                    lineHeight: 1.15,
-                    maxWidth: "100%",
-                  }}
-                  title={heroAcp ? `${heroAcp} ACP` : undefined}
-                >
-                  {balanceBusy && !balance
-                    ? t("walletAcpPage.loading")
-                    : (heroAcp != null ? formatAcpDisplay(heroAcp) : t("walletAcpPage.dash"))}{" "}
-                  <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-muted)" }}>ACP</span>
-                </div>
-                {balance?.primary_kind && (
-                  <div style={{ marginTop: 4, color: "var(--text-muted)", fontSize: "0.78rem" }}>
-                    {balance.primary_kind === "chain_supply"
-                      ? t("walletAcpPage.primaryKindSupply")
-                      : balance.primary_kind === "operator_total"
-                      ? t("walletAcpPage.primaryKindOperator")
-                      : balance.primary_kind === "platform_credits"
-                        ? t("walletAcpPage.primaryKindCredits")
-                        : t("walletAcpPage.primaryKindOnChain")}
-                  </div>
-                )}
-                {balance?.balance_status && balance.balance_status !== "live" && (
-                  <div style={{ marginTop: 6, color: "var(--text-muted)", fontSize: "0.8rem" }}>
-                    {t("walletAcpPage.statusLabel").replace("{status}", balance.balance_status)}
-                  </div>
-                )}
-                {balance?.utxo_count != null && <div style={{ marginTop: 10, color: "var(--text-muted)", fontSize: "0.85rem" }}>{t("walletAcpPage.utxoCount").replace("{n}", String(balance.utxo_count))}</div>}
-                {balance?.chain_height != null && (
-                  <div style={{ marginTop: 4, color: "var(--text-muted)", fontSize: "0.78rem" }}>
-                    {t("walletAcpPage.chainHeight").replace("{n}", String(balance.chain_height))}
-                  </div>
-                )}
-
-                {isOperatorHotView && balance?.tokenomics_buckets && balance.tokenomics_buckets.length > 0 ? (
-                  <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.78rem", lineHeight: 1.45 }}>
-                      {t("walletAcpPage.operatorBucketsLiveNote")}
-                    </div>
-                    {balance.tokenomics_buckets.map((bucket) => (
-                      <div
-                        key={bucket.key}
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 10,
-                          border: "1px solid var(--border)",
-                          background: "var(--bg)",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          gap: 12,
-                          flexWrap: "wrap",
-                          minWidth: 0,
-                          overflow: "hidden",
+                              setBackup(value.wallet_backup_mnemonic || "");
+                              void refreshWallet();
+                            },
+                          );
                         }}
                       >
-                        <strong style={{ color: "var(--text)", minWidth: 0, overflowWrap: "anywhere" }}>{bucket.label}</strong>
-                        <span
-                          style={{ color: "var(--text-muted)", fontSize: "0.9rem", minWidth: 0, overflowWrap: "anywhere", textAlign: "right" }}
-                          title={`${bucket.acp} ACP`}
+                        {t("walletAcpPage.personalizeWallet")}
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <label className={s.field}>
+                        <span>{c.address}</span>
+                        <code className={s.address}>
+                          {address || c.unknown}
+                        </code>
+                      </label>
+                      <button
+                        className={s.primary}
+                        disabled={!address || busy}
+                        onClick={() => void copy(address)}
+                      >
+                        {t("walletAcpPage.copy")}
+                      </button>
+                    </>
+                  )}
+                  {depositNote && <p className={s.warning}>{depositNote}</p>}
+                  {backup && (
+                    <section className={s.backup}>
+                      <h3>{c.backup}</h3>
+                      <p>{c.backupHint}</p>
+                      <code>{backup}</code>
+                      <div className={s.actions}>
+                        <button
+                          className={s.secondary}
+                          onClick={() => void copy(backup)}
                         >
-                          <strong style={{ color: "var(--text)" }}>{formatAcpDisplay(bucket.acp)} ACP</strong>
-                          {t(bucket.utxo_count === 1 ? "walletAcpPage.utxoOne" : "walletAcpPage.utxoMany").replace("{n}", String(bucket.utxo_count))}
-                        </span>
+                          {t("walletAcpPage.copy")}
+                        </button>
+                        <button
+                          className={s.secondary}
+                          onClick={() => setBackup("")}
+                        >
+                          {c.backupSaved}
+                        </button>
                       </div>
-                    ))}
-                    {balance.operator_controlled_live_acp != null && (
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                        {t("walletAcpPage.operatorLiveTotal")}{" "}
-                        <strong style={{ color: "var(--text)" }} title={`${balance.operator_controlled_live_acp} ACP`}>
-                          {formatAcpDisplay(balance.operator_controlled_live_acp)} ACP
-                        </strong>
-                      </div>
+                    </section>
+                  )}
+                  <details className={s.details}>
+                    <summary>{t("walletAcpPage.privacyReceive")}</summary>
+                    <p className={s.muted}>
+                      {t("walletAcpPage.privacyReceiveLead")}
+                    </p>
+                    {field(
+                      t("walletAcpPage.walletPasswordOnce"),
+                      <input
+                        type="password"
+                        value={privacyPassword}
+                        onChange={(e) => setPrivacyPassword(e.target.value)}
+                        autoComplete="current-password"
+                      />,
                     )}
-                    {balance.operator_hot_live_acp != null && (
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                        {t("walletAcpPage.operatorHotLive")}{" "}
-                        <strong style={{ color: "var(--text)" }} title={`${balance.operator_hot_live_acp} ACP`}>
-                          {formatAcpDisplay(balance.operator_hot_live_acp)} ACP
-                        </strong>
-                      </div>
+                    <button
+                      className={s.secondary}
+                      disabled={busy || needsPersonalize}
+                      onClick={() => {
+                        const secret = privacyPassword;
+                        setPrivacyPassword("");
+                        void perform(
+                          () =>
+                            walletAcp.privacyReceiveAddress({
+                              wallet_password: secret || undefined,
+                              label: "web-wallet",
+                            }),
+                          (value) => setPrivacyAddress(value.address || ""),
+                        );
+                      }}
+                    >
+                      {t("walletAcpPage.newPrivacyAddress")}
+                    </button>
+                    {privacyAddress && (
+                      <>
+                        <code className={s.address}>{privacyAddress}</code>
+                        <button
+                          className={s.secondary}
+                          onClick={() => void copy(privacyAddress)}
+                        >
+                          {t("walletAcpPage.copy")}
+                        </button>
+                      </>
                     )}
+                  </details>
+                </div>
+                <div className={s.actions}>
+                  <Link className={s.secondary} href="/buy-acp">
+                    {c.buy}
+                  </Link>
+                  <Link className={s.secondary} href="/bridge/acp-bsc">
+                    {c.bridge}
+                  </Link>
+                </div>
+              </section>
+            )}
+            {section === "send" && (
+              <section className={s.narrow}>
+                <div className={s.panel}>
+                  <h2>{c.send}</h2>
+                  <p className={s.muted}>{c.sendHint}</p>
+                  <div className={s.available}>
+                    {c.available}
+                    <strong>{money(available)} ACP</strong>
                   </div>
-                ) : (
-                  <>
-                    {balance?.units != null && balance.units !== "" && (
-                      <div style={{ marginTop: 6, color: "var(--text-muted)", fontSize: "0.78rem", lineHeight: 1.45, overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                        {t("walletAcpPage.smallestUnits")} <strong style={{ color: "var(--text)", fontWeight: 700 }}>{balance.units}</strong>
-                        <span style={{ opacity: 0.85 }}> {t("walletAcpPage.smallestUnitsHint")}</span>
+                  {attempted ? (
+                    <section className={s.stack} aria-live="polite">
+                      <h3>
+                        {result?.accepted === true && result?.txid
+                          ? c.submitted
+                          : busy
+                            ? t("walletAcpPage.sending")
+                            : c.uncertain}
+                      </h3>
+                      {review && (
+                        <dl className={s.facts}>
+                          <div>
+                            <dt>{c.recipient}</dt>
+                            <dd>{review.address}</dd>
+                          </div>
+                          <div>
+                            <dt>{c.total}</dt>
+                            <dd>{review.total} ACP</dd>
+                          </div>
+                        </dl>
+                      )}
+                      {result?.txid && (
+                        <Link
+                          className={s.transactionLink}
+                          href={`/acp/tx/${encodeURIComponent(result.txid)}`}
+                        >
+                          {result.txid} ↗
+                        </Link>
+                      )}
+                      {result?.accepted === true && result?.txid ? (
+                        <p className={s.muted}>{c.confirmations}</p>
+                      ) : (
+                        <p className={s.warning}>{c.uncertainHint}</p>
+                      )}
+                      {result?.job_id && (
+                        <div>
+                          <code className={s.scope}>ID: {result.job_id}</code>
+                          <button
+                            className={s.secondary}
+                            disabled={busy}
+                            onClick={() =>
+                              void perform(
+                                () => walletAcp.getWithdrawJob(result.job_id!),
+                                (value) => {
+                                  setResult(value);
+                                  if (value.accepted === true)
+                                    void refreshWallet();
+                                },
+                              )
+                            }
+                          >
+                            {c.checkStatus}
+                          </button>
+                        </div>
+                      )}
+                      <div className={s.actions}>
+                        <button
+                          className={s.primary}
+                          disabled={busy}
+                          onClick={() => {
+                            setHistoryState("idle");
+                            navigate("history");
+                          }}
+                        >
+                          {c.history}
+                        </button>
+                        <button
+                          className={s.secondary}
+                          disabled={busy}
+                          onClick={() => {
+                            setAttempted(false);
+                            setResult(null);
+                            setReview(null);
+                            setAmount("");
+                            setRecipient("");
+                            setError("");
+                          }}
+                        >
+                          {c.newTransfer}
+                        </button>
                       </div>
-                    )}
-                  </>
-                )}
-
-                <div
-                  style={{
-                    marginTop: 14,
-                    paddingTop: 12,
-                    borderTop: "1px solid var(--border)",
-                    display: "grid",
-                    gap: 8,
-                    minWidth: 0,
-                    maxWidth: "100%",
+                    </section>
+                  ) : review ? (
+                    <form className={s.stack} onSubmit={submitTransfer}>
+                      <h3>{c.review}</h3>
+                      <p className={s.warning}>{c.reviewHint}</p>
+                      <dl className={s.facts}>
+                        <div>
+                          <dt>{c.network}</dt>
+                          <dd>ACP</dd>
+                        </div>
+                        <div>
+                          <dt>{c.recipient}</dt>
+                          <dd>{review.address}</dd>
+                        </div>
+                        <div>
+                          <dt>{c.amount}</dt>
+                          <dd>{review.amount} ACP</dd>
+                        </div>
+                        <div>
+                          <dt>{c.fee}</dt>
+                          <dd>{review.fee} ACP</dd>
+                        </div>
+                        <div className={s.total}>
+                          <dt>{c.total}</dt>
+                          <dd>{review.total} ACP</dd>
+                        </div>
+                      </dl>
+                      {field(
+                        t("walletAcpPage.walletPassword"),
+                        <input
+                          type="password"
+                          value={walletPassword}
+                          onChange={(e) => setWalletPassword(e.target.value)}
+                          autoComplete="current-password"
+                          required
+                        />,
+                      )}
+                      <div className={s.actions}>
+                        <button
+                          className={s.secondary}
+                          type="button"
+                          onClick={() => {
+                            setReview(null);
+                            setWalletPassword("");
+                          }}
+                        >
+                          {c.back}
+                        </button>
+                        <button
+                          className={s.primary}
+                          disabled={busy || !walletPassword || needsPersonalize}
+                          type="submit"
+                        >
+                          {c.confirm}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <form
+                      className={s.stack}
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        setError("");
+                        if (validation.error) {
+                          setError(validationMessage(validation.error));
+                          return;
+                        }
+                        setReview({
+                          address: recipient.trim(),
+                          amount: amount.trim(),
+                          fee: fee.trim(),
+                          total: validation.total!,
+                        });
+                      }}
+                    >
+                      {field(
+                        c.recipient,
+                        <input
+                          placeholder="acp1…"
+                          value={recipient}
+                          onChange={(e) => setRecipient(e.target.value)}
+                          autoComplete="off"
+                          spellCheck={false}
+                          required
+                        />,
+                      )}
+                      {field(
+                        c.amount,
+                        <div className={s.amountInput}>
+                          <input
+                            inputMode="decimal"
+                            placeholder="0.00"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            required
+                          />
+                          <button
+                            type="button"
+                            disabled={available === null}
+                            onClick={() =>
+                              setAmount(maximumSend(available, fee))
+                            }
+                          >
+                            {c.max}
+                          </button>
+                        </div>,
+                      )}
+                      <p className={s.feeLine}>
+                        {c.fee}
+                        <strong>{fee} ACP</strong>
+                      </p>
+                      <details className={s.details}>
+                        <summary>{c.customFee}</summary>
+                        <label className={s.checkbox}>
+                          <input
+                            type="checkbox"
+                            checked={customFee}
+                            onChange={(e) => {
+                              setCustomFee(e.target.checked);
+                              if (!e.target.checked) setFee(DEFAULT_ACP_FEE);
+                            }}
+                          />
+                          {c.customFee}
+                        </label>
+                        {customFee &&
+                          field(
+                            c.fee,
+                            <input
+                              inputMode="decimal"
+                              value={fee}
+                              onChange={(e) => setFee(e.target.value)}
+                            />,
+                          )}
+                      </details>
+                      {amount && validation.error && (
+                        <p className={s.warning}>
+                          {validationMessage(validation.error)}
+                        </p>
+                      )}
+                      <button
+                        className={s.primary}
+                        disabled={
+                          busy || !!validation.error || needsPersonalize
+                        }
+                        type="submit"
+                      >
+                        {c.review} →
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </section>
+            )}
+            {section === "history" && (
+              <section className={s.panel}>
+                <div className={s.sectionHeader}>
+                  <div>
+                    <h2>{c.history}</h2>
+                    <p>{c.historyHint}</p>
+                  </div>
+                  <Link href="/wallet/credits" className={s.secondary}>
+                    {c.openCredits}
+                  </Link>
+                </div>
+                <form
+                  className={s.historyForm}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void loadHistory(historyAddress);
                   }}
                 >
-                  <div style={{ color: "var(--text-muted)", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                    {t("walletAcpPage.balanceBreakdown")}
-                  </div>
-                  <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))", minWidth: 0 }}>
-                    <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", minWidth: 0, overflow: "hidden" }}>
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.72rem", marginBottom: 4 }}>{t("walletAcpPage.partitionOnChain")}</div>
-                      <strong style={{ color: "var(--text)", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }} title={onChainAtDeposit ? `${onChainAtDeposit} ACP` : undefined}>
-                        {onChainAtDeposit != null ? formatAcpDisplay(onChainAtDeposit) : t("walletAcpPage.dash")} ACP
-                      </strong>
-                    </div>
-                    <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", minWidth: 0, overflow: "hidden" }}>
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.72rem", marginBottom: 4 }}>{t("walletAcpPage.partitionLedger")}</div>
-                      <strong style={{ color: "var(--text)", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }} title={`${platformLedger ?? "0"} ACP`}>
-                        {formatAcpDisplay(platformLedger ?? "0")} ACP
-                      </strong>
-                    </div>
-                    <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", minWidth: 0, overflow: "hidden" }}>
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.72rem", marginBottom: 4 }}>{t("walletAcpPage.partitionReserved")}</div>
-                      <strong style={{ color: "var(--text)", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }} title={`${reservedTotal ?? stakedAcp ?? "0"} ACP`}>
-                        {formatAcpDisplay(reservedTotal ?? stakedAcp ?? "0")} ACP
-                      </strong>
-                      {(stakedAcp != null || balance?.in_work_ledger_acp != null) && (
-                        <div style={{ marginTop: 4, color: "var(--text-muted)", fontSize: "0.72rem", lineHeight: 1.4, overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                          {t("walletAcpPage.stakesLedger")
-                            .replace("{stakes}", stakedAcp != null ? formatAcpDisplay(stakedAcp) : "—")
-                            .replace("{ledger}", formatAcpDisplay(balance?.in_work_ledger_acp ?? platformLedger ?? "—"))}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", minWidth: 0, overflow: "hidden" }}>
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.72rem", marginBottom: 4 }}>{t("walletAcpPage.partitionWithdrawable")}</div>
-                      <strong style={{ color: "var(--text)", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }} title={`${withdrawableNow} ACP`}>
-                        {formatAcpDisplay(withdrawableNow)} ACP
-                      </strong>
-                      {balance?.withdraw_source && (
-                        <div style={{ marginTop: 4, color: "var(--text-muted)", fontSize: "0.72rem", overflowWrap: "anywhere" }}>
-                          {balance.withdraw_source === "custodial_hot"
-                            ? t("walletAcpPage.withdrawSourceHot")
-                            : balance.withdraw_source === "personal_utxo"
-                              ? t("walletAcpPage.withdrawSourceUtxo")
-                              : t("walletAcpPage.withdrawSourceNone")}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {balance?.vested_unlocked_acp != null && (
-                  <div style={{ marginTop: 8, color: "var(--text-muted)", fontSize: "0.85rem", overflowWrap: "anywhere" }}>
-                    {t("walletAcpPage.vestedUnlocked")}{" "}
-                    <strong style={{ color: "var(--text)" }} title={`${balance.vested_unlocked_acp} ACP`}>
-                      {formatAcpDisplay(balance.vested_unlocked_acp)} ACP
-                    </strong>
-                  </div>
-                )}
-                {balance?.vested_locked_acp != null && (
-                  <div style={{ marginTop: 4, color: "var(--text-muted)", fontSize: "0.85rem", overflowWrap: "anywhere" }}>
-                    {t("walletAcpPage.vestedLocked")}{" "}
-                    <strong style={{ color: "var(--text)" }} title={`${balance.vested_locked_acp} ACP`}>
-                      {formatAcpDisplay(balance.vested_locked_acp)} ACP
-                    </strong>
-                  </div>
-                )}
-                {balance?.balance_note ? (
-                  <div style={{ marginTop: 8, color: "var(--text-muted)", fontSize: "0.8rem", lineHeight: 1.5, overflowWrap: "anywhere", wordBreak: "break-word", maxWidth: "100%" }}>
-                    {balance.balance_note}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="card">
-                <div className="card-header">
-                  <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.withdraw")}</h3>
-                  <span className="badge badge-warning">{t("walletAcpPage.signed")}</span>
-                </div>
-                <form onSubmit={doWithdraw} style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                  <input placeholder={t("walletAcpPage.toAddressPlaceholder")} value={withdrawForm.to_address} onChange={(e) => setWithdrawForm((p) => ({ ...p, to_address: e.target.value.trim() }))} className="input input-bordered w-full" required aria-invalid={withdrawForm.to_address.length > 0 && !withdrawAddressValid} autoComplete="off" />
-                  {withdrawForm.to_address.length > 0 && !withdrawAddressValid && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{t("walletAcpPage.addressMustStartAcp1Before")} <code>acp1</code>{t("walletAcpPage.addressMustStartAcp1After")}</div>}
-                  <input placeholder={t("walletAcpPage.amountAcpPlaceholder")} value={withdrawForm.amount_acp} onChange={(e) => setWithdrawForm((p) => ({ ...p, amount_acp: e.target.value }))} className="input input-bordered w-full" inputMode="decimal" required aria-invalid={withdrawForm.amount_acp.length > 0 && (!withdrawAmountValid || withdrawExceedsBalance)} />
-                  {withdrawExceedsBalance && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{t("walletAcpPage.amountExceedsBalance").replace("{amount}", balance?.withdrawable_now_acp ?? balance?.available_acp ?? balance?.acp ?? "0")}</div>}
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <label style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{t("walletAcpPage.feeMode")}</label>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button type="button" className="btn btn-ghost" onClick={() => { setWithdrawFeeMode("auto"); setWithdrawFeeAcp(ACP_FIXED_MIN_FEE); }} style={{ borderColor: withdrawFeeMode === "auto" ? "rgba(16, 185, 129, 0.5)" : undefined, color: withdrawFeeMode === "auto" ? "#34d399" : undefined }}>{t("walletAcpPage.auto")}</button>
-                      <button type="button" className="btn btn-ghost" onClick={() => setWithdrawFeeMode("manual")} style={{ borderColor: withdrawFeeMode === "manual" ? "rgba(16, 185, 129, 0.5)" : undefined, color: withdrawFeeMode === "manual" ? "#34d399" : undefined }}>{t("walletAcpPage.manual")}</button>
-                    </div>
-                    <input placeholder={t("walletAcpPage.feeAcpPlaceholder")} value={withdrawFeeAcp} onChange={(e) => setWithdrawFeeAcp(e.target.value)} className="input input-bordered w-full" inputMode="decimal" disabled={withdrawFeeMode === "auto"} />
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>
-                      {withdrawFeeMode === "auto" ? t("walletAcpPage.autoFeeHint").replace("{fee}", ACP_FIXED_MIN_FEE) : t("walletAcpPage.manualFeeHint")}
-                    </div>
-                  </div>
-                  <input type="password" placeholder={t("walletAcpPage.walletPassword")} value={withdrawForm.wallet_password} onChange={(e) => setWithdrawForm((p) => ({ ...p, wallet_password: e.target.value }))} className="input input-bordered w-full" required autoComplete="current-password" />
-                  <button className="btn btn-primary" type="submit" disabled={withdrawDisabled}>{busy ? t("walletAcpPage.sending") : t("walletAcpPage.withdraw")}</button>
-                </form>
-                {withdrawResult && <pre style={{ marginTop: 10, padding: 10, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", overflowX: "auto" }}>{JSON.stringify(withdrawResult, null, 2)}</pre>}
-                <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
-                  <h4 style={{ margin: 0 }}>{t("walletAcpPage.bulkDistribution")}</h4>
-                  <div style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: 4 }}>{t("walletAcpPage.bulkHintBefore")} <code>acp1... amount</code></div>
-                  <form onSubmit={runDistribution} style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                    <textarea className="input input-bordered w-full" rows={5} value={distributionPlan} onChange={(e) => setDistributionPlan(e.target.value)} placeholder={"acp1... 25000\nacp1... 15000"} />
-                    <input type="password" className="input input-bordered w-full" placeholder={t("walletAcpPage.walletPassword")} value={distributionPassword} onChange={(e) => setDistributionPassword(e.target.value)} required />
-                    <button className="btn btn-ghost" type="submit" disabled={busy}>{busy ? t("walletAcpPage.processing") : t("walletAcpPage.runBulk")}</button>
-                  </form>
-                  {distributionResult.length > 0 && <pre style={{ marginTop: 8, padding: 10, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", overflowX: "auto" }}>{JSON.stringify(distributionResult, null, 2)}</pre>}
-                </div>
-              </div>
-            </div>
-
-            <div className="card" id={PASSWORD_ROTATION_ID} ref={passwordSectionRef} tabIndex={-1} style={{ maxWidth: 760, scrollMarginTop: 110 }}>
-              {recoveryMode && (
-                <div style={{ marginBottom: 14, padding: "12px", borderRadius: "8px", background: "rgba(245,158,11,0.12)", color: "#fbbf24", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{t("walletAcpPage.recoveryTitle")}</div>
-                  <div>{t("walletAcpPage.recoveryLine1")}</div>
-                  <div>{t("walletAcpPage.recoveryLine2")}</div>
-                  <div>{t("walletAcpPage.recoveryLine3")}</div>
-                </div>
-              )}
-              <div className="card-header">
-                <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.passwordSectionTitle")}</h3>
-                <span className="badge badge-warning">{t("walletAcpPage.safeRotation")}</span>
-              </div>
-              <div style={{ marginTop: 10, color: "var(--text-muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                {t("walletAcpPage.passwordSectionLead")}
-              </div>
-              <form onSubmit={submitPasswordChange} style={{ marginTop: 14, display: "grid", gap: 10, maxWidth: 420 }}>
-                <input
-                  type="password"
-                  className="input input-bordered w-full"
-                  placeholder={t("walletAcpPage.currentPassword")}
-                  value={passwordChangeForm.current_password}
-                  onChange={(e) => setPasswordChangeForm((p) => ({ ...p, current_password: e.target.value }))}
-                  autoComplete="current-password"
-                  required
-                />
-                <input
-                  type="password"
-                  className="input input-bordered w-full"
-                  placeholder={t("walletAcpPage.newPassword")}
-                  value={passwordChangeForm.new_password}
-                  onChange={(e) => setPasswordChangeForm((p) => ({ ...p, new_password: e.target.value }))}
-                  autoComplete="new-password"
-                  required
-                  minLength={8}
-                />
-                <input
-                  type="password"
-                  className="input input-bordered w-full"
-                  placeholder={t("walletAcpPage.confirmNewPassword")}
-                  value={passwordChangeForm.confirm_password}
-                  onChange={(e) => setPasswordChangeForm((p) => ({ ...p, confirm_password: e.target.value }))}
-                  autoComplete="new-password"
-                  required
-                  minLength={8}
-                />
-                <button className="btn btn-primary" type="submit" disabled={passwordChangeBusy}>
-                  {passwordChangeBusy ? t("walletAcpPage.updatingPassword") : t("walletAcpPage.changePasswordSafely")}
-                </button>
-              </form>
-            </div>
-
-            <div className="card" style={{ border: "1px solid rgba(52, 211, 153, 0.2)" }}>
-              <div className="card-header">
-                <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.internalSwapDesk")}</h3>
-                <span className="badge badge-info">Mobile Exchange</span>
-              </div>
-              <p style={{ marginTop: 12, color: "var(--text-muted)", lineHeight: 1.7, fontSize: "0.95rem" }}>
-                Web USDT TRC-20 → ACP desk sale is disabled. Use the ANCAP mobile wallet Exchange tab for USDT→ACP
-                tickets, or buy via bridge / credits below.
-              </p>
-              <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a className="btn btn-primary" href="/bridge">Bridge wACP ↔ ACP</a>
-                <a className="btn btn-ghost" href="/wallet/credits">Credits</a>
-                <a className="btn btn-ghost" href="/buy-acp">Buy ACP options</a>
-              </div>
-            </div>
-
-            <OtcIntakeDesk defaultPayoutAddress={singleWalletAddress} />
-            <div style={{ marginTop: 24 }}>
-              <AssayGcDesk />
-              <OwnershipProofDesk />
-            </div>
-
-            <div className="card" style={{ border: "1px solid rgba(56, 189, 248, 0.22)", background: "linear-gradient(180deg, rgba(14, 165, 233, 0.08), rgba(255,255,255,0.02))" }}>
-              <div className="card-header">
-                <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.wacpTitle")}</h3>
-                <span className="badge badge-info">ACP {"->"} BSC</span>
-              </div>
-              <div style={{ marginTop: 12, display: "grid", gap: 8, color: "var(--text-muted)", fontSize: "0.92rem", lineHeight: 1.65 }}>
-                <div>{t("walletAcpPage.pairLiveBefore")} <strong style={{ color: "var(--text)" }}>wACP/USDT</strong> {t("walletAcpPage.pairLiveAfter")}</div>
-                <div>{t("walletAcpPage.poolLabel")} <code>0xF391ca2bcBaB93Afa23326ebF1e35DB950841601</code></div>
-                <div>{t("walletAcpPage.contractLabel")} <code>0x349797E2f1A4FD722Af2dB181ab1C4ED7606F402</code></div>
-                <div>{t("walletAcpPage.liveRailBefore")} <strong style={{ color: "var(--text)" }}>{t("walletAcpPage.liveRailValue")}</strong></div>
-                <div>{t("walletAcpPage.plannedRailBefore")} <strong style={{ color: "var(--text)" }}>{t("walletAcpPage.plannedRailValue")}</strong> {t("walletAcpPage.plannedRailAfter")}</div>
-                <div>{t("walletAcpPage.currentState")}</div>
-              </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14, alignItems: "flex-start" }}>
-                <Link href="/bridge/acp-bsc" className="btn btn-primary">{t("walletAcpPage.openBridge")}</Link>
-                <WacpPublicActions layout="compact" />
-                <a href="https://pancakeswap.finance/swap?inputCurrency=0x55d398326f99059fF775485246999027B3197955&outputCurrency=0x349797E2f1A4FD722Af2dB181ab1C4ED7606F402" className="btn btn-ghost" target="_blank" rel="noreferrer">{t("walletAcpPage.openSwap")}</a>
-                <a href="https://pancakeswap.finance/liquidity/pool/bsc/0xF391ca2bcBaB93Afa23326ebF1e35DB950841601" className="btn btn-ghost" target="_blank" rel="noreferrer">{t("walletAcpPage.viewPool")}</a>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-header">
-                <h3 style={{ fontWeight: 800, margin: 0 }}>{t("walletAcpPage.onChainHistory")}</h3>
-                <span className="badge badge-active">{t("walletAcpPage.explorer")}</span>
-              </div>
-              <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                <label style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{t("walletAcpPage.addressLabel")}</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <input className="input input-bordered w-full" value={txAddressInput} onChange={(e) => setTxAddressInput(e.target.value)} placeholder="acp1..." />
-                  <button type="button" className="btn btn-ghost" onClick={() => refreshTransactionsByAddress(txAddressInput)} disabled={historyBusy || !txAddressInput.trim()}>{t("walletAcpPage.loadHistory")}</button>
-                  <button type="button" className="btn btn-ghost" onClick={() => { const walletAddress = (singleWalletAddress || "").trim(); if (!walletAddress) return; setTxAddressInput(walletAddress); refreshTransactionsByAddress(walletAddress, { skipBalance: false }); }} disabled={historyBusy || !singleWalletAddress}>{t("walletAcpPage.useMyWallet")}</button>
-                  {isOperatorHotView ? (
+                  {field(
+                    c.address,
+                    <input
+                      value={historyAddress}
+                      onChange={(e) => setHistoryAddress(e.target.value)}
+                      placeholder="acp1…"
+                      spellCheck={false}
+                    />,
+                  )}
+                  <button
+                    className={s.secondary}
+                    type="submit"
+                    disabled={
+                      historyState === "loading" ||
+                      !isAcpAddress(historyAddress)
+                    }
+                  >
+                    {t("walletAcpPage.loadHistory")}
+                  </button>
+                  <button
+                    type="button"
+                    className={s.secondary}
+                    disabled={!address || historyState === "loading"}
+                    onClick={() => {
+                      setHistoryAddress(address);
+                      void loadHistory(address);
+                    }}
+                  >
+                    {t("walletAcpPage.useMyWallet")}
+                  </button>
+                  {operator && (
                     <button
+                      className={s.secondary}
                       type="button"
-                      className="btn btn-ghost"
                       onClick={() => {
-                        setTxAddressInput(CUSTODIAL_HOT_ADDRESS);
-                        refreshTransactionsByAddress(CUSTODIAL_HOT_ADDRESS, { skipBalance: false });
+                        setHistoryAddress(HOT_ADDRESS);
+                        void loadHistory(HOT_ADDRESS);
                       }}
-                      disabled={historyBusy}
                     >
                       {t("walletAcpPage.useCustodialHot")}
                     </button>
-                  ) : null}
+                  )}
+                </form>
+                {activeAddress && (
+                  <code className={s.scope}>{activeAddress}</code>
+                )}
+                {historyState === "loading" || historyState === "idle" ? (
+                  <p role="status" className={s.empty}>
+                    {t("walletAcpPage.historyLoading")}
+                  </p>
+                ) : historyState === "error" ? (
+                  <div className={s.error} role="alert">
+                    <p>{c.historyError}</p>
+                    <button
+                      className={s.secondary}
+                      onClick={() => void loadHistory(activeAddress || address)}
+                    >
+                      {t("walletAcpPage.loadHistory")}
+                    </button>
+                  </div>
+                ) : transactions.length === 0 ? (
+                  <div className={s.empty}>
+                    <WalletIcon name="history" />
+                    <h3>{c.emptyHistory}</h3>
+                    <button
+                      className={s.secondary}
+                      onClick={() => navigate("receive")}
+                    >
+                      {c.receive} ACP
+                    </button>
+                  </div>
+                ) : (
+                  <ul className={s.transactions}>
+                    {transactions.map((tx) => (
+                      <li key={`${tx.txid}-${tx.block_height}`}>
+                        <div className={s.transactionIcon}>
+                          <WalletIcon
+                            name={tx.direction === "in" ? "receive" : "send"}
+                          />
+                        </div>
+                        <div className={s.transactionBody}>
+                          <strong>
+                            {tx.direction === "in"
+                              ? c.incoming
+                              : tx.direction === "out"
+                                ? c.outgoing
+                                : c.self}
+                          </strong>
+                          <Link href={`/acp/tx/${encodeURIComponent(tx.txid)}`}>
+                            {tx.txid}
+                          </Link>
+                          <span>
+                            {Number.isNaN(Date.parse(tx.block_time))
+                              ? tx.block_time
+                              : new Date(tx.block_time).toLocaleString(
+                                  lang,
+                                )}{" "}
+                            ·{" "}
+                            {t("walletAcpPage.blockConf")
+                              .replace("{height}", String(tx.block_height))
+                              .replace("{conf}", String(tx.confirmations))}
+                          </span>
+                        </div>
+                        <strong
+                          className={
+                            tx.net_acp.startsWith("-") ? s.negative : s.positive
+                          }
+                        >
+                          {money(tx.net_acp)} ACP
+                        </strong>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+            {section === "security" && (
+              <section
+                className={`${s.panel} ${s.narrow}`}
+                id="password-security"
+                ref={securityRef}
+                tabIndex={-1}
+              >
+                <span className={s.eyebrow}>{c.security}</span>
+                <h2>{t("walletAcpPage.passwordSectionTitle")}</h2>
+                <p className={s.muted}>
+                  {t("walletAcpPage.passwordSectionLead")}
+                </p>
+                {typeof window !== "undefined" &&
+                  window.location.hash === "#password-security" && (
+                    <p className={s.warning}>
+                      {t("walletAcpPage.recoveryLine3")}
+                    </p>
+                  )}
+                <form
+                  className={s.stack}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (passwords.next !== passwords.confirm) {
+                      setError(t("walletAcpPage.passwordsMismatch"));
+                      return;
+                    }
+                    const snapshot = passwords;
+                    setPasswords({ current: "", next: "", confirm: "" });
+                    void perform(
+                      () => changePassword(snapshot.current, snapshot.next),
+                      () => setNotice(t("walletAcpPage.passwordUpdated")),
+                    );
+                  }}
+                >
+                  {field(
+                    t("walletAcpPage.currentPassword"),
+                    <input
+                      type="password"
+                      value={passwords.current}
+                      onChange={(e) =>
+                        setPasswords((p) => ({ ...p, current: e.target.value }))
+                      }
+                      autoComplete="current-password"
+                      required
+                      minLength={8}
+                    />,
+                  )}
+                  {field(
+                    t("walletAcpPage.newPassword"),
+                    <input
+                      type="password"
+                      value={passwords.next}
+                      onChange={(e) =>
+                        setPasswords((p) => ({ ...p, next: e.target.value }))
+                      }
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                    />,
+                  )}
+                  {field(
+                    t("walletAcpPage.confirmNewPassword"),
+                    <input
+                      type="password"
+                      value={passwords.confirm}
+                      onChange={(e) =>
+                        setPasswords((p) => ({ ...p, confirm: e.target.value }))
+                      }
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                    />,
+                  )}
+                  <button className={s.primary} disabled={busy} type="submit">
+                    {t("walletAcpPage.changePasswordSafely")}
+                  </button>
+                </form>
+              </section>
+            )}
+            {section === "services" && (
+              <section className={s.stack}>
+                <div>
+                  <h2>{c.services}</h2>
+                  <p className={s.muted}>{c.servicesHint}</p>
                 </div>
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{t("walletAcpPage.showing")} <span style={{ color: "var(--text)" }}>{txAddressActive || t("walletAcpPage.dash")}</span></div>
-                <div style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-                  {t("walletAcpPage.balanceLabel")} <strong style={{ color: "var(--text)" }}>{txAddressBalance?.acp ?? "0"} ACP</strong>
-                  {txAddressBalance?.utxo_count != null ?  t("walletAcpPage.utxoOne").replace("{n}", String(txAddressBalance.utxo_count)) : ""}
-                  {txAddressBalance?.units != null && txAddressBalance.units !== "" ? <span style={{ fontSize: "0.78rem", display: "block", marginTop: 4, opacity: 0.9 }}>{t("walletAcpPage.unitsLine").replace("{units}", txAddressBalance.units)}</span> : null}
-                  {isOperatorHotView && txAddressActive === singleWalletAddress ? (
-                    <span style={{ fontSize: "0.78rem", display: "block", marginTop: 4, opacity: 0.9 }}>
-                      {t("walletAcpPage.explorerDepositNote")}
-                    </span>
-                  ) : null}
+                <div className={s.linkGrid}>
+                  <Link href="/buy-acp">
+                    <strong>{c.buy} →</strong>
+                    <span>ACP</span>
+                  </Link>
+                  <Link href="/bridge/acp-bsc">
+                    <strong>{c.bridge} →</strong>
+                    <span>BSC / ACP</span>
+                  </Link>
+                  <Link href="/wallet/credits">
+                    <strong>{c.openCredits} →</strong>
+                    <span>{c.creditsHint}</span>
+                  </Link>
                 </div>
-              </div>
-
-              {!historyLoaded ? (
-                <div style={{ marginTop: 12, color: "var(--text-muted)" }}>{t("walletAcpPage.historyLoading")}</div>
-              ) : historyBusy ? (
-                <div style={{ marginTop: 12, color: "var(--text-muted)" }}>{t("walletAcpPage.historyLoading")}</div>
-              ) : transactions.length === 0 ? (
-                <div style={{ marginTop: 12, color: "var(--text-muted)" }}>
-                  {isOperatorHotView && txAddressActive === singleWalletAddress
-                    ? t("walletAcpPage.noTransactionsOperatorDeposit")
-                    : t("walletAcpPage.noTransactions")}
-                </div>
-              ) : (
-                <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-                  {transactions.map((tx) => (
-                    <div key={`${tx.txid}-${tx.block_height}`} style={{ padding: 10, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", display: "grid", gap: 6 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                        <strong>{tx.direction.toUpperCase()}</strong>
-                        <span style={{ color: "var(--text-muted)" }}>{t("walletAcpPage.blockConf").replace("{height}", String(tx.block_height)).replace("{conf}", String(tx.confirmations))}</span>
-                      </div>
-                      <div style={{ overflowWrap: "anywhere", wordBreak: "break-word" }}>{tx.txid}</div>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                        <span style={{ color: "var(--text-muted)" }}>{t("walletAcpPage.sentLabel").replace("{amount}", tx.sent_acp)}</span>
-                        <span style={{ color: "var(--text-muted)" }}>{t("walletAcpPage.receivedLabel").replace("{amount}", tx.received_acp)}</span>
-                        <strong style={{ color: tx.net_acp.startsWith("-") ? "#ef4444" : "#10b981" }}>{t("walletAcpPage.netLabel").replace("{amount}", tx.net_acp)}</strong>
-                      </div>
-                      <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{tx.block_time}</div>
-                    </div>
+                <div className={s.toolButtons}>
+                  {[
+                    ["otc", "OTC"],
+                    ["assay", "GC / MS"],
+                    ["ownership", c.assetDocs],
+                    ["bulk", t("walletAcpPage.bulkDistribution")],
+                  ].map(([key, label]) => (
+                    <button
+                      key={key}
+                      disabled={busy}
+                      className={tool === key ? s.primary : s.secondary}
+                      onClick={() => setTool(tool === key ? "" : key)}
+                    >
+                      {label}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+                {tool === "otc" && <OtcDesk defaultPayoutAddress={address} />}{" "}
+                {tool === "assay" && <AssayDesk />}{" "}
+                {tool === "ownership" && <OwnershipDesk />}{" "}
+                {tool === "bulk" && (
+                  <WalletBulkTransfer
+                    key={user?.id}
+                    onBusyChange={setBusy}
+                    available={available}
+                    disabled={busy || needsPersonalize}
+                    onComplete={() => {
+                      void refreshWallet();
+                      setHistoryState("idle");
+                    }}
+                  />
+                )}
+              </section>
+            )}
+          </>
+        )}
+      </main>
+    </div>
   );
 }

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "ACP Wallet & Swap · ANCAP",
+  title: "ACP Wallet",
   description:
-    "Custodial ACP hot wallet: deposit, withdraw, distribute and swap Tether TRC-20 → ACP. Signed-in only.",
+    "Receive and send native ACP, review network activity and manage wallet security.",
   alternates: { canonical: "/wallet/acp" },
   robots: { index: false, follow: false },
 };
-
-export default function AcpWalletLayout({ children }: { children: React.ReactNode }) {
+export default function WalletLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return children;
 }
