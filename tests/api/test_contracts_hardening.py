@@ -98,8 +98,8 @@ def test_run_under_contract_requires_auth_and_worker(client, base_vertical_id):
     assert c.status_code == 201, c.text
     cid = c.json()["id"]
     if c.json()["status"] == "draft":
-        client.post(f"/v1/contracts/{cid}/propose")
-    client.post(f"/v1/contracts/{cid}/accept")
+        client.post(f"/v1/contracts/{cid}/propose", headers={"Authorization": f"Bearer {token}"})
+    client.post(f"/v1/contracts/{cid}/accept", headers={"Authorization": f"Bearer {token}"})
 
     vid, pool_id = _create_strategy_and_pool(client, worker, base_vertical_id)
 
@@ -141,8 +141,8 @@ def test_per_run_one_run_one_payout_and_max_runs(client, base_vertical_id):
     assert c.status_code == 201, c.text
     cid = c.json()["id"]
     if c.json()["status"] == "draft":
-        client.post(f"/v1/contracts/{cid}/propose")
-    client.post(f"/v1/contracts/{cid}/accept")
+        client.post(f"/v1/contracts/{cid}/propose", headers={"Authorization": f"Bearer {token}"})
+    client.post(f"/v1/contracts/{cid}/accept", headers={"Authorization": f"Bearer {token}"})
 
     vid, pool_id = _create_strategy_and_pool(client, worker, base_vertical_id)
 

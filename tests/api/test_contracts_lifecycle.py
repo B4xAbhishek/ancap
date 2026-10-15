@@ -203,7 +203,7 @@ def test_per_run_contract_payout_uses_succeeded_runs(client, base_vertical_id):
 
   # Make contract active
   client.post(f"/v1/contracts/{cid}/propose")
-  a = client.post(f"/v1/contracts/{cid}/accept")
+  a = client.post(f"/v1/contracts/{cid}/accept", headers={"Authorization": f"Bearer {token}"})
   assert a.status_code == 200, a.text
   assert a.json()["status"] == "active"
 

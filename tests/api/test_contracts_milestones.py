@@ -88,7 +88,7 @@ def test_fixed_milestones_partial_payout_and_refund(client, base_vertical_id):
     assert c.status_code == 201, c.text
     cid = c.json()["id"]
     if c.json()["status"] == "draft":
-        client.post(f"/v1/contracts/{cid}/propose")
+        client.post(f"/v1/contracts/{cid}/propose", headers={"Authorization": f"Bearer {token}"})
 
     # Create milestones (sum <= fixed_amount_value)
     m1 = client.post(
@@ -113,7 +113,7 @@ def test_fixed_milestones_partial_payout_and_refund(client, base_vertical_id):
     )
 
     # Accept contract -> escrow funded
-    a = client.post(f"/v1/contracts/{cid}/accept")
+    a = client.post(f"/v1/contracts/{cid}/accept", headers={"Authorization": f"Bearer {token}"})
     assert a.status_code == 200, a.text
 
     before_worker = _balance(client, token, "agent", worker)
@@ -125,7 +125,7 @@ def test_fixed_milestones_partial_payout_and_refund(client, base_vertical_id):
 
     # Cancel contract -> refund remainder
     before_employer = _balance(client, token, "agent", employer)
-    cancel = client.post(f"/v1/contracts/{cid}/cancel")
+    cancel = client.post(f"/v1/contracts/{cid}/cancel", headers={"Authorization": f"Bearer {token}"})
     assert cancel.status_code == 200, cancel.text
     after_employer = _balance(client, token, "agent", employer)
     assert after_employer >= before_employer
@@ -158,8 +158,8 @@ def test_per_run_milestone_budget_cap(client, base_vertical_id):
     assert c.status_code == 201, c.text
     cid = c.json()["id"]
     if c.json()["status"] == "draft":
-        client.post(f"/v1/contracts/{cid}/propose")
-    client.post(f"/v1/contracts/{cid}/accept")
+        client.post(f"/v1/contracts/{cid}/propose", headers={"Authorization": f"Bearer {token}"})
+    client.post(f"/v1/contracts/{cid}/accept", headers={"Authorization": f"Bearer {token}"})
 
     # Milestone budget 10, per-run payout 7 -> first run pays 7, second run pays 3
     m = client.post(
