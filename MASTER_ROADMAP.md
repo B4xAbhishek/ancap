@@ -1,5 +1,9 @@
 # ANCAP Master Roadmap
 
+## GitHub product presentation — 2026-10-15
+
+README now leads with the workflow product, an accessible SVG overview, direct product links, current release evidence and contributor entry points. Advanced operator/reference material remains collapsed and machine-checkable. GitHub repository description/topics are aligned with the workflow platform. No runtime or licensing changes are included.
+
 ## ACP wallet usability — 2026-10-15
 
 Web wallet hierarchy, balance clarity, reviewed transfers and on-demand services are implemented. Full CI passed; build `f4588a7` is deployed and verified, including five-language/mobile guest checks. [Scope and verification](docs/WALLET_UX_RELEASE_2026-10-15.md). Existing native/consensus/bridge/SACP work is not included.

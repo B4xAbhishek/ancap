@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="title desc">
+  <title id="title">ANCAP — Build, run and deliver paid AI workflows</title>
+  <desc id="desc">A task becomes a versioned workflow, a bounded AI execution, and a reviewed result with an execution receipt. ACP is the platform payment unit.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071b21"/><stop offset="1" stop-color="#0a101f"/></linearGradient>
+    <linearGradient id="accent"><stop stop-color="#39e8bc"/><stop offset="1" stop-color="#61caff"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#1cae91" stop-opacity=".18"/><stop offset="1" stop-color="#1cae91" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="480" rx="24" fill="url(#bg)"/>
+  <ellipse cx="1060" cy="90" rx="390" ry="310" fill="url(#glow)"/>
+  <g fill="none" stroke="#17363b" stroke-opacity=".5"><path d="M830 0v480M910 0v480M990 0v480M1070 0v480M1150 0v480M750 80h450M750 160h450M750 240h450M750 320h450M750 400h450"/></g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="48" y="40" width="42" height="42" rx="12" fill="#103b38" stroke="#2a6b5c"/>
+    <path d="m58 70 11-20 11 20M62 63h14" fill="none" stroke="#53e7c4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="104" y="61" fill="#eefbf8" font-size="22" font-weight="700" letter-spacing="3">ANCAP</text>
+    <text x="104" y="79" fill="#8faaa9" font-size="10" letter-spacing="2.4">AI WORKFLOW PLATFORM</text>
+    <text x="48" y="143" fill="#f0f9fc" font-size="42" font-weight="700">Turn a task into a workflow.</text>
+    <text x="48" y="193" fill="url(#accent)" font-size="42" font-weight="700">Run it. Review it. Deliver it.</text>
+    <text x="49" y="229" fill="#adc4cb" font-size="17">Versioned AI execution · ACP payments · Execution receipts</text>
+    <g transform="translate(48 274)">
+      <rect width="344" height="136" rx="16" fill="#0d222a" stroke="#244650"/>
+      <text x="22" y="33" fill="#50dfbd" font-size="12" font-weight="700" letter-spacing="1.5">01 / BUILD</text>
+      <text x="22" y="65" fill="#eef8fa" font-size="23" font-weight="700">Define the work</text>
+      <text x="22" y="94" fill="#a8bec7" font-size="15">Inputs, context and approved steps.</text>
+      <text x="22" y="116" fill="#a8bec7" font-size="15">Save a version you can repeat.</text>
+    </g>
+    <path d="M403 342h24m-7-7 7 7-7 7" fill="none" stroke="#50dfbd" stroke-width="2"/>
+    <g transform="translate(428 274)">
+      <rect width="344" height="136" rx="16" fill="#0d222a" stroke="#244650"/>
+      <text x="22" y="33" fill="#50dfbd" font-size="12" font-weight="700" letter-spacing="1.5">02 / RUN</text>
+      <text x="22" y="65" fill="#eef8fa" font-size="23" font-weight="700">Set the boundaries</text>
+      <text x="22" y="94" fill="#a8bec7" font-size="15">Choose a budget and execution mode.</text>
+      <text x="22" y="116" fill="#a8bec7" font-size="15">Track steps and ACP charges.</text>
+    </g>
+    <path d="M783 342h24m-7-7 7 7-7 7" fill="none" stroke="#50dfbd" stroke-width="2"/>
+    <g transform="translate(808 274)">
+      <rect width="344" height="136" rx="16" fill="#0d222a" stroke="#244650"/>
+      <text x="22" y="33" fill="#50dfbd" font-size="12" font-weight="700" letter-spacing="1.5">03 / DELIVER</text>
+      <text x="22" y="65" fill="#eef8fa" font-size="23" font-weight="700">Review the result</text>
+      <text x="22" y="94" fill="#a8bec7" font-size="15">Inspect output and execution evidence.</text>
+      <text x="22" y="116" fill="#a8bec7" font-size="15">Approve external delivery explicitly.</text>
+    </g>
+    <text x="48" y="452" fill="#8ea9b4" font-size="12" letter-spacing="1">WORKFLOW STUDIO / MARKETPLACE / API / ACP WALLET</text>
+    <text x="1152" y="452" text-anchor="end" fill="#50dfbd" font-size="14">ancap.cloud</text>
+  </g>
+</svg>

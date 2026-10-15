@@ -1,40 +1,102 @@
-# ANCAP — AI-Native Capital Platform
+<p align="center">
+  <a href="https://ancap.cloud"><img src="docs/assets/github/ancap-overview.svg" alt="ANCAP — build, run and deliver paid AI workflows" width="1200" /></a>
+</p>
 
-**Create, buy, and sell paid AI workflows.** ACP-first payments, a lean chain, post-quantum hybrid encryption, and an operating system for the agent economy — not a people marketplace and not an investment fund.
+<h1 align="center">ANCAP</h1>
+<p align="center"><strong>Build, buy and sell AI workflows — with ACP payments and execution receipts.</strong></p>
+<p align="center">For teams that need repeatable AI work, creators who package it, and developers who integrate it.</p>
 
-**Live product:** [ancap.cloud](https://ancap.cloud) · **Vision:** [docs/VISION.md](docs/VISION.md) · **Public docs:** [ancap-docs](https://github.com/ancapcloud/ancap-docs)
+<p align="center">
+  <a href="https://ancap.cloud/ai/workflows"><strong>Explore workflows</strong></a> ·
+  <a href="https://ancap.cloud/ai/studio"><strong>Open Studio</strong></a> ·
+  <a href="https://ancap.cloud/investors">For investors</a> ·
+  <a href="https://github.com/ancapcloud/ancap-docs">Documentation</a>
+</p>
+<p align="center">
+  <a href="https://github.com/ancapcloud/ancap/actions/workflows/backend-ci.yml"><img src="https://github.com/ancapcloud/ancap/actions/workflows/backend-ci.yml/badge.svg?branch=master" alt="Backend CI" /></a>
+  <a href="https://github.com/ancapcloud/ancap/actions/workflows/docs-ci.yml"><img src="https://github.com/ancapcloud/ancap/actions/workflows/docs-ci.yml/badge.svg?branch=master" alt="Documentation checks" /></a>
+  <a href="https://github.com/ancapcloud/ancap/actions/workflows/secret-hygiene.yml"><img src="https://github.com/ancapcloud/ancap/actions/workflows/secret-hygiene.yml/badge.svg?branch=master" alt="Secret hygiene checks" /></a>
+</p>
 
-### Why people use ANCAP
+## From a request to a paid result
 
-- **Paid AI workflows** — teams and agents ship workflows people can run and pay for in ACP
-- **ACP-first money** — native accounting unit with wACP on BSC when you need EVM rails
-- **Crypto you can audit** — Rust lean chain, experimental X-Wing hybrid envelopes, open bridge contracts
-- **Built for agents** — identity, reputation, strategies, staking, and settlement paths in one stack
+**Choose a workflow → supply inputs → review the ACP quote → run → inspect the result and receipt.**
 
-> **Disclaimer.** Software infrastructure for strategy execution and performance tracking. No guaranteed returns.
+ANCAP packages AI work into defined offers: a buyer, a task, required inputs, an output,
+limitations and a price. Creators can publish workflow versions; users can run them;
+teams can add context, review results and connect delivery tools.
 
-### Start here
+**For users.** Find a workflow for a concrete task, understand its inputs and cost,
+and keep the result with its execution record. Start with [the workflow catalog](https://ancap.cloud/ai/workflows).
 
-| What you need | Where |
-| --- | --- |
-| Short status | [STATUS.md](STATUS.md) |
-| Execution roadmap | [MASTER_ROADMAP.md](MASTER_ROADMAP.md) |
-| Status matrix | [docs/STATUS_MATRIX.md](docs/STATUS_MATRIX.md) |
-| Architecture (L1/L2/L3) | [docs/ARCHITECTURE_LAYERS.md](docs/ARCHITECTURE_LAYERS.md) |
-| Public integrations | [examples/](examples/README.md) · [docs/PUBLIC_INTEGRATION_EXAMPLES.md](docs/PUBLIC_INTEGRATION_EXAMPLES.md) |
-| Bridge / wACP contracts | [contracts/bridge-bsc/](contracts/bridge-bsc/README.md) |
-| ACP crypto crate | [ACP-crypto/](ACP-crypto/README.md) · [docs/ACP_CRYPTO.md](docs/ACP_CRYPTO.md) |
-| Oracle Free Tier ACP node plan | [docs/ORACLE_CLOUD_ACP_NODE_PLAN.md](docs/ORACLE_CLOUD_ACP_NODE_PLAN.md) |
-| Mobile wallet | [ancap-mobile/](ancap-mobile/README.md) |
-| Open-source track | [docs/OPEN_SOURCE_GITHUB_TRANSPARENCY.md](docs/OPEN_SOURCE_GITHUB_TRANSPARENCY.md) |
+**For creators and teams.** Build sequential workflows in [Studio](https://ancap.cloud/ai/studio),
+save versions, set spending limits, schedule runs and review output before delivery.
+Publishing alone does not start a paid run.
 
-### More docs (operators & contributors)
+**For developers.** Integrate through the API, work with execution receipts and use
+[public examples](examples/README.md). Connector accounts and provider keys are supplied
+by the customer; availability depends on configuration.
 
-Roadmap history — [ROADMAP.md](ROADMAP.md). Plan from zero to L3 — [docs/PLAN_L0_TO_L3.md](docs/PLAN_L0_TO_L3.md). Reputation 2.0 — [docs/REPUTATION_2.md](docs/REPUTATION_2.md). Service catalog — [docs/rfc/service-catalog.md](docs/rfc/service-catalog.md). Staking — [docs/STAKING.md](docs/STAKING.md). Delivery / risk / audit — [docs/DELIVERY_BOARD.md](docs/DELIVERY_BOARD.md), [docs/RISK_REGISTER.md](docs/RISK_REGISTER.md), [docs/AUDIT_CHECKLIST.md](docs/AUDIT_CHECKLIST.md). AI governance — [docs/AI_ISO_GOVERNANCE_NOTES.md](docs/AI_ISO_GOVERNANCE_NOTES.md). Whitepapers — [docs/WHITEPAPER_PROJECT.md](docs/WHITEPAPER_PROJECT.md), [docs/WHITEPAPER_ACP.md](docs/WHITEPAPER_ACP.md). Legal — [docs/LEGAL_TERMS_TEMPLATE.md](docs/LEGAL_TERMS_TEMPLATE.md). Changelog — [docs/CHANGELOG_PUBLIC.md](docs/CHANGELOG_PUBLIC.md).
+## Explore the product
 
-Secret hygiene and operator tooling: [docs/SECRET_ROTATION_RUNBOOK.md](docs/SECRET_ROTATION_RUNBOOK.md), [scripts/check_secret_hygiene.py](scripts/check_secret_hygiene.py), [scripts/install_git_hooks.py](scripts/install_git_hooks.py), [scripts/render_secret_rotation_evidence.py](scripts/render_secret_rotation_evidence.py), [scripts/generate_secret_hygiene_evidence.py](scripts/generate_secret_hygiene_evidence.py). On Windows hosts that only expose the Python launcher, the same helpers can be run as \py -3 scripts/check_secret_hygiene.py ...\, \py -3 scripts/install_git_hooks.py\, \py -3 scripts/install_git_hooks.py --check\, \py -3 scripts/render_secret_rotation_evidence.py ...\, and \py -3 scripts/generate_secret_hygiene_evidence.py ...\.
+- **[Workflow catalog](https://ancap.cloud/ai/workflows)** — defined tasks, inputs, outputs and ACP pricing.
+- **[Workflow Studio](https://ancap.cloud/ai/studio)** — versions, context, review, schedules and bounded execution.
+- **[ACP wallet](https://ancap.cloud/wallet/acp)** — separate balances, receive/send, fee review and activity.
+- **[Developer hub](https://ancap.cloud/developers)** — API and integration entry points.
+- **[Investor overview](https://ancap.cloud/investors)** — product, business model and planned company structure.
 
-Docs-repo track: [docs/ANCAP_DOCS_SPLIT.md](docs/ANCAP_DOCS_SPLIT.md), [docs/ANCAP_DOCS_REPO_BOOTSTRAP.md](docs/ANCAP_DOCS_REPO_BOOTSTRAP.md), [.github/bootstrap/](.github/bootstrap/), [scripts/bootstrap_ancap_docs_repo.py](scripts/bootstrap_ancap_docs_repo.py), [scripts/generate_ancap_docs_live_followup.py](scripts/generate_ancap_docs_live_followup.py).
+The web interface supports **English, Русский, Українська, Deutsch and 繁體中文**.
+
+## What is verified
+
+The latest documented release checks include **907 backend tests, 54 frontend tests
+and 38 browser scenarios passed**. These are dated release results, not a promise
+about every future commit. CI badges above show the latest checks for `master`.
+
+- [Workflow operations release](docs/WORKFLOW_OPERATIONS_RELEASE_2026-10-15.md) — implementation, verification and integration limits.
+- [Wallet usability release](docs/WALLET_UX_RELEASE_2026-10-15.md) — balance clarity, reviewed transfers and read-only production checks.
+- [Live LLM demonstration evidence](docs/investors/evidence/2026-10-14-local-ollama/README.md) — recorded execution with test credits and a local model.
+- [Current status](STATUS.md) · [Execution roadmap](MASTER_ROADMAP.md) · [Status matrix](docs/STATUS_MATRIX.md).
+
+Test credits and fixtures are identified in the evidence. They do not establish
+customer revenue or live chain settlement. Native mobile release checks remain
+open; research concepts and partner-assisted desks are distinct from executable
+AI workflows. See the linked release notes for remaining limitations.
+
+## Find your way around the code
+
+- [`frontend-app/`](frontend-app/) — Next.js, React and TypeScript web interface.
+- [`app/`](app/) and [`alembic/`](alembic/) — FastAPI services, workflow execution, ledger and database migrations.
+- [`ACP-crypto/`](ACP-crypto/README.md) — Rust ACP chain, wallet and mobile FFI sources.
+- [`ancap-mobile/`](ancap-mobile/README.md) — Expo / React Native wallet and shared packages.
+- [`contracts/bridge-bsc/`](contracts/bridge-bsc/README.md) — wACP bridge contract sources and tests.
+- [`docs/`](docs/) and [`examples/`](examples/README.md) — architecture, operations and public integration samples.
+
+ACP is the platform accounting/payment unit. Native ACP, wrapped wACP and internal
+workflow credits have different roles; [the wallet](https://ancap.cloud/wallet/acp)
+keeps the balances separate. Chain and bridge infrastructure supports the product;
+it is not a claim of investment returns.
+
+## Build with us
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the development flow and
+[FRONTEND.md](FRONTEND.md) for frontend setup. Start with a focused change and run
+the checks relevant to it. Database tests require a disposable test database.
+
+[Report a bug](https://github.com/ancapcloud/ancap/issues/new?template=bug_report.md) ·
+[Suggest a feature](https://github.com/ancapcloud/ancap/issues/new?template=feature_request.md) ·
+[Read the security policy](SECURITY.md) · [Repository license terms](LICENSE)
+
+Never post keys, seed phrases, keystores or production credentials in issues or pull requests.
+
+---
+
+<details>
+<summary><strong>Advanced reference — operators, architecture and historical implementation notes</strong></summary>
+
+This reference preserves existing documentation and automation contracts. For current
+release scope, use the dated evidence and status links above; older milestone notes
+describe their original implementation stage.
 
 ### Operator / CI documentation contracts
 
@@ -201,7 +263,7 @@ Monorepo for the ANCAP platform, native ACP chain, BSC bridge contracts, and mob
 - **TypeScript**
 - **Tailwind CSS** + Custom CSS Variables
 - **JWT Authentication**
-- **Internationalization** (EN/RU)
+- **Internationalization** (EN/RU/UK/DE/zh-Hant)
 
 Default language: **EN**.
 
@@ -693,4 +755,7 @@ In tests, automatically: `DATABASE_URL` is converted to `postgresql+asyncpg://..
 
 ## License
 
-Proprietary / by agreement.
+See [LICENSE](LICENSE) for the repository terms. Component-specific notices, where present, also apply.
+
+
+</details>
