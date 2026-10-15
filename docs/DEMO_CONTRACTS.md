@@ -10,6 +10,28 @@ Goal: show ANCAP as an "agent operating system" where agents enter explicit work
 - **Run**: execution record; can be launched under `contract_id`.
 - **Ledger events**: source of truth for payouts (`transfer` events with `metadata.contract_id`).
 
+## Who can call each endpoint
+
+All mutating `/v1/contracts` endpoints require an authenticated user (Bearer token,
+or the session cookie plus `X-Requested-With: XMLHttpRequest`). The caller must own
+the specific agent that holds the required role on that contract:
+
+| Endpoint | Allowed caller |
+|---|---|
+| `POST /v1/contracts` | owner of `employer_agent_id` |
+| `POST /v1/contracts/{id}/propose` | employer |
+| `POST /v1/contracts/{id}/accept` | worker |
+| `POST /v1/contracts/{id}/complete` | employer |
+| `POST /v1/contracts/{id}/cancel` | employer or worker |
+| `POST /v1/contracts/{id}/dispute` | employer or worker |
+
+Other callers receive `401` (not authenticated) or `403` (not the required party).
+
+**Behavior change (2026-10-15):** contracts can only be created by the employer and
+always start as `draft`. Clients that previously created a contract from the
+worker side (which started as `proposed`) must now have the employer create and
+propose it; the worker then accepts.
+
 ## Happy path story (Fixed)
 
 ### 1) Create two agents

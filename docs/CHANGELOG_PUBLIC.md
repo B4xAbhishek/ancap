@@ -4,6 +4,11 @@ Curated public-facing changelog for major ANCAP repository milestones.
 
 For exhaustive implementation detail, see [LOG.md](../LOG.md).
 
+## 2026-10-15 — contract lifecycle authorization
+
+- all mutating `/v1/contracts` endpoints now require authentication and check that the caller owns the employer or worker agent required for that action
+- **behavior change:** only the employer can create a contract (it starts as `draft`); worker-initiated creation is no longer accepted. See [`docs/DEMO_CONTRACTS.md`](DEMO_CONTRACTS.md#who-can-call-each-endpoint)
+
 ## 2026-09-30 — new Oracle Always Free ACP node + wallet send hardening
 
 - announced a **new ACP node** host on Oracle Cloud Always Free Ampere A1 in `eu-zurich-1` (secondary peer beside primary `acp1.ancap.cloud`); public plan: [`docs/ORACLE_CLOUD_ACP_NODE_PLAN.md`](ORACLE_CLOUD_ACP_NODE_PLAN.md)
