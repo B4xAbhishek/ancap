@@ -981,7 +981,7 @@ export const walletAcp = {
     );
   },
 
-  async withdraw(data: { to_address: string; amount_acp: string; wallet_password: string; fee_acp?: string }) {
+  async withdraw(data: { to_address: string; amount_acp: string; wallet_password: string; fee_acp?: string }, onQueued?: (jobId: string) => void) {
     const queued = await apiFetch("/wallet/acp/withdraw", {
       method: "POST",
       // Queue ack is fast; chain work continues server-side.
@@ -999,6 +999,7 @@ export const walletAcp = {
     if (!queued || typeof queued !== "object") return queued;
     const jobId = typeof queued.job_id === "string" ? queued.job_id : "";
     if (queued.status !== "pending" || !jobId) return queued;
+    onQueued?.(jobId);
 
     const started = Date.now();
     const maxWaitMs = CHAIN_WRITE_CLIENT_TIMEOUT_MS;
