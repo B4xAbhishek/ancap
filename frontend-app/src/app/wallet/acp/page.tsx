@@ -173,10 +173,12 @@ export default function AcpWalletPage() {
     wallet?.view_mode === "operator_hot" ||
     wallet?.primary_kind === "operator_total" ||
     wallet?.primary_kind === "chain_supply";
-  const available =
-    wallet?.probe_status === "unavailable"
-      ? null
-      : (wallet?.withdrawable_now_acp ?? wallet?.available_acp ?? null);
+  const nativeDataUnavailable =
+    wallet?.probe_status === "unavailable" ||
+    wallet?.probe_status === "degraded";
+  const available = nativeDataUnavailable
+    ? null
+    : (wallet?.withdrawable_now_acp ?? wallet?.available_acp ?? null);
   const validation = transferCheck(recipient, amount, fee, available);
   const validationMessage = (code: string | null) =>
     code === "address"
@@ -234,7 +236,11 @@ export default function AcpWalletPage() {
       if (balance.status === "rejected") {
         try {
           value = await walletAcp.getBalance();
-        } catch {
+        } catch (e) {
+          if (e instanceof ApiError && e.status === 401) {
+            logout();
+            return;
+          }
           /* Keep the last known balance, labelled as stale. */
         }
         if (epoch !== generation.current) return;
@@ -461,7 +467,11 @@ export default function AcpWalletPage() {
   const summary = (
     <div className={s.metrics}>
       {[
-        [c.onChain, selectOnChainAtDeposit(wallet), c.network],
+        [
+          c.onChain,
+          nativeDataUnavailable ? null : selectOnChainAtDeposit(wallet),
+          c.network,
+        ],
         [c.credits, selectPlatformLedger(wallet), c.creditsHint],
         [
           c.reserved,

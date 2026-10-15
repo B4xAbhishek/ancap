@@ -23,6 +23,7 @@ async function fixtures(
     guest?: boolean;
     expired?: boolean;
     unavailable?: boolean;
+    degraded?: boolean;
     historyError?: boolean;
     personalize?: boolean;
     operator?: boolean;
@@ -74,7 +75,15 @@ async function fixtures(
                   view_mode: "operator_hot",
                   withdrawable_now_acp: "5",
                 }
-              : balance,
+              : options.degraded
+                ? {
+                    ...balance,
+                    probe_status: "degraded",
+                    balance_status: "degraded",
+                    withdrawable_now_acp: "0",
+                    on_chain_at_deposit_acp: "0",
+                  }
+                : balance,
           });
     if (path.endsWith("/transactions"))
       return options.historyError
@@ -338,4 +347,25 @@ test("an expired session clears wallet details", async ({ page }) => {
     page.getByRole("region", { name: "Available to send" }),
   ).toHaveCount(0);
   await expect(page.getByText(ownAddress, { exact: true })).toHaveCount(0);
+});
+
+test("degraded node data is unknown rather than a zero spendable balance", async ({
+  page,
+}) => {
+  await fixtures(page, { degraded: true });
+  await page.goto("/wallet/acp");
+  await expect(
+    page.getByText("Some wallet data is unavailable. Refresh to try again."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Available to send" }),
+  ).toContainText("— ACP");
+  await page.getByRole("button", { name: "Send", exact: true }).first().click();
+  await page
+    .getByLabel("Recipient ACP address", { exact: true })
+    .fill(recipient);
+  await page.getByRole("textbox", { name: /Amount \(ACP\)/ }).fill("1");
+  await expect(
+    page.getByRole("button", { name: "Review transfer", exact: false }),
+  ).toBeDisabled();
 });
